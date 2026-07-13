@@ -1,0 +1,13 @@
+# مسار العقيدة — beginner aqeedah journey.
+slug: masar-alaqeedah
+title_ar: مسار العقيدة
+description_ar: رحلة متدرجة في تعلم العقيدة الصحيحة، تبدأ بثلاثة الأصول التي يُسأل عنها العبد في قبره
+level: beginner
+science: aqeedah
+sort_order: 1
+is_published: false # published in M6 once series are synced
+stages:
+  - title_ar: "المرحلة الأولى: الأصول الثلاثة"
+    description_ar: معرفة العبد ربه ودينه ونبيه صلى الله عليه وسلم
+    items:
+      - series: sharh-thalathat-alusul

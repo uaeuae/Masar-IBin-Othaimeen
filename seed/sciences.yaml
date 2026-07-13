@@ -1,0 +1,33 @@
+# العلوم الشرعية — top-level categories.
+# slug: stable Latin identifier (natural key for idempotent ingestion). Never rename.
+sciences:
+  - slug: aqeedah
+    name_ar: العقيدة
+    description_ar: التوحيد وأصول الاعتقاد
+    icon: mosque
+    sort_order: 1
+  - slug: fiqh
+    name_ar: الفقه
+    description_ar: الأحكام العملية وفقه العبادات والمعاملات
+    icon: scale
+    sort_order: 2
+  - slug: hadith
+    name_ar: الحديث
+    description_ar: شروح كتب السنة والأحاديث النبوية
+    icon: book
+    sort_order: 3
+  - slug: tafsir
+    name_ar: التفسير
+    description_ar: تفسير القرآن الكريم وعلومه
+    icon: quran
+    sort_order: 4
+  - slug: usul-fiqh
+    name_ar: أصول الفقه
+    description_ar: القواعد التي يُبنى عليها استنباط الأحكام
+    icon: foundation
+    sort_order: 5
+  - slug: seerah-adab
+    name_ar: السيرة والآداب
+    description_ar: السيرة النبوية والأخلاق والآداب الشرعية
+    icon: heart
+    sort_order: 6

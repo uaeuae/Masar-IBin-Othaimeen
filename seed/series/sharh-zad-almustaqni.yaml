@@ -1,0 +1,10 @@
+# شرح زاد المستقنع — the sheikh's flagship fiqh explanation.
+slug: sharh-zad-almustaqni
+title_ar: شرح زاد المستقنع
+description_ar: الشرح الممتع — شرح متن زاد المستقنع في اختصار المقنع للحجاوي رحمه الله
+science: fiqh
+status: draft
+youtube_playlists: [] # long series; may span multiple playlists, order matters
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

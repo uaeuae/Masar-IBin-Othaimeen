@@ -1,0 +1,27 @@
+{
+  "name": "@masar/ingest",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "validate:seeds": "tsx src/cli.ts validate-seeds",
+    "sync:youtube": "tsx src/cli.ts sync-youtube",
+    "apply:seeds": "tsx src/cli.ts apply-seeds",
+    "publish:catalog": "tsx src/cli.ts publish-catalog",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "yaml": "^2.5.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.1"
+  }
+}

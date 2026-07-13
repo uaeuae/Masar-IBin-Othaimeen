@@ -1,0 +1,11 @@
+# شرح ثلاثة الأصول — the canonical beginner aqeedah text.
+slug: sharh-thalathat-alusul
+title_ar: شرح ثلاثة الأصول
+description_ar: شرح رسالة "ثلاثة الأصول وأدلتها" لشيخ الإسلام محمد بن عبدالوهاب رحمه الله
+science: aqeedah
+status: draft # becomes active in M6 once playlist IDs are curated and synced
+youtube_playlists: [] # filled during curation (M6) from @ibnothaimeentv
+overrides:
+  exclude_videos: []
+  # strip episode-number prefixes like "01- " or "12 | " from lesson titles
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'
