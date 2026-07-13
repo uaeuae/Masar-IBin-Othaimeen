@@ -62,27 +62,38 @@ void main() {
     expect(aqeedah.progress, closeTo(2 / 13, 0.001));
   });
 
-  test('journey detail assembles stages in order with per-series progress', () async {
-    await catalog.importCatalog(loadFixture());
-    await progress.markCompleted('fx-usul-01');
+  test(
+    'journey detail assembles stages in order with per-series progress',
+    () async {
+      await catalog.importCatalog(loadFixture());
+      await progress.markCompleted('fx-usul-01');
 
-    final detail = (await catalog.watchJourneyDetail('masar-alaqeedah').first)!;
-    expect(detail.stages, hasLength(2));
-    expect(detail.stages.first.titleAr, contains('الأصول'));
-    expect(detail.stages.first.series.single.completedCount, 1);
-    expect(detail.stages.first.series.single.lessonCount, 8);
-    expect(detail.currentStagePosition, 1);
-    expect(detail.summary.enrolled, isFalse);
+      final detail = (await catalog
+          .watchJourneyDetail('masar-alaqeedah')
+          .first)!;
+      expect(detail.stages, hasLength(2));
+      expect(detail.stages.first.titleAr, contains('الأصول'));
+      expect(detail.stages.first.series.single.completedCount, 1);
+      expect(detail.stages.first.series.single.lessonCount, 8);
+      expect(detail.currentStagePosition, 1);
+      expect(detail.summary.enrolled, isFalse);
 
-    expect(await catalog.watchJourneyDetail('no-such-journey').first, isNull);
-  });
+      expect(await catalog.watchJourneyDetail('no-such-journey').first, isNull);
+    },
+  );
 
   test('series detail lists lessons with progress and resume target', () async {
     await catalog.importCatalog(loadFixture());
     await progress.markCompleted('fx-zad-01', durationSeconds: 3600);
-    await progress.saveWatchPosition(videoId: 'fx-zad-02', watchedSeconds: 600, durationSeconds: 3480);
+    await progress.saveWatchPosition(
+      videoId: 'fx-zad-02',
+      watchedSeconds: 600,
+      durationSeconds: 3480,
+    );
 
-    final detail = (await catalog.watchSeriesDetail('sharh-zad-almustaqni').first)!;
+    final detail = (await catalog
+        .watchSeriesDetail('sharh-zad-almustaqni')
+        .first)!;
     expect(detail.lessons, hasLength(10));
     expect(detail.series.completedCount, 1);
     expect(detail.lessons[1].watchedSeconds, 600);
@@ -92,28 +103,48 @@ void main() {
   test('unavailable lessons are listed but excluded from counts', () async {
     await catalog.importCatalog(loadFixture());
 
-    final detail = (await catalog.watchSeriesDetail('sharh-alwasitiyah').first)!;
+    final detail = (await catalog
+        .watchSeriesDetail('sharh-alwasitiyah')
+        .first)!;
     expect(detail.lessons, hasLength(6));
     expect(detail.series.lessonCount, 5);
     expect(detail.lessons.last.status, LessonStatus.unavailable);
   });
 
-  test('continue watching orders by recency, needs >=30s, skips completed', () async {
-    await catalog.importCatalog(loadFixture());
-    final t0 = DateTime(2026, 7, 1, 10);
-    var callCount = 0;
-    final clocked = ProgressRepository(db, clock: () => t0.add(Duration(minutes: callCount++)));
+  test(
+    'continue watching orders by recency, needs >=30s, skips completed',
+    () async {
+      await catalog.importCatalog(loadFixture());
+      final t0 = DateTime(2026, 7, 1, 10);
+      var callCount = 0;
+      final clocked = ProgressRepository(
+        db,
+        clock: () => t0.add(Duration(minutes: callCount++)),
+      );
 
-    await clocked.saveWatchPosition(videoId: 'fx-riyd-01', watchedSeconds: 600, durationSeconds: 2580);
-    await clocked.saveWatchPosition(videoId: 'fx-zad-01', watchedSeconds: 900, durationSeconds: 3600);
-    await clocked.saveWatchPosition(videoId: 'fx-usul-01', watchedSeconds: 10, durationSeconds: 2700); // too short
-    await clocked.markCompleted('fx-wast-01'); // completed → excluded
+      await clocked.saveWatchPosition(
+        videoId: 'fx-riyd-01',
+        watchedSeconds: 600,
+        durationSeconds: 2580,
+      );
+      await clocked.saveWatchPosition(
+        videoId: 'fx-zad-01',
+        watchedSeconds: 900,
+        durationSeconds: 3600,
+      );
+      await clocked.saveWatchPosition(
+        videoId: 'fx-usul-01',
+        watchedSeconds: 10,
+        durationSeconds: 2700,
+      ); // too short
+      await clocked.markCompleted('fx-wast-01'); // completed → excluded
 
-    final items = await catalog.watchContinueWatching().first;
-    expect(items.map((i) => i.videoId), ['fx-zad-01', 'fx-riyd-01']);
-    expect(items.first.seriesTitleAr, 'شرح زاد المستقنع');
-    expect(items.first.progress, closeTo(900 / 3600, 0.001));
-  });
+      final items = await catalog.watchContinueWatching().first;
+      expect(items.map((i) => i.videoId), ['fx-zad-01', 'fx-riyd-01']);
+      expect(items.first.seriesTitleAr, 'شرح زاد المستقنع');
+      expect(items.first.progress, closeTo(900 / 3600, 0.001));
+    },
+  );
 
   test('re-import preserves progress and enrollments', () async {
     final data = loadFixture();
@@ -121,12 +152,14 @@ void main() {
     await progress.markCompleted('fx-usul-01');
     await progress.enroll('masar-alaqeedah');
 
-    await catalog.importCatalog(CatalogData(
-      version: 2,
-      sciences: data.sciences,
-      series: data.series,
-      journeys: data.journeys,
-    ));
+    await catalog.importCatalog(
+      CatalogData(
+        version: 2,
+        sciences: data.sciences,
+        series: data.series,
+        journeys: data.journeys,
+      ),
+    );
 
     expect(await catalog.currentVersion(), 2);
     final summaries = await catalog.watchJourneySummaries().first;
@@ -138,9 +171,15 @@ void main() {
   test('saveWatchPosition never un-completes a lesson', () async {
     await catalog.importCatalog(loadFixture());
     await progress.markCompleted('fx-usul-01', durationSeconds: 2700);
-    await progress.saveWatchPosition(videoId: 'fx-usul-01', watchedSeconds: 120, durationSeconds: 2700);
+    await progress.saveWatchPosition(
+      videoId: 'fx-usul-01',
+      watchedSeconds: 120,
+      durationSeconds: 2700,
+    );
 
-    final detail = (await catalog.watchSeriesDetail('sharh-thalathat-alusul').first)!;
+    final detail = (await catalog
+        .watchSeriesDetail('sharh-thalathat-alusul')
+        .first)!;
     expect(detail.lessons.first.completed, isTrue);
     expect(detail.lessons.first.watchedSeconds, 120);
   });

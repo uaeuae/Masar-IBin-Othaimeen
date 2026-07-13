@@ -15,7 +15,8 @@ import 'view_models.dart';
 /// - catalog tables are replaced wholesale, in one transaction
 /// - user tables (lesson_progress, journey_enrollments) are NEVER touched
 class CatalogRepository {
-  CatalogRepository(this.db, {AssetBundle? bundle}) : _bundle = bundle ?? rootBundle;
+  CatalogRepository(this.db, {AssetBundle? bundle})
+    : _bundle = bundle ?? rootBundle;
 
   final AppDatabase db;
   final AssetBundle _bundle;
@@ -114,7 +115,9 @@ class CatalogRepository {
         ]);
       });
 
-      await db.into(db.catalogInfo).insertOnConflictUpdate(
+      await db
+          .into(db.catalogInfo)
+          .insertOnConflictUpdate(
             CatalogInfoCompanion(
               id: const Value(1),
               version: Value(data.version),
@@ -141,30 +144,33 @@ class CatalogRepository {
   ''';
 
   JourneySummary _summaryFromRow(QueryRow row) => JourneySummary(
-        slug: row.read<String>('slug'),
-        titleAr: row.read<String>('title_ar'),
-        descriptionAr: row.readNullable<String>('description_ar'),
-        level: JourneyLevel.fromJson(row.read<String>('level')),
-        scienceSlug: row.readNullable<String>('science_slug'),
-        coverUrl: row.readNullable<String>('cover_url'),
-        stageCount: row.read<int>('stage_count'),
-        lessonCount: row.read<int>('lesson_count'),
-        completedCount: row.read<int>('completed_count'),
-        enrolled: row.read<int>('enrolled') != 0,
-      );
+    slug: row.read<String>('slug'),
+    titleAr: row.read<String>('title_ar'),
+    descriptionAr: row.readNullable<String>('description_ar'),
+    level: JourneyLevel.fromJson(row.read<String>('level')),
+    scienceSlug: row.readNullable<String>('science_slug'),
+    coverUrl: row.readNullable<String>('cover_url'),
+    stageCount: row.read<int>('stage_count'),
+    lessonCount: row.read<int>('lesson_count'),
+    completedCount: row.read<int>('completed_count'),
+    enrolled: row.read<int>('enrolled') != 0,
+  );
 
   Set<ResultSetImplementation> get _journeyReads => {
-        db.journeys,
-        db.journeyStages,
-        db.journeyItems,
-        db.lessons,
-        db.lessonProgress,
-        db.journeyEnrollments,
-      };
+    db.journeys,
+    db.journeyStages,
+    db.journeyItems,
+    db.lessons,
+    db.lessonProgress,
+    db.journeyEnrollments,
+  };
 
   Stream<List<JourneySummary>> watchJourneySummaries() {
     return db
-        .customSelect('$_journeySummarySql ORDER BY j.sort_order, j.slug', readsFrom: _journeyReads)
+        .customSelect(
+          '$_journeySummarySql ORDER BY j.sort_order, j.slug',
+          readsFrom: _journeyReads,
+        )
         .watch()
         .map((rows) => rows.map(_summaryFromRow).toList());
   }
@@ -197,24 +203,40 @@ class CatalogRepository {
       ORDER BY i.stage_position, i.position
       ''',
       variables: [Variable.withString(slug)],
-      readsFrom: {db.journeyItems, db.seriesEntries, db.lessons, db.lessonProgress},
+      // The summary/stages are re-fetched inside asyncMap, so every table
+      // they read must be listed here — notably journey_enrollments, or the
+      // detail screen would never react to enrolling.
+      readsFrom: {
+        db.journeyItems,
+        db.seriesEntries,
+        db.lessons,
+        db.lessonProgress,
+        db.journeys,
+        db.journeyStages,
+        db.journeyEnrollments,
+      },
     );
 
     return itemsQuery.watch().asyncMap((itemRows) async {
-      final summaryRow = await db.customSelect(
-        '$_journeySummarySql WHERE j.slug = ?',
-        variables: [Variable.withString(slug)],
-      ).getSingleOrNull();
+      final summaryRow = await db
+          .customSelect(
+            '$_journeySummarySql WHERE j.slug = ?',
+            variables: [Variable.withString(slug)],
+          )
+          .getSingleOrNull();
       if (summaryRow == null) return null;
 
-      final stageRows = await (db.select(db.journeyStages)
-            ..where((s) => s.journeySlug.equals(slug))
-            ..orderBy([(s) => OrderingTerm.asc(s.position)]))
-          .get();
+      final stageRows =
+          await (db.select(db.journeyStages)
+                ..where((s) => s.journeySlug.equals(slug))
+                ..orderBy([(s) => OrderingTerm.asc(s.position)]))
+              .get();
 
       final seriesByStage = <int, List<SeriesWithProgress>>{};
       for (final row in itemRows) {
-        seriesByStage.putIfAbsent(row.read<int>('stage_position'), () => []).add(
+        seriesByStage
+            .putIfAbsent(row.read<int>('stage_position'), () => [])
+            .add(
               SeriesWithProgress(
                 slug: row.read<String>('slug'),
                 titleAr: row.read<String>('title_ar'),
@@ -261,7 +283,9 @@ class CatalogRepository {
     );
 
     return lessonsQuery.watch().asyncMap((lessonRows) async {
-      final seriesRow = await (db.select(db.seriesEntries)..where((s) => s.slug.equals(slug))).getSingleOrNull();
+      final seriesRow = await (db.select(
+        db.seriesEntries,
+      )..where((s) => s.slug.equals(slug))).getSingleOrNull();
       if (seriesRow == null) return null;
 
       final lessons = [
@@ -277,7 +301,9 @@ class CatalogRepository {
           ),
       ];
 
-      final active = lessons.where((l) => l.status == LessonStatus.active).toList();
+      final active = lessons
+          .where((l) => l.status == LessonStatus.active)
+          .toList();
       return SeriesDetail(
         series: SeriesWithProgress(
           slug: seriesRow.slug,
@@ -287,7 +313,10 @@ class CatalogRepository {
           scienceSlug: seriesRow.scienceSlug,
           lessonCount: active.length,
           completedCount: active.where((l) => l.completed).length,
-          totalDurationSeconds: active.fold(0, (sum, l) => sum + (l.durationSeconds ?? 0)),
+          totalDurationSeconds: active.fold(
+            0,
+            (sum, l) => sum + (l.durationSeconds ?? 0),
+          ),
         ),
         lessons: lessons,
       );
@@ -320,7 +349,9 @@ class CatalogRepository {
                 seriesTitleAr: row.read<String>('series_title'),
                 watchedSeconds: row.read<int>('watched_seconds'),
                 durationSeconds: row.readNullable<int>('duration_seconds'),
-                lastWatchedAt: DateTime.fromMillisecondsSinceEpoch(row.read<int>('last_watched_at') * 1000),
+                lastWatchedAt: DateTime.fromMillisecondsSinceEpoch(
+                  row.read<int>('last_watched_at') * 1000,
+                ),
               ),
           ],
         );

@@ -75,10 +75,7 @@ class StageDetail {
 }
 
 class JourneyDetail {
-  const JourneyDetail({
-    required this.summary,
-    required this.stages,
-  });
+  const JourneyDetail({required this.summary, required this.stages});
 
   final JourneySummary summary;
   final List<StageDetail> stages;
@@ -120,10 +117,7 @@ class LessonWithProgress {
 }
 
 class SeriesDetail {
-  const SeriesDetail({
-    required this.series,
-    required this.lessons,
-  });
+  const SeriesDetail({required this.series, required this.lessons});
 
   final SeriesWithProgress series;
   final List<LessonWithProgress> lessons;

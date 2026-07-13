@@ -20,7 +20,8 @@ abstract class CatalogData with _$CatalogData {
     @Default([]) List<CatalogJourney> journeys,
   }) = _CatalogData;
 
-  factory CatalogData.fromJson(Map<String, dynamic> json) => _$CatalogDataFromJson(json);
+  factory CatalogData.fromJson(Map<String, dynamic> json) =>
+      _$CatalogDataFromJson(json);
 }
 
 @freezed
@@ -33,7 +34,8 @@ abstract class CatalogScience with _$CatalogScience {
     @Default(0) int sortOrder,
   }) = _CatalogScience;
 
-  factory CatalogScience.fromJson(Map<String, dynamic> json) => _$CatalogScienceFromJson(json);
+  factory CatalogScience.fromJson(Map<String, dynamic> json) =>
+      _$CatalogScienceFromJson(json);
 }
 
 @freezed
@@ -47,7 +49,8 @@ abstract class CatalogSeries with _$CatalogSeries {
     @Default([]) List<CatalogLesson> lessons,
   }) = _CatalogSeries;
 
-  factory CatalogSeries.fromJson(Map<String, dynamic> json) => _$CatalogSeriesFromJson(json);
+  factory CatalogSeries.fromJson(Map<String, dynamic> json) =>
+      _$CatalogSeriesFromJson(json);
 }
 
 @freezed
@@ -61,7 +64,8 @@ abstract class CatalogLesson with _$CatalogLesson {
     @Default(LessonStatus.active) LessonStatus status,
   }) = _CatalogLesson;
 
-  factory CatalogLesson.fromJson(Map<String, dynamic> json) => _$CatalogLessonFromJson(json);
+  factory CatalogLesson.fromJson(Map<String, dynamic> json) =>
+      _$CatalogLessonFromJson(json);
 }
 
 @freezed
@@ -77,7 +81,8 @@ abstract class CatalogJourney with _$CatalogJourney {
     @Default([]) List<CatalogStage> stages,
   }) = _CatalogJourney;
 
-  factory CatalogJourney.fromJson(Map<String, dynamic> json) => _$CatalogJourneyFromJson(json);
+  factory CatalogJourney.fromJson(Map<String, dynamic> json) =>
+      _$CatalogJourneyFromJson(json);
 }
 
 @freezed
@@ -88,7 +93,8 @@ abstract class CatalogStage with _$CatalogStage {
     @Default([]) List<CatalogStageItem> items,
   }) = _CatalogStage;
 
-  factory CatalogStage.fromJson(Map<String, dynamic> json) => _$CatalogStageFromJson(json);
+  factory CatalogStage.fromJson(Map<String, dynamic> json) =>
+      _$CatalogStageFromJson(json);
 }
 
 @freezed
@@ -98,5 +104,6 @@ abstract class CatalogStageItem with _$CatalogStageItem {
     required String series,
   }) = _CatalogStageItem;
 
-  factory CatalogStageItem.fromJson(Map<String, dynamic> json) => _$CatalogStageItemFromJson(json);
+  factory CatalogStageItem.fromJson(Map<String, dynamic> json) =>
+      _$CatalogStageItemFromJson(json);
 }

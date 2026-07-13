@@ -5,10 +5,15 @@ import 'db/database.dart';
 /// Writes to the user-owned tables. Local-first; `synced_at` stays null
 /// until Phase 2 introduces optional account sync.
 class ProgressRepository {
-  ProgressRepository(this.db, {DateTime Function()? clock}) : _now = clock ?? DateTime.now;
+  ProgressRepository(this.db, {DateTime Function()? clock})
+    : _now = clock ?? DateTime.now;
 
   final AppDatabase db;
   final DateTime Function() _now;
+
+  Future<LessonProgressData?> getProgress(String videoId) => (db.select(
+    db.lessonProgress,
+  )..where((p) => p.videoId.equals(videoId))).getSingleOrNull();
 
   /// Upserts watch position. Never un-completes a lesson: rewatching part of
   /// a finished lesson must not reset the checkmark.
@@ -41,7 +46,9 @@ class ProgressRepository {
 
   Future<void> markCompleted(String videoId, {int? durationSeconds}) async {
     final now = _now();
-    await db.into(db.lessonProgress).insertOnConflictUpdate(
+    await db
+        .into(db.lessonProgress)
+        .insertOnConflictUpdate(
           LessonProgressCompanion(
             videoId: Value(videoId),
             watchedSeconds: Value(durationSeconds ?? 0),
@@ -55,7 +62,9 @@ class ProgressRepository {
 
   Future<void> enroll(String journeySlug) async {
     final now = _now();
-    await db.into(db.journeyEnrollments).insert(
+    await db
+        .into(db.journeyEnrollments)
+        .insert(
           JourneyEnrollmentsCompanion.insert(
             journeySlug: journeySlug,
             enrolledAt: now,
@@ -66,8 +75,8 @@ class ProgressRepository {
   }
 
   Future<void> touchEnrollment(String journeySlug) async {
-    await (db.update(db.journeyEnrollments)..where((e) => e.journeySlug.equals(journeySlug))).write(
-      JourneyEnrollmentsCompanion(lastActivityAt: Value(_now())),
-    );
+    await (db.update(db.journeyEnrollments)
+          ..where((e) => e.journeySlug.equals(journeySlug)))
+        .write(JourneyEnrollmentsCompanion(lastActivityAt: Value(_now())));
   }
 }

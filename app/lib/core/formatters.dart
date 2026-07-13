@@ -41,6 +41,21 @@ String stageCountLabel(int count) {
   );
 }
 
+/// "سلسلة واحدة" / "سلسلتان" / "٣ سلاسل" / "١١ سلسلة"
+String seriesCountLabel(int count) {
+  final n = arabicDigits(count);
+  return Intl.pluralLogic(
+    count,
+    locale: 'ar',
+    zero: 'لا سلاسل بعد',
+    one: 'سلسلة واحدة',
+    two: 'سلسلتان',
+    few: '$n سلاسل',
+    many: '$n سلسلة',
+    other: '$n سلسلة',
+  );
+}
+
 /// Human duration for lesson/series lengths: "٤٥ دقيقة", "ساعة و١٠ دقائق", "٣ ساعات".
 String durationLabel(Duration duration) {
   final hours = duration.inHours;

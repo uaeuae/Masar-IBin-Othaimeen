@@ -36,6 +36,7 @@ class Lessons extends Table {
   IntColumn get position => integer()();
   TextColumn get titleAr => text()();
   IntColumn get durationSeconds => integer().nullable()();
+
   /// 'active' | 'hidden' | 'unavailable'
   TextColumn get status => text().withDefault(const Constant('active'))();
 
@@ -47,6 +48,7 @@ class Journeys extends Table {
   TextColumn get slug => text()();
   TextColumn get titleAr => text()();
   TextColumn get descriptionAr => text().nullable()();
+
   /// 'beginner' | 'intermediate' | 'advanced'
   TextColumn get level => text()();
   TextColumn get scienceSlug => text().nullable()();
