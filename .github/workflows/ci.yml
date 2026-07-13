@@ -14,6 +14,8 @@ jobs:
         working-directory: app
     steps:
       - uses: actions/checkout@v4
+      # drift unit tests need a loadable sqlite3 shared library on the host
+      - run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
