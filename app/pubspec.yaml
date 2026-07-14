@@ -78,3 +78,9 @@ flutter:
           weight: 400
         - asset: assets/fonts/Amiri-Bold.ttf
           weight: 700
+    - family: IBMPlexMono
+      fonts:
+        - asset: assets/fonts/IBMPlexMono-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexMono-Medium.ttf
+          weight: 500

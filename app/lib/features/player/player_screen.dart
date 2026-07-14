@@ -272,8 +272,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                     child: Row(
                       children: [
                         Text(
-                          _clockLtr(_position),
+                          clockLabelLtr(_position),
                           style: theme.textTheme.labelSmall?.copyWith(
+                            fontFamily: kMonoFont,
+                            fontSize: 11,
                             color: scheme.onSurfaceVariant,
                           ),
                         ),
@@ -293,8 +295,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          total == null ? '--:--' : _clockLtr(total),
+                          total == null ? '--:--' : clockLabelLtr(total),
                           style: theme.textTheme.labelSmall?.copyWith(
+                            fontFamily: kMonoFont,
+                            fontSize: 11,
                             color: scheme.onSurfaceVariant,
                           ),
                         ),
@@ -470,6 +474,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                               duration: lesson.durationSeconds == null
                                   ? null
                                   : Duration(seconds: lesson.durationSeconds!),
+                              monoClock: true,
                               showDivider: index != remaining.length - 1,
                               onTap: () => _startLesson(lesson.videoId),
                             ),
@@ -484,15 +489,6 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         ),
       ),
     );
-  }
-
-  /// Western-digit mm:ss for the LTR mono position row, per the design.
-  static String _clockLtr(Duration d) {
-    final h = d.inHours;
-    final m = d.inMinutes.remainder(60);
-    final s = d.inSeconds.remainder(60);
-    String two(int v) => v.toString().padLeft(2, '0');
-    return h > 0 ? '$h:${two(m)}:${two(s)}' : '${two(m)}:${two(s)}';
   }
 }
 

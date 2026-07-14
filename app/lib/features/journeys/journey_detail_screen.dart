@@ -246,10 +246,10 @@ class _StageContent extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(AppRadius.group),
                     border: Border.all(color: scheme.primary, width: 1.5),
                     boxShadow: [
-                      BoxShadow(
-                        color: masar.heroShadow,
+                      const BoxShadow(
+                        color: Color(0x1F1E5B45), // rgba(30,91,69,0.12)
                         blurRadius: 18,
-                        offset: const Offset(0, 6),
+                        offset: Offset(0, 6),
                       ),
                     ],
                   ),

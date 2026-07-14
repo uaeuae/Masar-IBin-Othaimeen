@@ -16,6 +16,7 @@ class LessonRow extends StatelessWidget {
     this.duration,
     this.progress = 0,
     this.showDivider = true,
+    this.monoClock = false,
     this.onTap,
   });
 
@@ -26,6 +27,10 @@ class LessonRow extends StatelessWidget {
   /// In-lesson progress 0–1 (rendered only for [LessonRowState.current]).
   final double progress;
   final bool showDivider;
+
+  /// Player context renders durations as LTR IBM Plex Mono (design 1h);
+  /// series detail keeps Arabic-Indic digits (design 1g).
+  final bool monoClock;
   final VoidCallback? onTap;
 
   @override
@@ -128,8 +133,13 @@ class LessonRow extends StatelessWidget {
                   if (duration != null) ...[
                     const SizedBox(width: 8),
                     Text(
-                      clockLabel(duration!),
+                      monoClock
+                          ? clockLabelLtr(duration!)
+                          : clockLabel(duration!),
+                      textDirection: monoClock ? TextDirection.ltr : null,
                       style: theme.textTheme.labelSmall?.copyWith(
+                        fontFamily: monoClock ? kMonoFont : null,
+                        fontSize: monoClock ? 11 : null,
                         color: state == LessonRowState.current
                             ? scheme.onSurfaceVariant
                             : masar.textFaint,

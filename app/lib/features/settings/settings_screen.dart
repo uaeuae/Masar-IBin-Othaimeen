@@ -143,6 +143,8 @@ class SettingsScreen extends ConsumerWidget {
                 'Masar v1.0.0',
                 textDirection: TextDirection.ltr,
                 style: theme.textTheme.labelSmall?.copyWith(
+                  fontFamily: kMonoFont,
+                  fontSize: 11,
                   color: masar.textFaint,
                 ),
               ),

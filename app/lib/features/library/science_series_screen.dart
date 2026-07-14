@@ -110,6 +110,7 @@ class ScienceSeriesScreen extends ConsumerWidget {
                   children: [
                     MasarChip(
                       label: 'الأحدث',
+                      dense: true,
                       selected: sort == _SeriesSort.newest,
                       onTap: () => ref
                           .read(_sortProvider.notifier)
@@ -118,6 +119,7 @@ class ScienceSeriesScreen extends ConsumerWidget {
                     const SizedBox(width: 8),
                     MasarChip(
                       label: 'الأقصر أولًا',
+                      dense: true,
                       selected: sort == _SeriesSort.shortest,
                       onTap: () => ref
                           .read(_sortProvider.notifier)
@@ -126,6 +128,7 @@ class ScienceSeriesScreen extends ConsumerWidget {
                     const SizedBox(width: 8),
                     MasarChip(
                       label: 'أبجديًا',
+                      dense: true,
                       selected: sort == _SeriesSort.alphabetical,
                       onTap: () => ref
                           .read(_sortProvider.notifier)

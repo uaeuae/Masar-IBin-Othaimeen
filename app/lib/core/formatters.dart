@@ -112,6 +112,15 @@ String clockLabel(Duration position) {
   return arabicDigits(text);
 }
 
+/// Western-digit mm:ss (or h:mm:ss) for the player's LTR mono timestamps.
+String clockLabelLtr(Duration position) {
+  final h = position.inHours;
+  final m = position.inMinutes.remainder(60);
+  final s = position.inSeconds.remainder(60);
+  String two(int v) => v.toString().padLeft(2, '0');
+  return h > 0 ? '$h:${two(m)}:${two(s)}' : '${two(m)}:${two(s)}';
+}
+
 /// "٪٦٥" style percent for progress labels.
 String percentLabel(double progress) {
   final pct = (progress.clamp(0.0, 1.0) * 100).round();

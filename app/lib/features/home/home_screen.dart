@@ -95,11 +95,11 @@ class HomeScreen extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: scheme.primaryContainer,
                         shape: BoxShape.circle,
-                        border: Border.all(color: masar.chipBorder),
+                        border: Border.all(color: masar.greenTintBorder),
                       ),
                       alignment: Alignment.center,
                       child: Icon(
-                        Icons.settings_outlined,
+                        Icons.access_time_rounded, // the design's clock roundel
                         size: 20,
                         color: scheme.onPrimaryContainer,
                       ),

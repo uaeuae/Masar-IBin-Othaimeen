@@ -9,7 +9,7 @@ void main() {
     tester,
     app,
   ) async {
-    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await tester.tap(find.byIcon(Icons.access_time_rounded));
     await tester.pumpAndSettle();
     expect(find.text('الإعدادات'), findsOneWidget);
 
@@ -24,7 +24,7 @@ void main() {
   });
 
   testApp('autoplay toggle persists', (tester, app) async {
-    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await tester.tap(find.byIcon(Icons.access_time_rounded));
     await tester.pumpAndSettle();
 
     // First switch is autoplay (on by default), second is the daily reminder.
@@ -36,7 +36,7 @@ void main() {
   });
 
   testApp('attribution and version footer are present', (tester, app) async {
-    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await tester.tap(find.byIcon(Icons.access_time_rounded));
     await tester.pumpAndSettle();
 
     await tester.scrollUntilVisible(find.text('Masar v1.0.0'), 300);

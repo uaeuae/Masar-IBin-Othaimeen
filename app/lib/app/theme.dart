@@ -29,6 +29,9 @@ const String kUiFont = 'IBMPlexSansArabic';
 /// Classical serif — journey/series/lesson titles, the logo, attribution lead.
 const String kSerifFont = 'Amiri';
 
+/// Mono — LTR timestamps in the player and the version footer, per design.
+const String kMonoFont = 'IBMPlexMono';
+
 /// Amiri title helper. The design uses it at 44 (logo), 30 (page titles),
 /// 21–22 (hero/lesson), 18–19 (cards).
 TextStyle serif(
@@ -60,6 +63,7 @@ class MasarColors extends ThemeExtension<MasarColors> {
     required this.goldTintFg,
     required this.oliveTintBg,
     required this.oliveTintFg,
+    required this.greenTintBorder,
     required this.textMuted,
     required this.textFaint,
     required this.highlightRow,
@@ -88,6 +92,7 @@ class MasarColors extends ThemeExtension<MasarColors> {
   final Color goldTintFg;
   final Color oliveTintBg; // متوسط badge
   final Color oliveTintFg;
+  final Color greenTintBorder; // #D5E2D9 — border of green-tinted circles
   final Color textMuted; // #8A968D
   final Color textFaint; // timestamps #B0AC9C
   final Color highlightRow; // current-lesson row bg
@@ -115,6 +120,7 @@ class MasarColors extends ThemeExtension<MasarColors> {
     goldTintFg: Color(0xFFA8874B),
     oliveTintBg: Color(0xFFEEF0E4),
     oliveTintFg: Color(0xFF6E7A4E),
+    greenTintBorder: Color(0xFFD5E2D9),
     textMuted: Color(0xFF8A968D),
     textFaint: Color(0xFFB0AC9C),
     highlightRow: Color(0xFFF4F8F5),
@@ -143,6 +149,7 @@ class MasarColors extends ThemeExtension<MasarColors> {
     goldTintFg: Color(0xFFD1B774),
     oliveTintBg: Color(0xFF222B1C),
     oliveTintFg: Color(0xFFA8B36E),
+    greenTintBorder: Color(0xFF26332B),
     textMuted: Color(0xFF5B6B60),
     textFaint: Color(0xFF5B6B60),
     highlightRow: Color(0xFF1B2620),
