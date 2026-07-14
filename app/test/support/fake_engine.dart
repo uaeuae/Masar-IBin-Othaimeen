@@ -7,12 +7,14 @@ import 'package:masar/features/player/player_engine.dart';
 class FakeLessonPlayerEngine implements LessonPlayerEngine {
   final positionsController = StreamController<Duration>.broadcast(sync: true);
   final endedController = StreamController<void>.broadcast(sync: true);
+  final playingController = StreamController<bool>.broadcast(sync: true);
 
   /// (videoId, startPosition) for every load() call.
   final loads = <(String, Duration)>[];
 
   Duration? durationToReport;
   bool disposed = false;
+  int togglePlayCalls = 0;
 
   @override
   Widget buildView(BuildContext context) => const SizedBox.expand();
@@ -22,6 +24,14 @@ class FakeLessonPlayerEngine implements LessonPlayerEngine {
 
   @override
   Stream<void> get ended => endedController.stream;
+
+  @override
+  Stream<bool> get playing => playingController.stream;
+
+  @override
+  Future<void> togglePlay() async {
+    togglePlayCalls++;
+  }
 
   @override
   Future<Duration?> currentDuration() async => durationToReport;
@@ -36,5 +46,6 @@ class FakeLessonPlayerEngine implements LessonPlayerEngine {
     disposed = true;
     positionsController.close();
     endedController.close();
+    playingController.close();
   }
 }

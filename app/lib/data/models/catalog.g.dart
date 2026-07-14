@@ -62,6 +62,7 @@ _CatalogSeries _$CatalogSeriesFromJson(Map<String, dynamic> json) =>
       titleAr: json['title_ar'] as String,
       descriptionAr: json['description_ar'] as String?,
       thumbnailUrl: json['thumbnail_url'] as String?,
+      level: $enumDecodeNullable(_$JourneyLevelEnumMap, json['level']),
       lessons:
           (json['lessons'] as List<dynamic>?)
               ?.map((e) => CatalogLesson.fromJson(e as Map<String, dynamic>))
@@ -76,8 +77,15 @@ Map<String, dynamic> _$CatalogSeriesToJson(_CatalogSeries instance) =>
       'title_ar': instance.titleAr,
       'description_ar': instance.descriptionAr,
       'thumbnail_url': instance.thumbnailUrl,
+      'level': _$JourneyLevelEnumMap[instance.level],
       'lessons': instance.lessons.map((e) => e.toJson()).toList(),
     };
+
+const _$JourneyLevelEnumMap = {
+  JourneyLevel.beginner: 'beginner',
+  JourneyLevel.intermediate: 'intermediate',
+  JourneyLevel.advanced: 'advanced',
+};
 
 _CatalogLesson _$CatalogLessonFromJson(Map<String, dynamic> json) =>
     _CatalogLesson(
@@ -136,12 +144,6 @@ Map<String, dynamic> _$CatalogJourneyToJson(_CatalogJourney instance) =>
       'sort_order': instance.sortOrder,
       'stages': instance.stages.map((e) => e.toJson()).toList(),
     };
-
-const _$JourneyLevelEnumMap = {
-  JourneyLevel.beginner: 'beginner',
-  JourneyLevel.intermediate: 'intermediate',
-  JourneyLevel.advanced: 'advanced',
-};
 
 _CatalogStage _$CatalogStageFromJson(Map<String, dynamic> json) =>
     _CatalogStage(

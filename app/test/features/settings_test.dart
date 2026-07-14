@@ -27,10 +27,22 @@ void main() {
     await tester.tap(find.byIcon(Icons.settings_outlined));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(SwitchListTile));
+    // First switch is autoplay (on by default), second is the daily reminder.
+    await tester.tap(find.byType(Switch).first);
     await tester.pumpAndSettle();
 
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getBool('autoplay_next'), isFalse);
+  });
+
+  testApp('attribution and version footer are present', (tester, app) async {
+    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Masar v1.0.0'), 300);
+    expect(
+      find.textContaining('مؤسسة الشيخ محمد بن صالح العثيمين الخيرية'),
+      findsOneWidget,
+    );
   });
 }

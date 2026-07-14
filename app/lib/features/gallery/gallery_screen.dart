@@ -3,27 +3,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/widgets/journey_card.dart';
-import '../../core/widgets/lesson_tile.dart';
+import '../../core/widgets/lesson_row.dart';
 import '../../core/widgets/level_badge.dart';
+import '../../core/widgets/masar_chip.dart';
 import '../../core/widgets/progress_ring.dart';
-import '../../core/widgets/section_header.dart';
+import '../../core/widgets/resume_hero_card.dart';
+import '../../core/widgets/science_glyph.dart';
+import '../../core/widgets/segmented_control.dart';
 import '../../core/widgets/skeleton.dart';
 import '../../core/widgets/stage_timeline.dart';
 import '../../data/models/enums.dart';
 import '../settings/theme_mode_provider.dart';
 
-/// Internal design-system gallery. Every core widget in every state,
-/// in both themes — the visual regression surface for the app's look.
+/// Internal design-system gallery — every core component in every state,
+/// in both themes. Kept in sync with docs/design/masar-screens.dc.html.
 class GalleryScreen extends ConsumerWidget {
   const GalleryScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final mode = ref.watch(themeModeProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('معرض المكونات'),
+        title: Text('معرض المكونات', style: theme.textTheme.titleLarge),
         actions: [
           IconButton(
             tooltip: 'تبديل المظهر',
@@ -37,183 +41,215 @@ class GalleryScreen extends ConsumerWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(20),
         children: [
-          const _GallerySection(title: 'الخط والنصوص'),
+          const _Section('الخط — Amiri للعناوين، Plex للواجهة'),
           Text(
-            'مسار ابن عثيمين',
-            style: Theme.of(context).textTheme.displaySmall,
+            'شرح ثلاثة الأصول',
+            style: serif(30, theme.colorScheme.onSurface),
           ),
+          Text('أهلًا بك يا طالب العلم', style: theme.textTheme.headlineSmall),
           Text(
-            'رحلة طالب العلم تبدأ من هنا',
-            style: Theme.of(context).textTheme.titleMedium,
+            'قال الشيخ رحمه الله: العلم يحتاج إلى تدرج — ٤٥ درسًا في ١٢ أسبوعًا.',
+            style: theme.textTheme.bodyMedium,
           ),
-          Text(
-            'قال الشيخ رحمه الله: العلم يحتاج إلى تدرج، فيبدأ الطالب بصغار العلم قبل كباره، ٤٥ درسًا في ١٢ أسبوعًا.',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: 24),
 
-          const _GallerySection(title: 'شارات المستوى'),
+          const _Section('شارات المستوى'),
           const Wrap(
-            spacing: AppSpacing.sm,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               LevelBadge(level: JourneyLevel.beginner),
               LevelBadge(level: JourneyLevel.intermediate),
               LevelBadge(level: JourneyLevel.advanced),
+              LevelBadge(level: JourneyLevel.beginner, onHero: true),
             ],
           ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: 24),
 
-          const _GallerySection(title: 'حلقات التقدم'),
+          const _Section('رموز العلوم'),
           const Row(
             children: [
-              ProgressRing(progress: 0.0, showLabel: true),
-              SizedBox(width: AppSpacing.lg),
-              ProgressRing(progress: 0.35, showLabel: true),
-              SizedBox(width: AppSpacing.lg),
+              ScienceGlyph(nameAr: 'العقيدة', sortOrder: 1, size: 44),
+              SizedBox(width: 10),
+              ScienceGlyph(nameAr: 'الفقه', sortOrder: 2, size: 44),
+              SizedBox(width: 10),
+              ScienceGlyph(nameAr: 'التفسير', sortOrder: 4, size: 44),
+              SizedBox(width: 10),
+              ScienceGlyph(nameAr: 'أصول الفقه', sortOrder: 5, size: 44),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          const _Section('الرقائق والمقاطع'),
+          Row(
+            children: [
+              MasarChip(label: 'الكل', selected: true, onTap: () {}),
+              const SizedBox(width: 8),
+              MasarChip(label: 'العقيدة', selected: false, onTap: () {}),
+              const SizedBox(width: 8),
+              MasarChip(label: 'الفقه', selected: false, onTap: () {}),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SegmentedControl<JourneyLevel>(
+            segments: {for (final l in JourneyLevel.values) l: l.labelAr},
+            selected: JourneyLevel.beginner,
+            onChanged: (_) {},
+          ),
+          const SizedBox(height: 24),
+
+          const _Section('حلقات التقدم'),
+          const Row(
+            children: [
+              ProgressRing(progress: 0.33, showLabel: true),
+              SizedBox(width: 16),
               ProgressRing(progress: 0.72, showLabel: true),
-              SizedBox(width: AppSpacing.lg),
+              SizedBox(width: 16),
               ProgressRing(progress: 1.0),
             ],
           ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: 24),
 
-          const _GallerySection(title: 'بطاقات المسارات'),
-          JourneyCard(
-            title: 'مسار العقيدة',
-            description: 'رحلة متدرجة في تعلم العقيدة الصحيحة من أصولها',
-            level: JourneyLevel.beginner,
-            stageCount: 3,
-            lessonCount: 45,
-            onTap: () {},
-          ),
-          const SizedBox(height: AppSpacing.md),
-          JourneyCard(
-            title: 'مسار الفقه — زاد المستقنع',
-            description: 'الشرح الممتع على زاد المستقنع كاملًا',
-            level: JourneyLevel.intermediate,
-            stageCount: 8,
-            lessonCount: 340,
+          const _Section('متابعة المشاهدة'),
+          ResumeHeroCard(
+            seriesTitle: 'الشرح الممتع على زاد المستقنع',
+            lessonLabel: 'الدرس ١٢ — كتاب الطهارة · باب المياه',
             progress: 0.42,
+            stoppedAt: const Duration(minutes: 12, seconds: 34),
+            remaining: const Duration(minutes: 25),
             onTap: () {},
           ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: 24),
 
-          const _GallerySection(title: 'الدروس'),
-          LessonTile(
-            index: 1,
-            title: 'مقدمة الشرح وبيان منهج المؤلف رحمه الله',
-            duration: const Duration(minutes: 45),
-            progress: 1,
+          const _Section('بطاقة مسار'),
+          JourneyCard(
+            title: 'مسار العقيدة — المستوى الأول',
+            level: JourneyLevel.beginner,
+            stageCount: 5,
+            scienceName: 'العقيدة',
+            scienceSortOrder: 1,
+            seriesPreview:
+                'ثلاثة الأصول ← القواعد الأربع ← كشف الشبهات ← كتاب التوحيد',
+            enrolled: true,
+            progress: 0.33,
             onTap: () {},
           ),
-          LessonTile(
-            index: 2,
-            title: 'باب المياه: أقسام المياه وأحكامها',
-            duration: const Duration(minutes: 52),
-            progress: 0.6,
-            onTap: () {},
-          ),
-          LessonTile(
-            index: 3,
-            title: 'باب الآنية وما يتعلق بها من أحكام',
-            duration: const Duration(hours: 1, minutes: 5),
-            isPlaying: true,
-            progress: 0.1,
-            onTap: () {},
-          ),
-          LessonTile(
-            index: 4,
-            title: 'باب الاستنجاء وآداب قضاء الحاجة',
-            duration: const Duration(minutes: 48),
-            onTap: () {},
-          ),
-          const LessonTile(
-            index: 5,
-            title: 'درس محذوف من المصدر',
-            unavailable: true,
-          ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: 24),
 
-          const _GallerySection(title: 'الخط الزمني للمراحل'),
+          const _Section('صفوف الدروس'),
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(AppRadius.card),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                LessonRow(
+                  title: 'الدرس ١ — مقدمة الرسالة',
+                  state: LessonRowState.completed,
+                  duration: const Duration(minutes: 42, seconds: 10),
+                  onTap: () {},
+                ),
+                LessonRow(
+                  title: 'الدرس ٢ — القاعدة الأولى',
+                  state: LessonRowState.current,
+                  progress: 0.4,
+                  duration: const Duration(minutes: 45, seconds: 30),
+                  onTap: () {},
+                ),
+                LessonRow(
+                  title: 'الدرس ٣ — القاعدة الثانية: الشفاعة',
+                  state: LessonRowState.upcoming,
+                  duration: const Duration(minutes: 51, seconds: 20),
+                  onTap: () {},
+                ),
+                const LessonRow(
+                  title: 'الدرس ٤ — درس محذوف',
+                  state: LessonRowState.unavailable,
+                  showDivider: false,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          const _Section('الخط الزمني للمراحل'),
           StageTimelineNode(
             index: 1,
-            title: 'المرحلة الأولى: الأصول الثلاثة',
-            description: 'معرفة العبد ربه ودينه ونبيه ﷺ',
             state: StageState.done,
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Text(
-                  'شرح ثلاثة الأصول — مكتمل',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(top: 2),
+              child: Text(
+                'شرح ثلاثة الأصول — مكتملة ✓',
+                style: serif(18, theme.colorScheme.onSurface),
               ),
             ),
           ),
           StageTimelineNode(
             index: 2,
-            title: 'المرحلة الثانية: كتاب التوحيد',
-            description: 'حق الله على العبيد',
             state: StageState.current,
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Text(
-                  'شرح كتاب التوحيد — ٤٠٪',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(top: 2),
+              child: Text(
+                'شرح القواعد الأربع — ٣ من ٨',
+                style: serif(18, theme.colorScheme.onSurface),
               ),
             ),
           ),
-          const StageTimelineNode(
+          StageTimelineNode(
             index: 3,
-            title: 'المرحلة الثالثة: العقيدة الواسطية',
             state: StageState.upcoming,
             isLast: true,
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(top: 2),
+              child: Text(
+                'شرح كشف الشبهات',
+                style: serif(18, masarColorsOf(context).chipText),
+              ),
+            ),
           ),
-          const SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: 24),
 
-          SectionHeader(title: 'متابعة المشاهدة', onSeeAll: () {}),
-          const SizedBox(height: AppSpacing.sm),
-
-          const _GallerySection(title: 'هياكل التحميل'),
+          const _Section('هياكل التحميل'),
           const Row(
             children: [
               Skeleton(width: 120, height: 68),
-              SizedBox(width: AppSpacing.md),
+              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Skeleton(width: 180),
-                    SizedBox(height: AppSpacing.sm),
+                    SizedBox(height: 8),
                     Skeleton(width: 100, height: 12),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.xxl),
+          const SizedBox(height: 32),
         ],
       ),
     );
   }
 }
 
-class _GallerySection extends StatelessWidget {
-  const _GallerySection({required this.title});
+class _Section extends StatelessWidget {
+  const _Section(this.title);
 
   final String title;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
           color: Theme.of(context).colorScheme.primary,
         ),
       ),

@@ -47,3 +47,21 @@ class AutoplayNotifier extends Notifier<bool> {
 final autoplayProvider = NotifierProvider<AutoplayNotifier, bool>(
   AutoplayNotifier.new,
 );
+
+/// Daily-continuation reminder preference. Persisted now; the actual local
+/// notification ships in Phase 2 (the UI labels it "قريبًا").
+class DailyReminderNotifier extends Notifier<bool> {
+  static const _key = 'daily_reminder';
+
+  @override
+  bool build() => ref.watch(sharedPreferencesProvider).getBool(_key) ?? false;
+
+  void set(bool value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setBool(_key, value);
+  }
+}
+
+final dailyReminderProvider = NotifierProvider<DailyReminderNotifier, bool>(
+  DailyReminderNotifier.new,
+);

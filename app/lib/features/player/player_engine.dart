@@ -18,10 +18,15 @@ abstract class LessonPlayerEngine {
   /// Fires when a video reaches its end.
   Stream<void> get ended;
 
+  /// Play/pause state changes.
+  Stream<bool> get playing;
+
   /// Total duration as reported by the player (null until metadata loads).
   Future<Duration?> currentDuration();
 
   Future<void> load(String videoId, {Duration start = Duration.zero});
+
+  Future<void> togglePlay();
 
   void dispose();
 }
@@ -47,6 +52,21 @@ class YoutubeLessonPlayerEngine implements LessonPlayerEngine {
   Stream<void> get ended => _controller.stream
       .where((value) => value.playerState == PlayerState.ended)
       .map((_) {});
+
+  @override
+  Stream<bool> get playing => _controller.stream
+      .map((value) => value.playerState == PlayerState.playing)
+      .distinct();
+
+  @override
+  Future<void> togglePlay() async {
+    final state = _controller.value.playerState;
+    if (state == PlayerState.playing) {
+      await _controller.pauseVideo();
+    } else {
+      await _controller.playVideo();
+    }
+  }
 
   @override
   Future<Duration?> currentDuration() async {
@@ -109,12 +129,18 @@ class ExternalLinkPlayerEngine implements LessonPlayerEngine {
   Stream<void> get ended => const Stream.empty();
 
   @override
+  Stream<bool> get playing => const Stream.empty();
+
+  @override
   Future<Duration?> currentDuration() async => null;
 
   @override
   Future<void> load(String videoId, {Duration start = Duration.zero}) async {
     _videoId = videoId;
   }
+
+  @override
+  Future<void> togglePlay() async {}
 
   @override
   void dispose() {}

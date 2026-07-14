@@ -26,6 +26,9 @@ class SeriesEntries extends Table {
   TextColumn get descriptionAr => text().nullable()();
   TextColumn get thumbnailUrl => text().nullable()();
 
+  /// 'beginner' | 'intermediate' | 'advanced' — optional curation metadata.
+  TextColumn get level => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {slug};
 }
@@ -129,5 +132,14 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(seriesEntries, seriesEntries.level);
+      }
+    },
+  );
 }

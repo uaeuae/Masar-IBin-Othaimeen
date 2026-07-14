@@ -1,84 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:masar/core/widgets/masar_nav_bar.dart';
+import 'package:masar/core/widgets/segmented_control.dart';
+import 'package:masar/data/models/enums.dart';
+import 'package:masar/features/journeys/journeys_screen.dart';
+import 'package:masar/features/library/library_screen.dart';
 
 import '../support/pump_app.dart';
+
+Finder navItem(String label) =>
+    find.descendant(of: find.byType(MasarNavBar), matching: find.text(label));
+
+Finder segmentedOption(String label) => find.descendant(
+  of: find.byType(SegmentedControl<JourneyLevel>),
+  matching: find.text(label),
+);
+
+Finder inJourneys(Finder finder) =>
+    find.descendant(of: find.byType(JourneysScreen), matching: finder);
 
 void main() {
   testApp('tabs switch between home, journeys, and library', (
     tester,
     app,
   ) async {
-    await tester.tap(find.text('المسارات'));
+    await tester.tap(navItem('المسارات'));
     await tester.pumpAndSettle();
-    expect(find.text('المسارات التعليمية'), findsOneWidget);
-    expect(find.text('كل العلوم'), findsOneWidget);
+    expect(inJourneys(find.text('المسارات')), findsOneWidget); // page title
+    expect(inJourneys(find.text('الكل')), findsOneWidget); // science chips
 
-    await tester.tap(find.text('المكتبة'));
+    await tester.tap(navItem('المكتبة'));
     await tester.pumpAndSettle();
-    expect(find.text('العقيدة'), findsOneWidget);
-    expect(find.text('سلسلتان'), findsWidgets); // aqeedah has 2 series
+    expect(find.textContaining('تصفّح جميع سلاسل الشيخ'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.textContaining('الفهرس كامل متاح دون اتصال'),
+      300,
+      scrollable: find
+          .descendant(
+            of: find.byType(LibraryScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(find.textContaining('الفهرس كامل متاح دون اتصال'), findsOneWidget);
   });
 
-  testApp('level filter narrows the journeys list', (tester, app) async {
-    await tester.tap(find.text('المسارات'));
+  testApp('level segmented control filters the journeys list', (
+    tester,
+    app,
+  ) async {
+    await tester.tap(navItem('المسارات'));
     await tester.pumpAndSettle();
 
-    // Lazy list: only assert on what's above the fold before filtering.
-    expect(find.text('مسار العقيدة'), findsOneWidget);
+    // Default مبتدئ → beginner journeys only.
+    expect(inJourneys(find.text('مسار العقيدة')), findsOneWidget);
+    expect(inJourneys(find.text('مسار الفقه')), findsNothing);
 
-    await tester.tap(find.widgetWithText(FilterChip, 'متوسط'));
+    await tester.tap(segmentedOption('متوسط'));
     await tester.pumpAndSettle();
-    expect(find.text('مسار الفقه'), findsOneWidget);
-    expect(find.text('مسار العقيدة'), findsNothing);
+    expect(inJourneys(find.text('مسار الفقه')), findsOneWidget);
+    expect(inJourneys(find.text('مسار العقيدة')), findsNothing);
 
-    await tester.tap(find.widgetWithText(FilterChip, 'متقدم'));
+    await tester.tap(segmentedOption('متقدم'));
     await tester.pumpAndSettle();
-    expect(find.text('لا مسارات تطابق التصفية'), findsOneWidget);
+    expect(inJourneys(find.text('لا مسارات تطابق التصفية')), findsOneWidget);
   });
 
-  testApp('journey detail shows stages and enrolling updates home', (
+  testApp('journey detail CTA enrolls and opens the player', (
     tester,
     app,
   ) async {
     await tapVisible(tester, find.text('مسار العقيدة'));
 
-    expect(find.textContaining('المرحلة الأولى'), findsOneWidget);
-    expect(find.textContaining('المرحلة الثانية'), findsOneWidget);
+    // Green header + timeline with the first stage as the current one.
+    expect(find.textContaining('مرحلتان'), findsWidgets);
     expect(find.text('شرح ثلاثة الأصول'), findsOneWidget);
+    expect(find.textContaining('ابدأ المسار — الدرس'), findsOneWidget);
 
-    await tapVisible(tester, find.text('ابدأ المسار'));
-    expect(find.text('ابدأ المسار'), findsNothing);
-    expect(find.text('٪٠'), findsOneWidget);
+    await tapVisible(tester, find.textContaining('ابدأ المسار — الدرس'));
 
-    // pageBack() searches for an English "Back" tooltip; ours is Arabic.
-    await tester.tap(find.byType(BackButton));
-    await tester.pumpAndSettle();
-
-    // Home keeps its scroll offset; the new section header is at the top.
-    await tester.scrollUntilVisible(
-      find.text('مساراتي'),
-      -200,
-      scrollable: find.byType(Scrollable).first,
-    );
-    expect(find.text('مساراتي'), findsOneWidget);
+    // CTA enrolls and resumes straight into lesson 1.
+    expect(app.engine.loads.single.$1, 'fx-usul-01');
+    final enrolled = await app.db.select(app.db.journeyEnrollments).get();
+    expect(enrolled.single.journeySlug, 'masar-alaqeedah');
   });
 
-  testApp('series detail lists lessons and opens the player route', (
+  testApp('series detail lists lessons and opens the player', (
     tester,
     app,
   ) async {
     await tapVisible(tester, find.text('مسار العقيدة'));
     await tapVisible(tester, find.text('شرح ثلاثة الأصول'));
 
-    expect(find.text('ابدأ المشاهدة'), findsOneWidget);
+    expect(find.textContaining('٨ دروس'), findsOneWidget);
     expect(
-      find.textContaining('٨ دروس'),
+      find.textContaining('ابدأ — الدرس'),
       findsOneWidget,
-    ); // part of the meta line
+    ); // resume banner
     expect(find.textContaining('المسائل الأربع'), findsOneWidget);
 
-    await tapVisible(tester, find.text('ابدأ المشاهدة'));
-    expect(find.text('الدرس ١ من ٨'), findsOneWidget);
+    await tapVisible(tester, find.textContaining('ابدأ — الدرس'));
+    expect(find.textContaining('١ / ٨'), findsOneWidget); // player breadcrumb
     expect(find.text('التالي'), findsOneWidget);
   });
 
@@ -86,15 +108,15 @@ void main() {
     tester,
     app,
   ) async {
-    await tester.tap(find.text('المكتبة'));
+    await tester.tap(navItem('المكتبة'));
     await tester.pumpAndSettle();
     await tapVisible(tester, find.text('العقيدة'));
     await tapVisible(tester, find.text('شرح العقيدة الواسطية'));
 
     await tester.scrollUntilVisible(
-      find.text('هذا الدرس غير متاح حاليًا'),
+      find.textContaining('غير متاح حاليًا'),
       300,
     );
-    expect(find.text('هذا الدرس غير متاح حاليًا'), findsOneWidget);
+    expect(find.textContaining('غير متاح حاليًا'), findsOneWidget);
   });
 }

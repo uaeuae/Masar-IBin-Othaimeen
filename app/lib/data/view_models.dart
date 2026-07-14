@@ -14,7 +14,9 @@ class JourneySummary {
     required this.stageCount,
     required this.lessonCount,
     required this.completedCount,
+    required this.totalDurationSeconds,
     required this.enrolled,
+    this.seriesPreview = '',
   });
 
   final String slug;
@@ -26,7 +28,11 @@ class JourneySummary {
   final int stageCount;
   final int lessonCount;
   final int completedCount;
+  final int totalDurationSeconds;
   final bool enrolled;
+
+  /// Stage sequence teaser: "ثلاثة الأصول ← القواعد الأربع ← الواسطية".
+  final String seriesPreview;
 
   double get progress => lessonCount == 0 ? 0 : completedCount / lessonCount;
 }
@@ -41,6 +47,7 @@ class SeriesWithProgress {
     required this.lessonCount,
     required this.completedCount,
     this.totalDurationSeconds = 0,
+    this.level,
   });
 
   final String slug;
@@ -51,8 +58,11 @@ class SeriesWithProgress {
   final int lessonCount;
   final int completedCount;
   final int totalDurationSeconds;
+  final JourneyLevel? level;
 
   double get progress => lessonCount == 0 ? 0 : completedCount / lessonCount;
+
+  bool get started => completedCount > 0;
 }
 
 class StageDetail {
@@ -140,6 +150,7 @@ class ContinueWatchingItem {
   const ContinueWatchingItem({
     required this.videoId,
     required this.titleAr,
+    required this.position,
     required this.seriesSlug,
     required this.seriesTitleAr,
     required this.watchedSeconds,
@@ -149,6 +160,7 @@ class ContinueWatchingItem {
 
   final String videoId;
   final String titleAr;
+  final int position;
   final String seriesSlug;
   final String seriesTitleAr;
   final int watchedSeconds;
@@ -168,12 +180,16 @@ class ScienceSummary {
     required this.nameAr,
     this.descriptionAr,
     this.icon,
+    required this.sortOrder,
     required this.seriesCount,
+    required this.lessonCount,
   });
 
   final String slug;
   final String nameAr;
   final String? descriptionAr;
   final String? icon;
+  final int sortOrder;
   final int seriesCount;
+  final int lessonCount;
 }

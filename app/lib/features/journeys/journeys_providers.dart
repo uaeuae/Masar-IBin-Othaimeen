@@ -15,18 +15,26 @@ final journeyDetailProvider = StreamProvider.autoDispose
           ref.watch(catalogRepositoryProvider).watchJourneyDetail(slug),
     );
 
-/// Filters on the المسارات tab. Not auto-disposed so they survive tab switches.
-class LevelFilterNotifier extends Notifier<JourneyLevel?> {
-  @override
-  JourneyLevel? build() => null;
+/// The user's level (مبتدئ default) — the design's "level chips replace
+/// onboarding". Persisted; drives home suggestions AND the journeys filter.
+class LevelFilterNotifier extends Notifier<JourneyLevel> {
+  static const _key = 'preferred_level';
 
-  void set(JourneyLevel? level) => state = level;
+  @override
+  JourneyLevel build() {
+    final stored = ref.watch(sharedPreferencesProvider).getString(_key);
+    return JourneyLevel.values.asNameMap()[stored] ?? JourneyLevel.beginner;
+  }
+
+  void set(JourneyLevel level) {
+    state = level;
+    ref.read(sharedPreferencesProvider).setString(_key, level.name);
+  }
 }
 
-final levelFilterProvider =
-    NotifierProvider<LevelFilterNotifier, JourneyLevel?>(
-      LevelFilterNotifier.new,
-    );
+final levelFilterProvider = NotifierProvider<LevelFilterNotifier, JourneyLevel>(
+  LevelFilterNotifier.new,
+);
 
 class ScienceFilterNotifier extends Notifier<String?> {
   @override

@@ -427,6 +427,15 @@ class $SeriesEntriesTable extends SeriesEntries
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _levelMeta = const VerificationMeta('level');
+  @override
+  late final GeneratedColumn<String> level = GeneratedColumn<String>(
+    'level',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     slug,
@@ -434,6 +443,7 @@ class $SeriesEntriesTable extends SeriesEntries
     titleAr,
     descriptionAr,
     thumbnailUrl,
+    level,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -492,6 +502,12 @@ class $SeriesEntriesTable extends SeriesEntries
         ),
       );
     }
+    if (data.containsKey('level')) {
+      context.handle(
+        _levelMeta,
+        level.isAcceptableOrUnknown(data['level']!, _levelMeta),
+      );
+    }
     return context;
   }
 
@@ -521,6 +537,10 @@ class $SeriesEntriesTable extends SeriesEntries
         DriftSqlType.string,
         data['${effectivePrefix}thumbnail_url'],
       ),
+      level: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}level'],
+      ),
     );
   }
 
@@ -536,12 +556,16 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
   final String titleAr;
   final String? descriptionAr;
   final String? thumbnailUrl;
+
+  /// 'beginner' | 'intermediate' | 'advanced' — optional curation metadata.
+  final String? level;
   const SeriesRow({
     required this.slug,
     required this.scienceSlug,
     required this.titleAr,
     this.descriptionAr,
     this.thumbnailUrl,
+    this.level,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -554,6 +578,9 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     }
     if (!nullToAbsent || thumbnailUrl != null) {
       map['thumbnail_url'] = Variable<String>(thumbnailUrl);
+    }
+    if (!nullToAbsent || level != null) {
+      map['level'] = Variable<String>(level);
     }
     return map;
   }
@@ -569,6 +596,9 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       thumbnailUrl: thumbnailUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(thumbnailUrl),
+      level: level == null && nullToAbsent
+          ? const Value.absent()
+          : Value(level),
     );
   }
 
@@ -583,6 +613,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       titleAr: serializer.fromJson<String>(json['titleAr']),
       descriptionAr: serializer.fromJson<String?>(json['descriptionAr']),
       thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
+      level: serializer.fromJson<String?>(json['level']),
     );
   }
   @override
@@ -594,6 +625,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       'titleAr': serializer.toJson<String>(titleAr),
       'descriptionAr': serializer.toJson<String?>(descriptionAr),
       'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
+      'level': serializer.toJson<String?>(level),
     };
   }
 
@@ -603,6 +635,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     String? titleAr,
     Value<String?> descriptionAr = const Value.absent(),
     Value<String?> thumbnailUrl = const Value.absent(),
+    Value<String?> level = const Value.absent(),
   }) => SeriesRow(
     slug: slug ?? this.slug,
     scienceSlug: scienceSlug ?? this.scienceSlug,
@@ -611,6 +644,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
         ? descriptionAr.value
         : this.descriptionAr,
     thumbnailUrl: thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
+    level: level.present ? level.value : this.level,
   );
   SeriesRow copyWithCompanion(SeriesEntriesCompanion data) {
     return SeriesRow(
@@ -625,6 +659,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       thumbnailUrl: data.thumbnailUrl.present
           ? data.thumbnailUrl.value
           : this.thumbnailUrl,
+      level: data.level.present ? data.level.value : this.level,
     );
   }
 
@@ -635,14 +670,21 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           ..write('scienceSlug: $scienceSlug, ')
           ..write('titleAr: $titleAr, ')
           ..write('descriptionAr: $descriptionAr, ')
-          ..write('thumbnailUrl: $thumbnailUrl')
+          ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('level: $level')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(slug, scienceSlug, titleAr, descriptionAr, thumbnailUrl);
+  int get hashCode => Object.hash(
+    slug,
+    scienceSlug,
+    titleAr,
+    descriptionAr,
+    thumbnailUrl,
+    level,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -651,7 +693,8 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           other.scienceSlug == this.scienceSlug &&
           other.titleAr == this.titleAr &&
           other.descriptionAr == this.descriptionAr &&
-          other.thumbnailUrl == this.thumbnailUrl);
+          other.thumbnailUrl == this.thumbnailUrl &&
+          other.level == this.level);
 }
 
 class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
@@ -660,6 +703,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
   final Value<String> titleAr;
   final Value<String?> descriptionAr;
   final Value<String?> thumbnailUrl;
+  final Value<String?> level;
   final Value<int> rowid;
   const SeriesEntriesCompanion({
     this.slug = const Value.absent(),
@@ -667,6 +711,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     this.titleAr = const Value.absent(),
     this.descriptionAr = const Value.absent(),
     this.thumbnailUrl = const Value.absent(),
+    this.level = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SeriesEntriesCompanion.insert({
@@ -675,6 +720,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     required String titleAr,
     this.descriptionAr = const Value.absent(),
     this.thumbnailUrl = const Value.absent(),
+    this.level = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : slug = Value(slug),
        scienceSlug = Value(scienceSlug),
@@ -685,6 +731,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     Expression<String>? titleAr,
     Expression<String>? descriptionAr,
     Expression<String>? thumbnailUrl,
+    Expression<String>? level,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -693,6 +740,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
       if (titleAr != null) 'title_ar': titleAr,
       if (descriptionAr != null) 'description_ar': descriptionAr,
       if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
+      if (level != null) 'level': level,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -703,6 +751,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     Value<String>? titleAr,
     Value<String?>? descriptionAr,
     Value<String?>? thumbnailUrl,
+    Value<String?>? level,
     Value<int>? rowid,
   }) {
     return SeriesEntriesCompanion(
@@ -711,6 +760,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
       titleAr: titleAr ?? this.titleAr,
       descriptionAr: descriptionAr ?? this.descriptionAr,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      level: level ?? this.level,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -733,6 +783,9 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     if (thumbnailUrl.present) {
       map['thumbnail_url'] = Variable<String>(thumbnailUrl.value);
     }
+    if (level.present) {
+      map['level'] = Variable<String>(level.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -747,6 +800,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
           ..write('titleAr: $titleAr, ')
           ..write('descriptionAr: $descriptionAr, ')
           ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('level: $level, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3596,6 +3650,7 @@ typedef $$SeriesEntriesTableCreateCompanionBuilder =
       required String titleAr,
       Value<String?> descriptionAr,
       Value<String?> thumbnailUrl,
+      Value<String?> level,
       Value<int> rowid,
     });
 typedef $$SeriesEntriesTableUpdateCompanionBuilder =
@@ -3605,6 +3660,7 @@ typedef $$SeriesEntriesTableUpdateCompanionBuilder =
       Value<String> titleAr,
       Value<String?> descriptionAr,
       Value<String?> thumbnailUrl,
+      Value<String?> level,
       Value<int> rowid,
     });
 
@@ -3639,6 +3695,11 @@ class $$SeriesEntriesTableFilterComposer
 
   ColumnFilters<String> get thumbnailUrl => $composableBuilder(
     column: $table.thumbnailUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get level => $composableBuilder(
+    column: $table.level,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3676,6 +3737,11 @@ class $$SeriesEntriesTableOrderingComposer
     column: $table.thumbnailUrl,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get level => $composableBuilder(
+    column: $table.level,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SeriesEntriesTableAnnotationComposer
@@ -3707,6 +3773,9 @@ class $$SeriesEntriesTableAnnotationComposer
     column: $table.thumbnailUrl,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get level =>
+      $composableBuilder(column: $table.level, builder: (column) => column);
 }
 
 class $$SeriesEntriesTableTableManager
@@ -3745,6 +3814,7 @@ class $$SeriesEntriesTableTableManager
                 Value<String> titleAr = const Value.absent(),
                 Value<String?> descriptionAr = const Value.absent(),
                 Value<String?> thumbnailUrl = const Value.absent(),
+                Value<String?> level = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SeriesEntriesCompanion(
                 slug: slug,
@@ -3752,6 +3822,7 @@ class $$SeriesEntriesTableTableManager
                 titleAr: titleAr,
                 descriptionAr: descriptionAr,
                 thumbnailUrl: thumbnailUrl,
+                level: level,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3761,6 +3832,7 @@ class $$SeriesEntriesTableTableManager
                 required String titleAr,
                 Value<String?> descriptionAr = const Value.absent(),
                 Value<String?> thumbnailUrl = const Value.absent(),
+                Value<String?> level = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SeriesEntriesCompanion.insert(
                 slug: slug,
@@ -3768,6 +3840,7 @@ class $$SeriesEntriesTableTableManager
                 titleAr: titleAr,
                 descriptionAr: descriptionAr,
                 thumbnailUrl: thumbnailUrl,
+                level: level,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

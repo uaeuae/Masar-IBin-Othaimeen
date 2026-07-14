@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 
 import '../formatters.dart';
 
-/// Circular progress indicator used wherever journey/series progress appears.
-/// Progress is the emotional core of the app — rings should feel rewarding.
+/// Circular progress ring — the design's مساراتي row uses a 52px ring with
+/// the percent bold inside. Track is the green tint (light) / dark border.
 class ProgressRing extends StatelessWidget {
   const ProgressRing({
     super.key,
     required this.progress,
-    this.size = 48,
+    this.size = 52,
     this.strokeWidth = 5,
     this.showLabel = false,
     this.child,
@@ -24,15 +24,14 @@ class ProgressRing extends StatelessWidget {
   final double size;
   final double strokeWidth;
 
-  /// Renders "٪٦٥" in the center.
+  /// Renders "٣٣٪" in the center.
   final bool showLabel;
-
-  /// Custom center content (e.g. a lesson index).
   final Widget? child;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final clamped = progress.clamp(0.0, 1.0);
     final complete = clamped >= 1.0;
 
@@ -42,23 +41,26 @@ class ProgressRing extends StatelessWidget {
       child: CustomPaint(
         painter: _RingPainter(
           progress: clamped,
-          trackColor: scheme.surfaceContainerHighest,
-          color: complete ? scheme.primary : scheme.primary,
+          trackColor: isDark
+              ? scheme.surfaceContainerHighest
+              : scheme.primaryContainer,
+          color: scheme.primary,
           strokeWidth: strokeWidth,
         ),
         child: Center(
           child: complete && child == null && !showLabel
               ? Icon(
                   Icons.check_rounded,
-                  size: size * 0.5,
+                  size: size * 0.45,
                   color: scheme.primary,
                 )
               : showLabel
               ? Text(
                   percentLabel(clamped),
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: scheme.onSurfaceVariant,
+                  style: TextStyle(
+                    fontSize: size * 0.23,
+                    fontWeight: FontWeight.w700,
+                    color: scheme.primary,
                   ),
                 )
               : child,

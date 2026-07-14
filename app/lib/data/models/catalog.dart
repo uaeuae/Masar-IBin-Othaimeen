@@ -46,6 +46,7 @@ abstract class CatalogSeries with _$CatalogSeries {
     required String titleAr,
     String? descriptionAr,
     String? thumbnailUrl,
+    JourneyLevel? level,
     @Default([]) List<CatalogLesson> lessons,
   }) = _CatalogSeries;
 

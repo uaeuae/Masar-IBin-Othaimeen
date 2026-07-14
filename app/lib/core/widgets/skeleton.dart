@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../app/theme.dart';
-
 /// Pulsing placeholder shown while content loads. Wrap in the shape you need.
 class Skeleton extends StatefulWidget {
   const Skeleton({super.key, this.width, this.height = 16, this.borderRadius});
@@ -40,8 +38,7 @@ class _SkeletonState extends State<Skeleton>
         height: widget.height,
         decoration: BoxDecoration(
           color: color,
-          borderRadius:
-              widget.borderRadius ?? BorderRadius.circular(AppRadius.tile / 2),
+          borderRadius: widget.borderRadius ?? BorderRadius.circular(6),
         ),
       ),
     );

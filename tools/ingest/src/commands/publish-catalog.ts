@@ -85,6 +85,7 @@ export function publishCatalog(options: PublishOptions): { version: number; less
       title_ar: s.title_ar,
       description_ar: s.description_ar ?? null,
       thumbnail_url: s.thumbnail_url ?? null,
+      level: s.level ?? null,
       lessons: (lessonsBySeries.get(s.slug) ?? [])
         .filter((l) => l.status !== 'hidden')
         .map((l) => ({

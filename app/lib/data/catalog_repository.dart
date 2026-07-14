@@ -66,6 +66,7 @@ class CatalogRepository {
               titleAr: s.titleAr,
               descriptionAr: Value(s.descriptionAr),
               thumbnailUrl: Value(s.thumbnailUrl),
+              level: Value(s.level?.name),
             ),
         ]);
         batch.insertAll(db.lessons, [
@@ -139,22 +140,46 @@ class CatalogRepository {
          JOIN journey_items i ON l.series_slug = i.series_slug
          JOIN lesson_progress p ON p.video_id = l.video_id AND p.completed = 1
         WHERE i.journey_slug = j.slug AND l.status = 'active') AS completed_count,
+      (SELECT COALESCE(SUM(l.duration_seconds), 0) FROM lessons l
+         JOIN journey_items i ON l.series_slug = i.series_slug
+        WHERE i.journey_slug = j.slug AND l.status = 'active') AS total_duration,
       EXISTS(SELECT 1 FROM journey_enrollments e WHERE e.journey_slug = j.slug) AS enrolled
     FROM journeys j
   ''';
 
-  JourneySummary _summaryFromRow(QueryRow row) => JourneySummary(
-    slug: row.read<String>('slug'),
-    titleAr: row.read<String>('title_ar'),
-    descriptionAr: row.readNullable<String>('description_ar'),
-    level: JourneyLevel.fromJson(row.read<String>('level')),
-    scienceSlug: row.readNullable<String>('science_slug'),
-    coverUrl: row.readNullable<String>('cover_url'),
-    stageCount: row.read<int>('stage_count'),
-    lessonCount: row.read<int>('lesson_count'),
-    completedCount: row.read<int>('completed_count'),
-    enrolled: row.read<int>('enrolled') != 0,
-  );
+  JourneySummary _summaryFromRow(QueryRow row, {String seriesPreview = ''}) =>
+      JourneySummary(
+        slug: row.read<String>('slug'),
+        titleAr: row.read<String>('title_ar'),
+        descriptionAr: row.readNullable<String>('description_ar'),
+        level: JourneyLevel.fromJson(row.read<String>('level')),
+        scienceSlug: row.readNullable<String>('science_slug'),
+        coverUrl: row.readNullable<String>('cover_url'),
+        stageCount: row.read<int>('stage_count'),
+        lessonCount: row.read<int>('lesson_count'),
+        completedCount: row.read<int>('completed_count'),
+        totalDurationSeconds: row.read<int>('total_duration'),
+        enrolled: row.read<int>('enrolled') != 0,
+        seriesPreview: seriesPreview,
+      );
+
+  /// journey slug → "ثلاثة الأصول ← القواعد الأربع ← ..." (stage order).
+  Future<Map<String, String>> _seriesPreviews() async {
+    final rows = await db.customSelect('''
+      SELECT i.journey_slug, s.title_ar FROM journey_items i
+      JOIN series s ON s.slug = i.series_slug
+      ORDER BY i.journey_slug, i.stage_position, i.position
+    ''').get();
+    final titlesByJourney = <String, List<String>>{};
+    for (final row in rows) {
+      titlesByJourney
+          .putIfAbsent(row.read<String>('journey_slug'), () => [])
+          .add(row.read<String>('title_ar'));
+    }
+    return titlesByJourney.map(
+      (slug, titles) => MapEntry(slug, titles.join(' ← ')),
+    );
+  }
 
   Set<ResultSetImplementation> get _journeyReads => {
     db.journeys,
@@ -172,7 +197,16 @@ class CatalogRepository {
           readsFrom: _journeyReads,
         )
         .watch()
-        .map((rows) => rows.map(_summaryFromRow).toList());
+        .asyncMap((rows) async {
+          final previews = await _seriesPreviews();
+          return [
+            for (final row in rows)
+              _summaryFromRow(
+                row,
+                seriesPreview: previews[row.read<String>('slug')] ?? '',
+              ),
+          ];
+        });
   }
 
   Stream<List<JourneySummary>> watchEnrolledJourneys() {
@@ -184,13 +218,22 @@ class CatalogRepository {
           readsFrom: _journeyReads,
         )
         .watch()
-        .map((rows) => rows.map(_summaryFromRow).toList());
+        .asyncMap((rows) async {
+          final previews = await _seriesPreviews();
+          return [
+            for (final row in rows)
+              _summaryFromRow(
+                row,
+                seriesPreview: previews[row.read<String>('slug')] ?? '',
+              ),
+          ];
+        });
   }
 
   Stream<JourneyDetail?> watchJourneyDetail(String slug) {
     final itemsQuery = db.customSelect(
       '''
-      SELECT i.stage_position, i.position, s.slug, s.title_ar, s.description_ar, s.thumbnail_url, s.science_slug,
+      SELECT i.stage_position, i.position, s.slug, s.title_ar, s.description_ar, s.thumbnail_url, s.science_slug, s.level,
         (SELECT COUNT(*) FROM lessons l WHERE l.series_slug = s.slug AND l.status = 'active') AS lesson_count,
         (SELECT COALESCE(SUM(l.duration_seconds), 0) FROM lessons l
           WHERE l.series_slug = s.slug AND l.status = 'active') AS total_duration,
@@ -246,6 +289,7 @@ class CatalogRepository {
                 lessonCount: row.read<int>('lesson_count'),
                 completedCount: row.read<int>('completed_count'),
                 totalDurationSeconds: row.read<int>('total_duration'),
+                level: _levelOrNull(row.readNullable<String>('level')),
               ),
             );
       }
@@ -317,6 +361,7 @@ class CatalogRepository {
             0,
             (sum, l) => sum + (l.durationSeconds ?? 0),
           ),
+          level: _levelOrNull(seriesRow.level),
         ),
         lessons: lessons,
       );
@@ -327,7 +372,7 @@ class CatalogRepository {
     return db
         .customSelect(
           '''
-          SELECT l.video_id, l.title_ar, l.duration_seconds, l.series_slug,
+          SELECT l.video_id, l.title_ar, l.duration_seconds, l.series_slug, l.position,
             s.title_ar AS series_title, p.watched_seconds, p.last_watched_at
           FROM lesson_progress p
           JOIN lessons l ON l.video_id = p.video_id AND l.status = 'active'
@@ -345,6 +390,7 @@ class CatalogRepository {
               ContinueWatchingItem(
                 videoId: row.read<String>('video_id'),
                 titleAr: row.read<String>('title_ar'),
+                position: row.read<int>('position'),
                 seriesSlug: row.read<String>('series_slug'),
                 seriesTitleAr: row.read<String>('series_title'),
                 watchedSeconds: row.read<int>('watched_seconds'),
@@ -363,12 +409,15 @@ class CatalogRepository {
     return db
         .customSelect(
           '''
-          SELECT sc.slug, sc.name_ar, sc.description_ar, sc.icon,
-            (SELECT COUNT(*) FROM series s WHERE s.science_slug = sc.slug) AS series_count
+          SELECT sc.slug, sc.name_ar, sc.description_ar, sc.icon, sc.sort_order,
+            (SELECT COUNT(*) FROM series s WHERE s.science_slug = sc.slug) AS series_count,
+            (SELECT COUNT(*) FROM lessons l
+               JOIN series s ON s.slug = l.series_slug
+              WHERE s.science_slug = sc.slug AND l.status = 'active') AS lesson_count
           FROM sciences sc
           ORDER BY sc.sort_order
           ''',
-          readsFrom: {db.sciences, db.seriesEntries},
+          readsFrom: {db.sciences, db.seriesEntries, db.lessons},
         )
         .watch()
         .map(
@@ -377,6 +426,8 @@ class CatalogRepository {
               ScienceSummary(
                 slug: row.read<String>('slug'),
                 nameAr: row.read<String>('name_ar'),
+                sortOrder: row.read<int>('sort_order'),
+                lessonCount: row.read<int>('lesson_count'),
                 descriptionAr: row.readNullable<String>('description_ar'),
                 icon: row.readNullable<String>('icon'),
                 seriesCount: row.read<int>('series_count'),
@@ -389,7 +440,7 @@ class CatalogRepository {
     return db
         .customSelect(
           '''
-          SELECT s.slug, s.title_ar, s.description_ar, s.thumbnail_url, s.science_slug,
+          SELECT s.slug, s.title_ar, s.description_ar, s.thumbnail_url, s.science_slug, s.level,
             (SELECT COUNT(*) FROM lessons l WHERE l.series_slug = s.slug AND l.status = 'active') AS lesson_count,
             (SELECT COALESCE(SUM(l.duration_seconds), 0) FROM lessons l
               WHERE l.series_slug = s.slug AND l.status = 'active') AS total_duration,
@@ -416,8 +467,12 @@ class CatalogRepository {
                 lessonCount: row.read<int>('lesson_count'),
                 completedCount: row.read<int>('completed_count'),
                 totalDurationSeconds: row.read<int>('total_duration'),
+                level: _levelOrNull(row.readNullable<String>('level')),
               ),
           ],
         );
   }
 }
+
+JourneyLevel? _levelOrNull(String? value) =>
+    value == null ? null : JourneyLevel.fromJson(value);

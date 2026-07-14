@@ -5,63 +5,78 @@ import '../formatters.dart';
 
 enum StageState { done, current, upcoming }
 
-/// One stage (مرحلة) in a journey's vertical timeline. Stages are visually
-/// sequenced but never locked — adult learners choose their own pace.
+/// One stage node on the journey timeline, per the design: 34px marker
+/// (green check / bordered number / recessed number), 2px connector that is
+/// green above completed stages, content supplied by the screen.
 class StageTimelineNode extends StatelessWidget {
   const StageTimelineNode({
     super.key,
     required this.index,
-    required this.title,
     required this.state,
-    this.description,
     this.isLast = false,
-    this.child,
+    required this.child,
   });
 
   /// 1-based stage number.
   final int index;
-  final String title;
-  final String? description;
   final StageState state;
   final bool isLast;
-
-  /// Stage content (series cards / tiles) rendered under the title.
-  final Widget? child;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
+    final masar = masarColorsOf(context);
+    final scheme = Theme.of(context).colorScheme;
 
     final Widget marker = switch (state) {
-      StageState.done => _markerCircle(
-        background: scheme.primary,
-        child: Icon(Icons.check_rounded, size: 18, color: scheme.onPrimary),
+      StageState.done => Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          color: masar.heroGreen,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: Icon(Icons.check_rounded, size: 16, color: masar.onHero),
       ),
-      StageState.current => _markerCircle(
-        background: scheme.primaryContainer,
-        border: Border.all(color: scheme.primary, width: 2),
+      StageState.current => Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          color: masar.chipBg,
+          shape: BoxShape.circle,
+          border: Border.all(color: scheme.primary, width: 2.5),
+        ),
+        alignment: Alignment.center,
         child: Text(
           arabicDigits(index),
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: scheme.primary,
+          style: TextStyle(
+            fontFamily: kUiFont,
+            fontSize: 13,
             fontWeight: FontWeight.w700,
+            color: scheme.primary,
           ),
         ),
       ),
-      StageState.upcoming => _markerCircle(
-        background: Colors.transparent,
-        border: Border.all(color: scheme.outlineVariant, width: 1.5),
+      StageState.upcoming => Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          color: masar.upcomingCircle,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
         child: Text(
           arabicDigits(index),
-          style: theme.textTheme.labelMedium?.copyWith(
-            color: scheme.onSurfaceVariant,
+          style: TextStyle(
+            fontFamily: kUiFont,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: masar.textMuted,
           ),
         ),
       ),
     };
-
-    final dimmed = state == StageState.upcoming;
 
     return IntrinsicHeight(
       child: Row(
@@ -74,65 +89,22 @@ class StageTimelineNode extends StatelessWidget {
                 Expanded(
                   child: Container(
                     width: 2,
-                    margin: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
                     color: state == StageState.done
-                        ? scheme.primary
-                        : scheme.outlineVariant,
+                        ? masar.heroGreen
+                        : masar.timelineInactive,
                   ),
                 ),
             ],
           ),
-          const SizedBox(width: AppSpacing.lg),
+          const SizedBox(width: 14),
           Expanded(
-            child: Opacity(
-              opacity: dimmed ? 0.65 : 1,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.xl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(top: 3),
-                      child: Text(title, style: theme.textTheme.titleMedium),
-                    ),
-                    if (description != null) ...[
-                      const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        description!,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                    if (child != null) ...[
-                      const SizedBox(height: AppSpacing.md),
-                      child!,
-                    ],
-                  ],
-                ),
-              ),
+            child: Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
+              child: child,
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _markerCircle({
-    required Color background,
-    Border? border,
-    required Widget child,
-  }) {
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        color: background,
-        shape: BoxShape.circle,
-        border: border,
-      ),
-      alignment: Alignment.center,
-      child: child,
     );
   }
 }

@@ -41,6 +41,7 @@ export const seriesSeedSchema = z.object({
   description_ar: z.string().optional(),
   thumbnail_url: z.string().url().optional(),
   science: slugSchema,
+  level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
   status: z.enum(['active', 'draft', 'archived']).default('draft'),
   /** Ordered: when a long series spans multiple playlists, order here is playback order. */
   youtube_playlists: z.array(z.string().min(1)).default([]),

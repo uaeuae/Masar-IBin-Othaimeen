@@ -1,34 +1,35 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
 import '../../data/models/enums.dart';
 import '../formatters.dart';
-import 'level_badge.dart';
+import 'science_glyph.dart';
 
-/// Card presenting a learning journey (مسار) in lists and on the home screen.
+/// Journey card per the design's المسارات list: glyph + title row with an
+/// optional "ملتحق" badge, the stage-sequence teaser line, then either a
+/// progress bar + meta (enrolled) or just the meta line.
 class JourneyCard extends StatelessWidget {
   const JourneyCard({
     super.key,
     required this.title,
     required this.level,
     required this.stageCount,
-    required this.lessonCount,
-    this.description,
+    required this.scienceName,
+    this.scienceSortOrder = 1,
+    this.seriesPreview = '',
+    this.enrolled = false,
     this.progress,
-    this.coverUrl,
     this.onTap,
   });
 
   final String title;
   final JourneyLevel level;
   final int stageCount;
-  final int lessonCount;
-  final String? description;
-
-  /// null = not enrolled; 0.0–1.0 shows a progress footer.
+  final String scienceName;
+  final int scienceSortOrder;
+  final String seriesPreview;
+  final bool enrolled;
   final double? progress;
-  final String? coverUrl;
   final VoidCallback? onTap;
 
   @override
@@ -36,102 +37,98 @@ class JourneyCard extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
+    final meta = '${stageCountLabel(stageCount)} · ${level.labelAr}';
+
     return Card(
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            AspectRatio(
-              aspectRatio: 21 / 9,
-              child: coverUrl != null
-                  ? CachedNetworkImage(imageUrl: coverUrl!, fit: BoxFit.cover)
-                  : DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: AlignmentDirectional.topStart,
-                          end: AlignmentDirectional.bottomEnd,
-                          colors: [
-                            scheme.primaryContainer,
-                            scheme.primaryContainer.withValues(alpha: 0.4),
-                          ],
-                        ),
-                      ),
-                      child: Align(
-                        alignment: const AlignmentDirectional(0.9, 1.6),
-                        child: Icon(
-                          Icons.auto_stories_rounded,
-                          size: 72,
-                          color: scheme.primary.withValues(alpha: 0.25),
-                        ),
-                      ),
-                    ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: theme.textTheme.titleMedium,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      LevelBadge(level: level),
-                    ],
+                  ScienceGlyph(
+                    nameAr: scienceName,
+                    sortOrder: scienceSortOrder,
+                    size: 38,
                   ),
-                  if (description != null) ...[
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      description!,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                      maxLines: 2,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      title,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    '${stageCountLabel(stageCount)} · ${lessonCountLabel(lessonCount)}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
+                      style: theme.textTheme.titleMedium,
                     ),
                   ),
-                  if (progress != null) ...[
-                    const SizedBox(height: AppSpacing.md),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(999),
-                            child: LinearProgressIndicator(
-                              value: progress!.clamp(0.0, 1.0),
-                              minHeight: 6,
-                            ),
-                          ),
+                  if (enrolled) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsetsDirectional.symmetric(
+                        horizontal: 10,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: scheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(AppRadius.chip),
+                      ),
+                      child: Text(
+                        'ملتحق',
+                        style: TextStyle(
+                          fontFamily: kUiFont,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: scheme.onPrimaryContainer,
                         ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text(
-                          percentLabel(progress!),
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: scheme.primary,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ],
               ),
-            ),
-          ],
+              if (seriesPreview.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  seriesPreview,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 10),
+              if (enrolled && progress != null)
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(AppRadius.chip),
+                        child: LinearProgressIndicator(
+                          value: progress!.clamp(0.0, 1.0),
+                          minHeight: 5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      meta,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                )
+              else
+                Text(
+                  meta,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

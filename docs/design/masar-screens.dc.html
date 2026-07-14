@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Amiri:ital,wght@0,400;0,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: #EAE7DD; }
+  a { color: #1E5B45; text-decoration: none; }
+  a:hover { color: #17492F; text-decoration: underline; }
+</style>
+</helmet>
+
+<section style="padding: 56px 64px 96px; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; display: flex; flex-direction: column; gap: 56px;">
+
+  <!-- ═══════════ HEADER ═══════════ -->
+  <div style="display: flex; flex-direction: column; gap: 10px; max-width: 900px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.14em; color: #8A8674; text-transform: uppercase;">Turn 1 · Hi-fi mockups · iPhone · RTL Arabic</div>
+    <div style="display: flex; align-items: baseline; gap: 18px;">
+      <div style="font-family: 'Amiri', serif; font-size: 44px; color: #1E3B2E; line-height: 1;">مسار ابن عثيمين</div>
+      <div style="font-size: 17px; color: #6B7A70;">Masar Ibn Uthaymeen — 9 MVP screens + 6 Phase 2–3 screens</div>
+    </div>
+    <div style="font-size: 13.5px; color: #7C7867; max-width: 720px; line-height: 1.6;">Direction: serene classical — deep green <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#1E5B45;vertical-align:-1px;"></span> on warm ivory, Amiri for classical text titles, IBM Plex Sans Arabic for UI. Dark theme shown on Home and the players.</div>
+  </div>
+
+  <!-- ═══════════ ROW 1 — SPLASH + THE THREE TABS ═══════════ -->
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #55503F; border-bottom: 1px solid #D8D4C6; padding-bottom: 8px;">01 — Launch &amp; the three tabs</div>
+    <div style="display: flex; gap: 44px; flex-wrap: wrap; align-items: flex-start;">
+
+      <!-- 1a SPLASH -->
+      <div id="1a" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1a</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Splash</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(175deg, #21624B 0%, #17492F 100%); gap: 28px;">
+            <div style="width: 132px; height: 132px; border-radius: 50%; border: 1.5px solid rgba(209,183,116,0.65); display: flex; align-items: center; justify-content: center;">
+              <div style="width: 112px; height: 112px; border-radius: 50%; border: 1px solid rgba(209,183,116,0.35); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div style="font-family: 'Amiri', serif; font-size: 44px; color: #F3EFE0; line-height: 1;">مسار</div>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <div style="font-family: 'Amiri', serif; font-size: 28px; color: #F3EFE0;">مسار ابن عثيمين</div>
+              <div style="font-size: 14px; color: rgba(243,239,224,0.7);">رحلة طالب العلم مع دروس الشيخ رحمه الله</div>
+            </div>
+            <div style="display: flex; gap: 7px; margin-top: 12px;">
+              <div style="width: 7px; height: 7px; border-radius: 50%; background: rgba(243,239,224,0.9);"></div>
+              <div style="width: 7px; height: 7px; border-radius: 50%; background: rgba(243,239,224,0.45);"></div>
+              <div style="width: 7px; height: 7px; border-radius: 50%; background: rgba(243,239,224,0.25);"></div>
+            </div>
+            <div style="position: absolute; bottom: 56px; font-size: 11.5px; color: rgba(243,239,224,0.55); text-align: center; padding: 0 40px; line-height: 1.7;">بإذن مؤسسة الشيخ محمد بن صالح العثيمين الخيرية<br>تطبيق تطوعي غير ربحي</div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Native launch screen — green + logo while the offline catalog loads. Foundation attribution up front.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1b HOME LIGHT -->
+      <div id="1b" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1b</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Home · الرئيسية</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 66px 20px 0; display: flex; flex-direction: column; gap: 20px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="font-size: 13px; color: #6B7A70;">السلام عليكم ورحمة الله</div>
+                  <div style="font-size: 24px; font-weight: 700; color: #1F2A24;">أهلًا بك يا طالب العلم</div>
+                </div>
+                <div style="width: 42px; height: 42px; border-radius: 50%; background: #E7EFE9; border: 1px solid #D5E2D9; display: flex; align-items: center; justify-content: center;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#1E5B45" stroke-width="1.6"></circle><path d="M12 7v5l3 2" stroke="#1E5B45" stroke-width="1.6" stroke-linecap="round"></path></svg>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <div style="padding: 7px 16px; border-radius: 99px; background: #1E5B45; color: #F3F1E7; font-size: 13px; font-weight: 600;">مبتدئ</div>
+                <div style="padding: 7px 16px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 13px; border: 1px solid #E3DFD1;">متوسط</div>
+                <div style="padding: 7px 16px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 13px; border: 1px solid #E3DFD1;">متقدم</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="font-size: 17px; font-weight: 700; color: #1F2A24;">متابعة المشاهدة</div>
+                <div style="background: #1E5B45; border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 24px rgba(30,91,69,0.22);">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <div style="font-family: 'Amiri', serif; font-size: 21px; color: #F3EFE0; line-height: 1.35;">الشرح الممتع على زاد المستقنع</div>
+                      <div style="font-size: 13px; color: rgba(243,239,224,0.75);">الدرس ١٢ — كتاب الطهارة · باب المياه</div>
+                    </div>
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #F3EFE0; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#1E5B45"></path></svg>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="height: 5px; border-radius: 99px; background: rgba(243,239,224,0.25); overflow: hidden;"><div style="width: 42%; height: 100%; border-radius: 99px; background: #D1B774;"></div></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: rgba(243,239,224,0.7);"><span>توقفت عند ١٢:٣٤</span><span>متبقٍ ٢٥ دقيقة</span></div>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                  <div style="font-size: 17px; font-weight: 700; color: #1F2A24;">مساراتي</div>
+                  <div style="font-size: 12.5px; color: #1E5B45; font-weight: 600;">عرض الكل</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+                  <svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="#E7EFE9" stroke-width="5"></circle><circle cx="26" cy="26" r="22" fill="none" stroke="#1E5B45" stroke-width="5" stroke-linecap="round" stroke-dasharray="46 138" transform="rotate(-90 26 26)"></circle><text x="26" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#1E5B45" font-family="IBM Plex Sans Arabic">٣٣٪</text></svg>
+                  <div style="display: flex; flex-direction: column; gap: 3px; flex: 1;">
+                    <div style="font-size: 15px; font-weight: 700; color: #1F2A24;">مسار العقيدة — المستوى الأول</div>
+                    <div style="font-size: 12.5px; color: #6B7A70;">المرحلة ٢ من ٥ · القواعد الأربع — الدرس ٣ من ٨</div>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="transform: scaleX(-1);"><path d="M9 6l6 6-6 6" stroke="#9AA79E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="font-size: 17px; font-weight: 700; color: #1F2A24;">مسارات مقترحة لك</div>
+                <div style="display: flex; gap: 12px;">
+                  <div style="flex: 1; background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="width: 34px; height: 34px; border-radius: 10px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 17px; color: #1E5B45;">ح</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #1F2A24; line-height: 1.4;">مسار الحديث للمبتدئين</div>
+                    <div style="font-size: 11.5px; color: #6B7A70;">الأربعون النووية ← رياض الصالحين</div>
+                  </div>
+                  <div style="flex: 1; background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="width: 34px; height: 34px; border-radius: 10px; background: #F3EDDD; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 17px; color: #A8874B;">ت</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #1F2A24; line-height: 1.4;">مسار التفسير</div>
+                    <div style="font-size: 11.5px; color: #6B7A70;">تفسير جزء عمّ ← سورة البقرة</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; padding: 10px 24px 34px; background: rgba(255,255,255,0.94); border-top: 1px solid #E7E3D6;">
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7v8.4a1.6 1.6 0 0 1-1.6 1.6H14v-6h-4v6H4.6A1.6 1.6 0 0 1 3 19.4z" stroke="#1E5B45" stroke-width="1.8" stroke-linejoin="round" fill="#E7EFE9"></path></svg>
+                <span style="font-size: 11px; font-weight: 700; color: #1E5B45;">الرئيسية</span>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="18" r="2.6" stroke="#8A968D" stroke-width="1.8"></circle><circle cx="18" cy="6" r="2.6" stroke="#8A968D" stroke-width="1.8"></circle><path d="M8 16.2C11.5 13 12.5 11 16 7.8" stroke="#8A968D" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 3.4"></path></svg>
+                <span style="font-size: 11px; color: #8A968D;">المسارات</span>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5z" stroke="#8A968D" stroke-width="1.8" stroke-linejoin="round"></path><path d="M8 3v18" stroke="#8A968D" stroke-width="1.8"></path></svg>
+                <span style="font-size: 11px; color: #8A968D;">المكتبة</span>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Home — resume card (exact minute + time left), enrolled journey with progress ring, level chips replace onboarding, suggested journeys.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1c HOME DARK -->
+      <div id="1c" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1c</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Home · dark</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #0F1613; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 66px 20px 0; display: flex; flex-direction: column; gap: 20px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="font-size: 13px; color: #93A398;">السلام عليكم ورحمة الله</div>
+                  <div style="font-size: 24px; font-weight: 700; color: #ECEAE0;">أهلًا بك يا طالب العلم</div>
+                </div>
+                <div style="width: 42px; height: 42px; border-radius: 50%; background: #1B2A21; border: 1px solid #26332B; display: flex; align-items: center; justify-content: center;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#7CC4A2" stroke-width="1.6"></circle><path d="M12 7v5l3 2" stroke="#7CC4A2" stroke-width="1.6" stroke-linecap="round"></path></svg>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <div style="padding: 7px 16px; border-radius: 99px; background: #7CC4A2; color: #0F1613; font-size: 13px; font-weight: 700;">مبتدئ</div>
+                <div style="padding: 7px 16px; border-radius: 99px; background: #17211A; color: #93A398; font-size: 13px; border: 1px solid #26332B;">متوسط</div>
+                <div style="padding: 7px 16px; border-radius: 99px; background: #17211A; color: #93A398; font-size: 13px; border: 1px solid #26332B;">متقدم</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="font-size: 17px; font-weight: 700; color: #ECEAE0;">متابعة المشاهدة</div>
+                <div style="background: #1E5B45; border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <div style="font-family: 'Amiri', serif; font-size: 21px; color: #F3EFE0; line-height: 1.35;">الشرح الممتع على زاد المستقنع</div>
+                      <div style="font-size: 13px; color: rgba(243,239,224,0.75);">الدرس ١٢ — كتاب الطهارة · باب المياه</div>
+                    </div>
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #F3EFE0; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#1E5B45"></path></svg>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="height: 5px; border-radius: 99px; background: rgba(243,239,224,0.25); overflow: hidden;"><div style="width: 42%; height: 100%; border-radius: 99px; background: #D1B774;"></div></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: rgba(243,239,224,0.7);"><span>توقفت عند ١٢:٣٤</span><span>متبقٍ ٢٥ دقيقة</span></div>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                  <div style="font-size: 17px; font-weight: 700; color: #ECEAE0;">مساراتي</div>
+                  <div style="font-size: 12.5px; color: #7CC4A2; font-weight: 600;">عرض الكل</div>
+                </div>
+                <div style="background: #17211A; border: 1px solid #26332B; border-radius: 18px; padding: 16px; display: flex; align-items: center; gap: 14px;">
+                  <svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" fill="none" stroke="#26332B" stroke-width="5"></circle><circle cx="26" cy="26" r="22" fill="none" stroke="#7CC4A2" stroke-width="5" stroke-linecap="round" stroke-dasharray="46 138" transform="rotate(-90 26 26)"></circle><text x="26" y="30" text-anchor="middle" font-size="12" font-weight="700" fill="#7CC4A2" font-family="IBM Plex Sans Arabic">٣٣٪</text></svg>
+                  <div style="display: flex; flex-direction: column; gap: 3px; flex: 1;">
+                    <div style="font-size: 15px; font-weight: 700; color: #ECEAE0;">مسار العقيدة — المستوى الأول</div>
+                    <div style="font-size: 12.5px; color: #93A398;">المرحلة ٢ من ٥ · القواعد الأربع — الدرس ٣ من ٨</div>
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="transform: scaleX(-1);"><path d="M9 6l6 6-6 6" stroke="#5B6B60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="font-size: 17px; font-weight: 700; color: #ECEAE0;">مسارات مقترحة لك</div>
+                <div style="display: flex; gap: 12px;">
+                  <div style="flex: 1; background: #17211A; border: 1px solid #26332B; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="width: 34px; height: 34px; border-radius: 10px; background: #1B2A21; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 17px; color: #7CC4A2;">ح</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #ECEAE0; line-height: 1.4;">مسار الحديث للمبتدئين</div>
+                    <div style="font-size: 11.5px; color: #93A398;">الأربعون النووية ← رياض الصالحين</div>
+                  </div>
+                  <div style="flex: 1; background: #17211A; border: 1px solid #26332B; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="width: 34px; height: 34px; border-radius: 10px; background: #2A2416; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 17px; color: #D1B774;">ت</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #ECEAE0; line-height: 1.4;">مسار التفسير</div>
+                    <div style="font-size: 11.5px; color: #93A398;">تفسير جزء عمّ ← سورة البقرة</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; padding: 10px 24px 34px; background: rgba(15,22,19,0.94); border-top: 1px solid #26332B;">
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7v8.4a1.6 1.6 0 0 1-1.6 1.6H14v-6h-4v6H4.6A1.6 1.6 0 0 1 3 19.4z" stroke="#7CC4A2" stroke-width="1.8" stroke-linejoin="round" fill="#1B2A21"></path></svg>
+                <span style="font-size: 11px; font-weight: 700; color: #7CC4A2;">الرئيسية</span>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="18" r="2.6" stroke="#5B6B60" stroke-width="1.8"></circle><circle cx="18" cy="6" r="2.6" stroke="#5B6B60" stroke-width="1.8"></circle><path d="M8 16.2C11.5 13 12.5 11 16 7.8" stroke="#5B6B60" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 3.4"></path></svg>
+                <span style="font-size: 11px; color: #5B6B60;">المسارات</span>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5z" stroke="#5B6B60" stroke-width="1.8" stroke-linejoin="round"></path><path d="M8 3v18" stroke="#5B6B60" stroke-width="1.8"></path></svg>
+                <span style="font-size: 11px; color: #5B6B60;">المكتبة</span>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Home in dark theme — same structure; green shifts to a lighter mint accent for contrast.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1d JOURNEYS LIST -->
+      <div id="1d" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1d</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Journeys · المسارات</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 66px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+              <div style="font-size: 28px; font-weight: 700; color: #1F2A24;">المسارات</div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <div style="padding: 7px 15px; border-radius: 99px; background: #1E5B45; color: #F3F1E7; font-size: 13px; font-weight: 600;">الكل</div>
+                <div style="padding: 7px 15px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 13px; border: 1px solid #E3DFD1;">العقيدة</div>
+                <div style="padding: 7px 15px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 13px; border: 1px solid #E3DFD1;">الفقه</div>
+                <div style="padding: 7px 15px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 13px; border: 1px solid #E3DFD1;">الحديث</div>
+                <div style="padding: 7px 15px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 13px; border: 1px solid #E3DFD1;">التفسير</div>
+              </div>
+              <div style="display: flex; background: #ECE9DE; border-radius: 12px; padding: 3px;">
+                <div style="flex: 1; text-align: center; padding: 7px 0; border-radius: 9px; background: #FFFFFF; font-size: 13px; font-weight: 700; color: #1F2A24; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">مبتدئ</div>
+                <div style="flex: 1; text-align: center; padding: 7px 0; font-size: 13px; color: #6B7A70;">متوسط</div>
+                <div style="flex: 1; text-align: center; padding: 7px 0; font-size: 13px; color: #6B7A70;">متقدم</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <div style="width: 38px; height: 38px; border-radius: 11px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 19px; color: #1E5B45;">ع</div>
+                      <div style="font-size: 16px; font-weight: 700; color: #1F2A24;">مسار العقيدة — المستوى الأول</div>
+                    </div>
+                    <div style="padding: 3px 10px; border-radius: 99px; background: #E7EFE9; color: #1E5B45; font-size: 11px; font-weight: 700;">ملتحق</div>
+                  </div>
+                  <div style="font-size: 12.5px; color: #6B7A70; line-height: 1.6;">ثلاثة الأصول ← القواعد الأربع ← كشف الشبهات ← كتاب التوحيد ← الواسطية</div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="flex: 1; height: 5px; border-radius: 99px; background: #ECE9DE;"><div style="width: 33%; height: 100%; border-radius: 99px; background: #1E5B45;"></div></div>
+                    <div style="font-size: 11.5px; color: #6B7A70;">٥ مراحل · مبتدئ</div>
+                  </div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 38px; height: 38px; border-radius: 11px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 19px; color: #1E5B45;">ف</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #1F2A24;">مسار الفقه للمبتدئين</div>
+                  </div>
+                  <div style="font-size: 12.5px; color: #6B7A70; line-height: 1.6;">شرح عمدة الأحكام ← شرح بلوغ المرام (كتاب الطهارة والصلاة)</div>
+                  <div style="font-size: 11.5px; color: #6B7A70;">٣ مراحل · مبتدئ</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 38px; height: 38px; border-radius: 11px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 19px; color: #1E5B45;">ح</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #1F2A24;">مسار الحديث للمبتدئين</div>
+                  </div>
+                  <div style="font-size: 12.5px; color: #6B7A70; line-height: 1.6;">شرح الأربعين النووية ← شرح رياض الصالحين (٤٧٠+ حلقة)</div>
+                  <div style="font-size: 11.5px; color: #6B7A70;">مرحلتان · مبتدئ</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 38px; height: 38px; border-radius: 11px; background: #F3EDDD; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 19px; color: #A8874B;">ت</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #1F2A24;">مسار التفسير</div>
+                  </div>
+                  <div style="font-size: 12.5px; color: #6B7A70; line-height: 1.6;">تفسير جزء عمّ ← تفسير آية الكرسي ← تفسير سورة البقرة</div>
+                  <div style="font-size: 11.5px; color: #6B7A70;">٣ مراحل · مبتدئ</div>
+                </div>
+              </div>
+            </div>
+            <div style="display: flex; padding: 10px 24px 34px; background: rgba(255,255,255,0.94); border-top: 1px solid #E7E3D6;">
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7v8.4a1.6 1.6 0 0 1-1.6 1.6H14v-6h-4v6H4.6A1.6 1.6 0 0 1 3 19.4z" stroke="#8A968D" stroke-width="1.8" stroke-linejoin="round"></path></svg>
+                <span style="font-size: 11px; color: #8A968D;">الرئيسية</span>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="18" r="2.6" stroke="#1E5B45" stroke-width="1.8" fill="#E7EFE9"></circle><circle cx="18" cy="6" r="2.6" stroke="#1E5B45" stroke-width="1.8" fill="#E7EFE9"></circle><path d="M8 16.2C11.5 13 12.5 11 16 7.8" stroke="#1E5B45" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 3.4"></path></svg>
+                <span style="font-size: 11px; font-weight: 700; color: #1E5B45;">المسارات</span>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5z" stroke="#8A968D" stroke-width="1.8" stroke-linejoin="round"></path><path d="M8 3v18" stroke="#8A968D" stroke-width="1.8"></path></svg>
+                <span style="font-size: 11px; color: #8A968D;">المكتبة</span>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Journeys — filter by science (chips) + level (segmented). Enrolled journeys show a progress bar; each card previews its stage sequence.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1e LIBRARY -->
+      <div id="1e" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1e</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Library · المكتبة</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 66px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 28px; font-weight: 700; color: #1F2A24;">المكتبة</div>
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="#55645B" stroke-width="1.8"></circle><path d="M16 16l4 4" stroke="#55645B" stroke-width="1.8" stroke-linecap="round"></path></svg>
+                </div>
+              </div>
+              <div style="font-size: 13px; color: #6B7A70; line-height: 1.6;">تصفّح جميع سلاسل الشيخ رحمه الله بحسب العلم — دون التقيد بمسار</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="width: 44px; height: 44px; border-radius: 13px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 23px; color: #1E5B45;">ع</div>
+                  <div style="font-size: 17px; font-weight: 700; color: #1F2A24;">العقيدة</div>
+                  <div style="font-size: 12px; color: #6B7A70;">١٤ سلسلة · ٦٢٠ درسًا</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="width: 44px; height: 44px; border-radius: 13px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 23px; color: #1E5B45;">ف</div>
+                  <div style="font-size: 17px; font-weight: 700; color: #1F2A24;">الفقه</div>
+                  <div style="font-size: 12px; color: #6B7A70;">٩ سلاسل · ٨٤٠ درسًا</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="width: 44px; height: 44px; border-radius: 13px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 23px; color: #1E5B45;">ح</div>
+                  <div style="font-size: 17px; font-weight: 700; color: #1F2A24;">الحديث</div>
+                  <div style="font-size: 12px; color: #6B7A70;">٦ سلاسل · ٧١٠ دروس</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="width: 44px; height: 44px; border-radius: 13px; background: #F3EDDD; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 23px; color: #A8874B;">ت</div>
+                  <div style="font-size: 17px; font-weight: 700; color: #1F2A24;">التفسير</div>
+                  <div style="font-size: 12px; color: #6B7A70;">١١ سلسلة · ٥٣٠ درسًا</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="width: 44px; height: 44px; border-radius: 13px; background: #F3EDDD; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 23px; color: #A8874B;">أ</div>
+                  <div style="font-size: 17px; font-weight: 700; color: #1F2A24;">أصول الفقه</div>
+                  <div style="font-size: 12px; color: #6B7A70;">٣ سلاسل · ٩٠ درسًا</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="width: 44px; height: 44px; border-radius: 13px; background: #F3EDDD; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 23px; color: #A8874B;">ن</div>
+                  <div style="font-size: 17px; font-weight: 700; color: #1F2A24;">النحو</div>
+                  <div style="font-size: 12px; color: #6B7A70;">سلسلتان · ٦٠ درسًا</div>
+                </div>
+              </div>
+              <div style="background: #ECE9DE; border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; gap: 10px;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3v10m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="#55645B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <div style="font-size: 12px; color: #55645B; line-height: 1.5;">الفهرس كامل متاح دون اتصال — التشغيل يتطلب اتصالًا بالإنترنت</div>
+              </div>
+            </div>
+            <div style="display: flex; padding: 10px 24px 34px; background: rgba(255,255,255,0.94); border-top: 1px solid #E7E3D6;">
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M3 11l9-7 9 7v8.4a1.6 1.6 0 0 1-1.6 1.6H14v-6h-4v6H4.6A1.6 1.6 0 0 1 3 19.4z" stroke="#8A968D" stroke-width="1.8" stroke-linejoin="round"></path></svg>
+                <span style="font-size: 11px; color: #8A968D;">الرئيسية</span>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="18" r="2.6" stroke="#8A968D" stroke-width="1.8"></circle><circle cx="18" cy="6" r="2.6" stroke="#8A968D" stroke-width="1.8"></circle><path d="M8 16.2C11.5 13 12.5 11 16 7.8" stroke="#8A968D" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3 3.4"></path></svg>
+                <span style="font-size: 11px; color: #8A968D;">المسارات</span>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5z" stroke="#1E5B45" stroke-width="1.8" stroke-linejoin="round" fill="#E7EFE9"></path><path d="M8 3v18" stroke="#1E5B45" stroke-width="1.8"></path></svg>
+                <span style="font-size: 11px; font-weight: 700; color: #1E5B45;">المكتبة</span>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Library — sciences grid, the "browse everything" escape hatch. Offline-catalog note at the bottom.</div>
+        </sc-if>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════ ROW 2 — STACK SCREENS ═══════════ -->
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #55503F; border-bottom: 1px solid #D8D4C6; padding-bottom: 8px;">02 — Screens that open above the tabs</div>
+    <div style="display: flex; gap: 44px; flex-wrap: wrap; align-items: flex-start;">
+
+      <!-- 1f JOURNEY DETAIL -->
+      <div id="1f" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1f</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Journey detail · تفاصيل المسار</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="background: linear-gradient(175deg, #21624B 0%, #17492F 100%); padding: 64px 20px 22px; display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#F3EFE0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="padding: 4px 12px; border-radius: 99px; background: rgba(209,183,116,0.2); border: 1px solid rgba(209,183,116,0.4); color: #EBD9A8; font-size: 11.5px; font-weight: 600;">مبتدئ</div>
+              </div>
+              <div style="font-family: 'Amiri', serif; font-size: 30px; color: #F3EFE0; line-height: 1.2;">مسار العقيدة — المستوى الأول</div>
+              <div style="font-size: 13px; color: rgba(243,239,224,0.75); line-height: 1.7;">من ثلاثة الأصول إلى العقيدة الواسطية — خمس مراحل متدرجة بشرح الشيخ رحمه الله</div>
+              <div style="display: flex; gap: 16px; font-size: 12px; color: rgba(243,239,224,0.8);">
+                <span>٥ مراحل</span><span>·</span><span>١١٨ درسًا</span><span>·</span><span>٩٦ ساعة</span>
+              </div>
+            </div>
+            <div style="flex: 1; overflow: hidden; padding: 20px 20px 0; display: flex; flex-direction: column; gap: 0;">
+              <div style="display: flex; gap: 14px;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                  <div style="width: 34px; height: 34px; border-radius: 50%; background: #1E5B45; display: flex; align-items: center; justify-content: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="#F3EFE0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                  <div style="width: 2px; flex: 1; background: #1E5B45;"></div>
+                </div>
+                <div style="flex: 1; padding-bottom: 16px; display: flex; flex-direction: column; gap: 3px;">
+                  <div style="font-family: 'Amiri', serif; font-size: 18px; color: #1F2A24;">شرح ثلاثة الأصول</div>
+                  <div style="font-size: 12px; color: #1E5B45; font-weight: 600;">مكتملة — ٢٤ من ٢٤ درسًا ✓</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 14px;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                  <div style="width: 34px; height: 34px; border-radius: 50%; background: #FFFFFF; border: 2.5px solid #1E5B45; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #1E5B45;">٢</div>
+                  <div style="width: 2px; flex: 1; background: #D8D4C6;"></div>
+                </div>
+                <div style="flex: 1; padding-bottom: 16px; display: flex; flex-direction: column; gap: 8px;">
+                  <div style="background: #FFFFFF; border: 1.5px solid #1E5B45; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 6px 18px rgba(30,91,69,0.12);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                      <div style="font-family: 'Amiri', serif; font-size: 18px; color: #1F2A24;">شرح القواعد الأربع</div>
+                      <div style="font-size: 11.5px; color: #6B7A70;">٣ من ٨</div>
+                    </div>
+                    <div style="height: 5px; border-radius: 99px; background: #ECE9DE;"><div style="width: 37%; height: 100%; border-radius: 99px; background: #1E5B45;"></div></div>
+                    <div style="align-self: flex-start; padding: 8px 20px; border-radius: 99px; background: #1E5B45; color: #F3F1E7; font-size: 13px; font-weight: 700;">استئناف — الدرس ٣</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 14px;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                  <div style="width: 34px; height: 34px; border-radius: 50%; background: #ECE9DE; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #8A968D;">٣</div>
+                  <div style="width: 2px; flex: 1; background: #D8D4C6;"></div>
+                </div>
+                <div style="flex: 1; padding-bottom: 16px; display: flex; flex-direction: column; gap: 3px;">
+                  <div style="font-family: 'Amiri', serif; font-size: 18px; color: #55645B;">شرح كشف الشبهات</div>
+                  <div style="font-size: 12px; color: #8A968D;">١٢ درسًا · ٩ ساعات</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 14px;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                  <div style="width: 34px; height: 34px; border-radius: 50%; background: #ECE9DE; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #8A968D;">٤</div>
+                  <div style="width: 2px; flex: 1; background: #D8D4C6;"></div>
+                </div>
+                <div style="flex: 1; padding-bottom: 16px; display: flex; flex-direction: column; gap: 3px;">
+                  <div style="font-family: 'Amiri', serif; font-size: 18px; color: #55645B;">شرح كتاب التوحيد</div>
+                  <div style="font-size: 12px; color: #8A968D;">٤٨ درسًا · ٤٠ ساعة</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 14px;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                  <div style="width: 34px; height: 34px; border-radius: 50%; background: #ECE9DE; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #8A968D;">٥</div>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 3px;">
+                  <div style="font-family: 'Amiri', serif; font-size: 18px; color: #55645B;">شرح العقيدة الواسطية</div>
+                  <div style="font-size: 12px; color: #8A968D;">٢٦ درسًا · ٢٢ ساعة</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Journey detail — stage timeline (المراحل): completed ✓, current stage expanded with resume CTA, upcoming stages quiet. Green header carries the journey identity.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1g SERIES DETAIL -->
+      <div id="1g" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1g</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Series detail · السلسلة</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 62px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; justify-content: flex-start;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#55645B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="font-size: 12px; font-weight: 600; color: #1E5B45;">العقيدة · المرحلة ٢ من مسار العقيدة</div>
+                <div style="font-family: 'Amiri', serif; font-size: 30px; color: #1F2A24; line-height: 1.25;">شرح القواعد الأربع</div>
+                <div style="font-size: 12.5px; color: #6B7A70;">٨ دروس · ٦ ساعات و٢٠ دقيقة · قناة الشيخ الرسمية</div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; background: #1E5B45; border-radius: 16px; padding: 14px 16px;">
+                <div style="width: 42px; height: 42px; border-radius: 50%; background: #F3EFE0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#1E5B45"></path></svg>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="font-size: 14.5px; font-weight: 700; color: #F3EFE0;">استئناف — الدرس ٣</div>
+                  <div style="font-size: 11.5px; color: rgba(243,239,224,0.7);">توقفت عند ١٨:٠٥ من ٤٥:٣٠</div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; overflow: hidden;">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="width: 26px; height: 26px; border-radius: 50%; background: #1E5B45; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="#F3EFE0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                  <div style="flex: 1; font-size: 14px; color: #8A968D; text-decoration: line-through;">الدرس ١ — مقدمة الرسالة</div>
+                  <div style="font-size: 11.5px; color: #B0AC9C;">٤٢:١٠</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="width: 26px; height: 26px; border-radius: 50%; background: #1E5B45; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="#F3EFE0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+                  <div style="flex: 1; font-size: 14px; color: #8A968D; text-decoration: line-through;">الدرس ٢ — الحنيفية وحقيقة العبادة</div>
+                  <div style="font-size: 11.5px; color: #B0AC9C;">٣٨:٥٥</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; padding: 13px 16px; background: #F4F8F5; border-bottom: 1px solid #F0EDE2;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 26px; height: 26px; border-radius: 50%; border: 2px solid #1E5B45; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="9" height="9" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#1E5B45"></path></svg></div>
+                    <div style="flex: 1; font-size: 14px; font-weight: 700; color: #1F2A24;">الدرس ٣ — القاعدة الأولى</div>
+                    <div style="font-size: 11.5px; color: #6B7A70;">٤٥:٣٠</div>
+                  </div>
+                  <div style="height: 4px; border-radius: 99px; background: #E1E8E2; margin-right: 38px;"><div style="width: 40%; height: 100%; border-radius: 99px; background: #1E5B45;"></div></div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #D8D4C6; flex-shrink: 0;"></div>
+                  <div style="flex: 1; font-size: 14px; color: #1F2A24;">الدرس ٤ — القاعدة الثانية: الشفاعة</div>
+                  <div style="font-size: 11.5px; color: #B0AC9C;">٥١:٢٠</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #D8D4C6; flex-shrink: 0;"></div>
+                  <div style="flex: 1; font-size: 14px; color: #1F2A24;">الدرس ٥ — القاعدة الثالثة</div>
+                  <div style="font-size: 11.5px; color: #B0AC9C;">٤٧:٠٠</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #D8D4C6; flex-shrink: 0;"></div>
+                  <div style="flex: 1; font-size: 14px; color: #1F2A24;">الدرس ٦ — القاعدة الرابعة</div>
+                  <div style="font-size: 11.5px; color: #B0AC9C;">٣٩:٤٥</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 13px 16px;">
+                  <div style="width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #D8D4C6; flex-shrink: 0;"></div>
+                  <div style="flex: 1; font-size: 14px; color: #1F2A24;">الدرس ٧ — خاتمة الرسالة وفوائدها</div>
+                  <div style="font-size: 11.5px; color: #B0AC9C;">٤٤:١٥</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Series detail — checkmarked lesson list, current lesson highlighted with in-lesson progress, استئناف resumes at the saved minute.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1h LESSON PLAYER -->
+      <div id="1h" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1h</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Lesson player · dark</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #0F1613; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 62px 0 0; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #17211A; display: flex; align-items: center; justify-content: center;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#ECEAE0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="font-size: 12px; color: #93A398;">شرح القواعد الأربع · ٣ / ٨</div>
+              </div>
+              <div style="width: 100%; aspect-ratio: 16 / 9; background: repeating-linear-gradient(45deg, #17211A, #17211A 10px, #1B2620 10px, #1B2620 20px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+                <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(243,239,224,0.95); display: flex; align-items: center; justify-content: center;"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#1E5B45"></path></svg></div>
+                <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7A8A7F;">YouTube embed — official channel player</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px; padding: 0 20px;">
+                <div dir="ltr" style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 11px; color: #93A398; font-family: 'IBM Plex Mono', monospace;">18:05</span>
+                  <div style="flex: 1; height: 4px; border-radius: 99px; background: #26332B; position: relative;"><div style="width: {{ playerPct }}%; height: 100%; border-radius: 99px; background: #7CC4A2;"></div></div>
+                  <span style="font-size: 11px; color: #93A398; font-family: 'IBM Plex Mono', monospace;">45:30</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px; align-self: flex-start;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10" stroke="#7CC4A2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  <span style="font-size: 11.5px; color: #7CC4A2;">حُفظ موضع التوقف تلقائيًا</span>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 20px;">
+                <div style="font-family: 'Amiri', serif; font-size: 22px; color: #ECEAE0; line-height: 1.4;">الدرس ٣ — القاعدة الأولى</div>
+                <div style="font-size: 13px; color: #93A398;">مسار العقيدة · المرحلة ٢ · شرح القواعد الأربع</div>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 26px;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                  <div style="width: 46px; height: 46px; border-radius: 50%; background: #17211A; display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="transform: scaleX(-1);"><path d="M6 5v14M18 6l-8 6 8 6z" stroke="#ECEAE0" stroke-width="1.8" stroke-linejoin="round"></path></svg></div>
+                  <span style="font-size: 10.5px; color: #93A398;">السابق</span>
+                </div>
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: #7CC4A2; display: flex; align-items: center; justify-content: center;"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#0F1613"></path></svg></div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                  <div style="width: 46px; height: 46px; border-radius: 50%; background: #17211A; display: flex; align-items: center; justify-content: center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 5v14M18 6l-8 6 8 6z" stroke="#ECEAE0" stroke-width="1.8" stroke-linejoin="round"></path></svg></div>
+                  <span style="font-size: 10.5px; color: #93A398;">التالي</span>
+                </div>
+              </div>
+              <div style="margin: 0 20px; display: flex; align-items: center; justify-content: space-between; background: #17211A; border: 1px solid #26332B; border-radius: 14px; padding: 12px 16px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="font-size: 13.5px; font-weight: 600; color: #ECEAE0;">التشغيل التلقائي للدرس التالي</div>
+                  <div style="font-size: 11.5px; color: #93A398;">التالي: الدرس ٤ — القاعدة الثانية: الشفاعة</div>
+                </div>
+                <div style="width: 46px; height: 27px; border-radius: 99px; background: #7CC4A2; position: relative; flex-shrink: 0;"><div style="position: absolute; top: 2.5px; left: 2.5px; width: 22px; height: 22px; border-radius: 50%; background: #0F1613;"></div></div>
+              </div>
+              <div style="margin: 0 20px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="font-size: 14px; font-weight: 700; color: #ECEAE0;">بقية الدروس</div>
+                <div style="display: flex; align-items: center; gap: 12px; background: #17211A; border: 1px solid #26332B; border-radius: 14px; padding: 11px 14px;">
+                  <div style="width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #3A473E; flex-shrink: 0;"></div>
+                  <div style="flex: 1; font-size: 13.5px; color: #ECEAE0;">الدرس ٤ — القاعدة الثانية: الشفاعة</div>
+                  <div style="font-size: 11px; color: #5B6B60; font-family: 'IBM Plex Mono', monospace;">51:20</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Lesson player — official YouTube embed, prev/next, autoplay-next toggle with up-next preview, auto-saved position badge. (Progress % is tweakable.)</div>
+        </sc-if>
+      </div>
+
+      <!-- 1i SCIENCE SERIES LIST -->
+      <div id="1i" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1i</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Science series list · الفقه</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 62px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#55645B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: 40px; height: 40px; border-radius: 12px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 21px; color: #1E5B45;">ف</div>
+                  <div style="display: flex; flex-direction: column;">
+                    <div style="font-size: 22px; font-weight: 700; color: #1F2A24;">الفقه</div>
+                    <div style="font-size: 12px; color: #6B7A70;">٩ سلاسل · ٨٤٠ درسًا</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <div style="padding: 6px 14px; border-radius: 99px; background: #1E5B45; color: #F3F1E7; font-size: 12.5px; font-weight: 600;">الأحدث</div>
+                <div style="padding: 6px 14px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 12.5px; border: 1px solid #E3DFD1;">الأقصر أولًا</div>
+                <div style="padding: 6px 14px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 12.5px; border: 1px solid #E3DFD1;">أبجديًا</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
+                    <div style="font-family: 'Amiri', serif; font-size: 19px; color: #1F2A24; line-height: 1.35;">الشرح الممتع على زاد المستقنع</div>
+                    <div style="padding: 3px 10px; border-radius: 99px; background: #F3EDDD; color: #A8874B; font-size: 10.5px; font-weight: 700; flex-shrink: 0;">متقدم</div>
+                  </div>
+                  <div style="font-size: 12px; color: #6B7A70;">٣٤٨ حلقة · ٢٩٠ ساعة</div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="flex: 1; height: 4px; border-radius: 99px; background: #ECE9DE;"><div style="width: 4%; height: 100%; border-radius: 99px; background: #1E5B45;"></div></div>
+                    <div style="font-size: 11px; color: #6B7A70;">١٢ / ٣٤٨</div>
+                  </div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
+                    <div style="font-family: 'Amiri', serif; font-size: 19px; color: #1F2A24; line-height: 1.35;">شرح بلوغ المرام</div>
+                    <div style="padding: 3px 10px; border-radius: 99px; background: #EEF0E4; color: #6E7A4E; font-size: 10.5px; font-weight: 700; flex-shrink: 0;">متوسط</div>
+                  </div>
+                  <div style="font-size: 12px; color: #6B7A70;">٢٢٠ حلقة · ١٧٥ ساعة</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
+                    <div style="font-family: 'Amiri', serif; font-size: 19px; color: #1F2A24; line-height: 1.35;">شرح عمدة الأحكام</div>
+                    <div style="padding: 3px 10px; border-radius: 99px; background: #E7EFE9; color: #1E5B45; font-size: 10.5px; font-weight: 700; flex-shrink: 0;">مبتدئ</div>
+                  </div>
+                  <div style="font-size: 12px; color: #6B7A70;">٥٦ حلقة · ٤٤ ساعة</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px;">
+                    <div style="font-family: 'Amiri', serif; font-size: 19px; color: #1F2A24; line-height: 1.35;">شرح منهج السالكين</div>
+                    <div style="padding: 3px 10px; border-radius: 99px; background: #E7EFE9; color: #1E5B45; font-size: 10.5px; font-weight: 700; flex-shrink: 0;">مبتدئ</div>
+                  </div>
+                  <div style="font-size: 12px; color: #6B7A70;">٣٢ حلقة · ٢٥ ساعة</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Science series list — all fiqh series with level badges, episode counts, and progress where started.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1j SETTINGS -->
+      <div id="1j" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1j</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Settings · الإعدادات</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 62px 20px 0; display: flex; flex-direction: column; gap: 18px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#55645B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="font-size: 24px; font-weight: 700; color: #1F2A24;">الإعدادات</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="font-size: 12.5px; font-weight: 700; color: #6B7A70;">المظهر</div>
+                <div style="display: flex; background: #ECE9DE; border-radius: 12px; padding: 3px;">
+                  <div style="flex: 1; text-align: center; padding: 8px 0; border-radius: 9px; background: #FFFFFF; font-size: 13px; font-weight: 700; color: #1F2A24; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">فاتح</div>
+                  <div style="flex: 1; text-align: center; padding: 8px 0; font-size: 13px; color: #6B7A70;">داكن</div>
+                  <div style="flex: 1; text-align: center; padding: 8px 0; font-size: 13px; color: #6B7A70;">تلقائي</div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 16px; overflow: hidden;">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <div style="font-size: 14.5px; font-weight: 600; color: #1F2A24;">التشغيل التلقائي للدرس التالي</div>
+                    <div style="font-size: 11.5px; color: #6B7A70;">ينتقل تلقائيًا بعد انتهاء الدرس</div>
+                  </div>
+                  <div style="width: 46px; height: 27px; border-radius: 99px; background: #1E5B45; position: relative; flex-shrink: 0;"><div style="position: absolute; top: 2.5px; left: 2.5px; width: 22px; height: 22px; border-radius: 50%; background: #FFFFFF;"></div></div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px;">
+                  <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <div style="font-size: 14.5px; font-weight: 600; color: #1F2A24;">تذكير المتابعة اليومي</div>
+                    <div style="font-size: 11.5px; color: #6B7A70;">إشعار لطيف لمواصلة مسارك</div>
+                  </div>
+                  <div style="width: 46px; height: 27px; border-radius: 99px; background: #D8D4C6; position: relative; flex-shrink: 0;"><div style="position: absolute; top: 2.5px; right: 2.5px; width: 22px; height: 22px; border-radius: 50%; background: #FFFFFF;"></div></div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 16px; overflow: hidden;">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="font-size: 14.5px; color: #1F2A24;">القناة الرسمية للشيخ</div>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="transform: scaleX(-1);"><path d="M9 6l6 6-6 6" stroke="#9AA79E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="font-size: 14.5px; color: #1F2A24;">موقع المؤسسة</div>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="transform: scaleX(-1);"><path d="M9 6l6 6-6 6" stroke="#9AA79E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px;">
+                  <div style="font-size: 14.5px; color: #1F2A24;">مسح بيانات التقدم</div>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="transform: scaleX(-1);"><path d="M9 6l6 6-6 6" stroke="#9AA79E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+              </div>
+              <div style="background: #EFEBDD; border: 1px solid #E3DCC5; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="font-family: 'Amiri', serif; font-size: 17px; color: #55503F;">جميع الدروس بإذن ونسبة كاملة إلى</div>
+                <div style="font-size: 13.5px; font-weight: 700; color: #1F2A24;">مؤسسة الشيخ محمد بن صالح العثيمين الخيرية</div>
+                <div style="font-size: 12px; color: #77735F; line-height: 1.7;">تطبيق تطوعي غير ربحي — بلا حسابات، بلا إعلانات، بلا جمع بيانات. تقدمك محفوظ على جهازك فقط.</div>
+              </div>
+              <div dir="ltr" style="text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B0AC9C;">Masar v1.0.0</div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Settings — theme, autoplay, official links, and the foundation attribution + no-accounts promise.</div>
+        </sc-if>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════ ROW 3 — PHASE 2–3 ═══════════ -->
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #55503F; border-bottom: 1px solid #D8D4C6; padding-bottom: 8px;">03 — Phase 2–3 (final product)</div>
+    <div style="display: flex; gap: 44px; flex-wrap: wrap; align-items: flex-start;">
+
+      <!-- 1k FATWA TOPICS -->
+      <div id="1k" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1k</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Fatwa topics · الفتاوى</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 62px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#55645B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="font-size: 24px; font-weight: 700; color: #1F2A24;">الفتاوى</div>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <div style="padding: 7px 15px; border-radius: 99px; background: #1E5B45; color: #F3F1E7; font-size: 13px; font-weight: 600;">نور على الدرب</div>
+                <div style="padding: 7px 15px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 13px; border: 1px solid #E3DFD1;">اللقاء الشهري</div>
+                <div style="padding: 7px 15px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 13px; border: 1px solid #E3DFD1;">لقاء الباب المفتوح</div>
+              </div>
+              <div style="display: flex; flex-direction: column; background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; overflow: hidden;">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 15px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="width: 36px; height: 36px; border-radius: 11px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 18px; color: #1E5B45;">ط</div>
+                  <div style="flex: 1; font-size: 15px; font-weight: 600; color: #1F2A24;">الطهارة</div>
+                  <div style="font-size: 12px; color: #8A968D;">٣١٢ فتوى</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 15px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="width: 36px; height: 36px; border-radius: 11px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 18px; color: #1E5B45;">ص</div>
+                  <div style="flex: 1; font-size: 15px; font-weight: 600; color: #1F2A24;">الصلاة</div>
+                  <div style="font-size: 12px; color: #8A968D;">٨٤٠ فتوى</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 15px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="width: 36px; height: 36px; border-radius: 11px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 18px; color: #1E5B45;">ز</div>
+                  <div style="flex: 1; font-size: 15px; font-weight: 600; color: #1F2A24;">الزكاة</div>
+                  <div style="font-size: 12px; color: #8A968D;">٢٠٥ فتاوى</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 15px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="width: 36px; height: 36px; border-radius: 11px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 18px; color: #1E5B45;">م</div>
+                  <div style="flex: 1; font-size: 15px; font-weight: 600; color: #1F2A24;">الصيام</div>
+                  <div style="font-size: 12px; color: #8A968D;">٣٧٦ فتوى</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 15px 16px; border-bottom: 1px solid #F0EDE2;">
+                  <div style="width: 36px; height: 36px; border-radius: 11px; background: #E7EFE9; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 18px; color: #1E5B45;">ج</div>
+                  <div style="flex: 1; font-size: 15px; font-weight: 600; color: #1F2A24;">الحج والعمرة</div>
+                  <div style="font-size: 12px; color: #8A968D;">٤٤١ فتوى</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; padding: 15px 16px;">
+                  <div style="width: 36px; height: 36px; border-radius: 11px; background: #F3EDDD; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 18px; color: #A8874B;">ب</div>
+                  <div style="flex: 1; font-size: 15px; font-weight: 600; color: #1F2A24;">البيوع والمعاملات</div>
+                  <div style="font-size: 12px; color: #8A968D;">٥٩٨ فتوى</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Phase 2 · Fatwa topics — filter by source program, browse by fiqh chapter.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1l FATWA DETAIL -->
+      <div id="1l" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1l</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Fatwa detail · الفتوى</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 62px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#55645B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 3h12v18l-6-4-6 4z" stroke="#55645B" stroke-width="1.7" stroke-linejoin="round"></path></svg>
+                  </div>
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 14V4m0 0L8 8m4-4l4 4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="#55645B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="padding: 4px 12px; border-radius: 99px; background: #E7EFE9; color: #1E5B45; font-size: 11.5px; font-weight: 700;">الصلاة</div>
+                <div style="font-size: 11.5px; color: #8A968D;">نور على الدرب · الشريط ١٢٣</div>
+              </div>
+              <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 18px; display: flex; gap: 12px;">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: #1E5B45; color: #F3EFE0; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 17px; flex-shrink: 0;">س</div>
+                <div style="font-family: 'Amiri', serif; font-size: 18px; color: #1F2A24; line-height: 1.8;">ما حكم من أدرك الإمام راكعًا — هل تُحسب له الركعة وإن لم يقرأ الفاتحة؟</div>
+              </div>
+              <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 18px; display: flex; gap: 12px;">
+                <div style="width: 32px; height: 32px; border-radius: 10px; background: #F3EDDD; color: #A8874B; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 17px; flex-shrink: 0;">ج</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <div style="font-family: 'Amiri', serif; font-size: 17px; color: #3A453E; line-height: 2;">الحمد لله، إذا أدرك المأموم الإمام راكعًا فقد أدرك الركعة على القول الراجح، وتسقط عنه قراءة الفاتحة في هذه الحال؛ لحديث أبي بكرة رضي الله عنه…</div>
+                  <div style="font-size: 12px; color: #1E5B45; font-weight: 600;">قراءة النص كاملًا</div>
+                </div>
+              </div>
+              <div style="background: #1E5B45; border-radius: 18px; padding: 14px 16px; display: flex; align-items: center; gap: 14px;">
+                <div style="width: 44px; height: 44px; border-radius: 50%; background: #F3EFE0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="16" height="16" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#1E5B45"></path></svg>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+                  <div style="font-size: 12.5px; font-weight: 600; color: #F3EFE0;">الاستماع لجواب الشيخ صوتيًا</div>
+                  <div style="display: flex; align-items: flex-end; gap: 2.5px; height: 18px;">
+                    <div style="width: 3px; height: 40%; border-radius: 2px; background: rgba(243,239,224,0.9);"></div><div style="width: 3px; height: 75%; border-radius: 2px; background: rgba(243,239,224,0.9);"></div><div style="width: 3px; height: 55%; border-radius: 2px; background: rgba(243,239,224,0.9);"></div><div style="width: 3px; height: 90%; border-radius: 2px; background: rgba(243,239,224,0.9);"></div><div style="width: 3px; height: 60%; border-radius: 2px; background: rgba(243,239,224,0.9);"></div><div style="width: 3px; height: 35%; border-radius: 2px; background: rgba(243,239,224,0.5);"></div><div style="width: 3px; height: 70%; border-radius: 2px; background: rgba(243,239,224,0.35);"></div><div style="width: 3px; height: 45%; border-radius: 2px; background: rgba(243,239,224,0.35);"></div><div style="width: 3px; height: 80%; border-radius: 2px; background: rgba(243,239,224,0.35);"></div><div style="width: 3px; height: 50%; border-radius: 2px; background: rgba(243,239,224,0.35);"></div>
+                  </div>
+                </div>
+                <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: rgba(243,239,224,0.7);">1:12 / 2:40</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="font-size: 14px; font-weight: 700; color: #1F2A24;">فتاوى ذات صلة</div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 14px; padding: 13px 16px; font-family: 'Amiri', serif; font-size: 15.5px; color: #3A453E; line-height: 1.7;">حكم قضاء ما فات المسبوق بعد سلام الإمام</div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 14px; padding: 13px 16px; font-family: 'Amiri', serif; font-size: 15.5px; color: #3A453E; line-height: 1.7;">متى تُدرك صلاة الجماعة؟</div>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Phase 2 · Fatwa detail — question + answer text with the sheikh's original audio inline; bookmark and share.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1m SEARCH -->
+      <div id="1m" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1m</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Unified search · البحث</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" keyboard="{{ true }}" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 62px 20px 0; display: flex; flex-direction: column; gap: 14px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="flex: 1; display: flex; align-items: center; gap: 10px; background: #FFFFFF; border: 1.5px solid #1E5B45; border-radius: 14px; padding: 11px 14px;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="#1E5B45" stroke-width="1.8"></circle><path d="M16 16l4 4" stroke="#1E5B45" stroke-width="1.8" stroke-linecap="round"></path></svg>
+                  <span style="font-size: 15px; color: #1F2A24;">الربا</span>
+                  <span style="width: 2px; height: 18px; background: #1E5B45;"></span>
+                </div>
+                <div style="font-size: 13.5px; color: #1E5B45; font-weight: 600;">إلغاء</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <div style="padding: 6px 14px; border-radius: 99px; background: #1E5B45; color: #F3F1E7; font-size: 12px; font-weight: 600;">الكل</div>
+                <div style="padding: 6px 14px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 12px; border: 1px solid #E3DFD1;">دروس</div>
+                <div style="padding: 6px 14px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 12px; border: 1px solid #E3DFD1;">فتاوى</div>
+                <div style="padding: 6px 14px; border-radius: 99px; background: #FFFFFF; color: #55645B; font-size: 12px; border: 1px solid #E3DFD1;">كتب</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="font-size: 12px; font-weight: 700; color: #6B7A70;">دروس · ٨ نتائج</div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 14px; padding: 13px 16px; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="font-size: 14px; font-weight: 600; color: #1F2A24;">باب <span style="background: #F3EDDD; color: #7A6230; border-radius: 4px; padding: 0 3px;">الربا</span> والصرف — الشرح الممتع</div>
+                  <div style="font-size: 11.5px; color: #8A968D;">الفقه · الدرس ٢٤١ · ٥٥:٣٠</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 14px; padding: 13px 16px; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="font-size: 14px; font-weight: 600; color: #1F2A24;">حديث «كل قرض جرّ نفعًا…» — شرح بلوغ المرام</div>
+                  <div style="font-size: 11.5px; color: #8A968D;">الفقه · الدرس ١٥٦ · ٤٨:١٠</div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="font-size: 12px; font-weight: 700; color: #6B7A70;">فتاوى · ٢٣ نتيجة</div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 14px; padding: 13px 16px; display: flex; flex-direction: column; gap: 4px;">
+                  <div style="font-family: 'Amiri', serif; font-size: 15.5px; color: #1F2A24; line-height: 1.6;">حكم فوائد البنوك — هل هي من <span style="background: #F3EDDD; color: #7A6230; border-radius: 4px; padding: 0 3px;">الربا</span>؟</div>
+                  <div style="font-size: 11.5px; color: #8A968D;">نور على الدرب · البيوع والمعاملات</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Phase 2–3 · Unified search — one query across lessons, fatwas and books, grouped results with highlighted matches. (iOS keyboard shown.)</div>
+        </sc-if>
+      </div>
+
+      <!-- 1n AUDIO PLAYER -->
+      <div id="1n" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1n</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Audio player · dark</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ true }}" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: linear-gradient(180deg, #142019 0%, #0F1613 60%); font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 66px 28px 0; display: flex; flex-direction: column; align-items: center; gap: 24px;">
+              <div style="align-self: stretch; display: flex; justify-content: space-between; align-items: center;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #17211A; display: flex; align-items: center; justify-content: center;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="transform: rotate(-90deg);"><path d="M9 6l6 6-6 6" stroke="#ECEAE0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="font-size: 12px; color: #93A398;">تشغيل صوتي · يعمل في الخلفية</div>
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #17211A; display: flex; align-items: center; justify-content: center;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#93A398" stroke-width="1.6"></circle><path d="M12 8v4l2.5 1.5" stroke="#93A398" stroke-width="1.6" stroke-linecap="round"></path></svg>
+                </div>
+              </div>
+              <div style="width: 240px; height: 240px; border-radius: 28px; background: linear-gradient(160deg, #1E5B45, #17492F); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.45);">
+                <div style="width: 92px; height: 92px; border-radius: 50%; border: 1.5px solid rgba(209,183,116,0.55); display: flex; align-items: center; justify-content: center;">
+                  <div style="font-family: 'Amiri', serif; font-size: 34px; color: #F3EFE0;">ر</div>
+                </div>
+                <div style="font-family: 'Amiri', serif; font-size: 18px; color: rgba(243,239,224,0.85);">رياض الصالحين</div>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                <div style="font-family: 'Amiri', serif; font-size: 24px; color: #ECEAE0; text-align: center; line-height: 1.4;">باب الصبر — الحلقة ٨٧</div>
+                <div style="font-size: 13px; color: #93A398;">شرح رياض الصالحين · صوتيات المؤسسة</div>
+              </div>
+              <div style="align-self: stretch; display: flex; flex-direction: column; gap: 6px;">
+                <div dir="ltr" style="height: 4px; border-radius: 99px; background: #26332B;"><div style="width: 62%; height: 100%; border-radius: 99px; background: #7CC4A2;"></div></div>
+                <div dir="ltr" style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #93A398;"><span>28:44</span><span>46:20</span></div>
+              </div>
+              <div style="align-self: stretch; display: flex; align-items: center; justify-content: space-between; padding: 0 8px;">
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; color: #93A398;">١٫٥×</div>
+                <div style="display: flex; align-items: center; gap: 22px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="transform: scaleX(-1);"><path d="M6 5v14M18 6l-8 6 8 6z" stroke="#ECEAE0" stroke-width="1.8" stroke-linejoin="round"></path></svg>
+                  <div style="width: 68px; height: 68px; border-radius: 50%; background: #7CC4A2; display: flex; align-items: center; justify-content: center;">
+                    <div style="display: flex; gap: 5px;"><div style="width: 6px; height: 22px; border-radius: 2px; background: #0F1613;"></div><div style="width: 6px; height: 22px; border-radius: 2px; background: #0F1613;"></div></div>
+                  </div>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 5v14M18 6l-8 6 8 6z" stroke="#ECEAE0" stroke-width="1.8" stroke-linejoin="round"></path></svg>
+                </div>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3a6 6 0 0 0-6 6v3l-2 4h16l-2-4V9a6 6 0 0 0-6-6zM10 19a2 2 0 0 0 4 0" stroke="#93A398" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+              </div>
+              <div style="align-self: stretch; background: #17211A; border: 1px solid #26332B; border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="font-size: 12.5px; color: #ECEAE0;">التالي: باب الصدق — الحلقة ٨٨</div>
+                <div style="font-size: 11px; color: #5B6B60; font-family: 'IBM Plex Mono', monospace;">44:05</div>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Phase 2 · Audio series player — foundation-hosted audio, background playback, speed control, sleep timer, up next.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1o BOOK READER -->
+      <div id="1o" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1o</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Book reader · المتون</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #FBF8EF; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 62px 24px 0; display: flex; flex-direction: column; gap: 18px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#55645B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center; font-family: 'Amiri', serif; font-size: 13px; color: #55645B;">أ<span style="font-size: 17px;">أ</span></div>
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 3h12v18l-6-4-6 4z" stroke="#55645B" stroke-width="1.7" stroke-linejoin="round"></path></svg>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; border-bottom: 1px solid #EAE4D2; padding-bottom: 16px;">
+                <div style="font-family: 'Amiri', serif; font-size: 28px; color: #1F2A24;">ثلاثة الأصول وأدلتها</div>
+                <div style="font-size: 12px; color: #8A968D;">المتن · الفصل الأول</div>
+              </div>
+              <div style="font-family: 'Amiri', serif; font-size: 21px; color: #2A342C; line-height: 2.3; text-align: justify;">اعلم — رحمك الله — أنه يجب علينا تعلُّم أربع مسائل: <span style="color: #1E5B45;">الأولى:</span> العلم، وهو معرفة الله، ومعرفة نبيه، ومعرفة دين الإسلام بالأدلة. <span style="color: #1E5B45;">الثانية:</span> العمل به. <span style="color: #1E5B45;">الثالثة:</span> الدعوة إليه. <span style="color: #1E5B45;">الرابعة:</span> الصبر على الأذى فيه…</div>
+              <div style="background: #FFFFFF; border: 1px solid #E3DCC5; border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: #E7EFE9; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <svg width="15" height="15" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#1E5B45"></path></svg>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="font-size: 13px; font-weight: 700; color: #1F2A24;">شاهد شرح هذا الموضع</div>
+                  <div style="font-size: 11.5px; color: #6B7A70;">شرح ثلاثة الأصول — الدرس ٢ · من الدقيقة ٠٤:٣٠</div>
+                </div>
+              </div>
+              <div style="font-family: 'Amiri', serif; font-size: 21px; color: #2A342C; line-height: 2.3; text-align: justify;">والدليل قوله تعالى: ﴿وَالْعَصْرِ • إِنَّ الْإِنسَانَ لَفِي خُسْرٍ…﴾ قال الشافعي رحمه الله: لو ما أنزل الله حجةً على خلقه إلا هذه السورة لكفتهم.</div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Phase 3 · Book reader — the matn in Amiri on warm paper; inline cards jump to the exact minute of the sheikh's شرح.</div>
+        </sc-if>
+      </div>
+
+      <!-- 1p NOTES -->
+      <div id="1p" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <div style="align-self: flex-start; display: flex; gap: 8px; align-items: center;"><span style="background: #1E3B2E; color: #F3F1E7; font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 3px 9px; border-radius: 99px;">1p</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #6B6754;">Notes · ملاحظاتي</span></div>
+        <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+          <div dir="rtl" style="height: 100%; display: flex; flex-direction: column; background: #F6F4EE; font-family: 'IBM Plex Sans Arabic', sans-serif;">
+            <div style="flex: 1; overflow: hidden; padding: 62px 20px 0; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 1px solid #E3DFD1; display: flex; align-items: center; justify-content: center;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="#55645B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                </div>
+                <div style="font-size: 24px; font-weight: 700; color: #1F2A24;">ملاحظاتي</div>
+              </div>
+              <div style="display: flex; background: #ECE9DE; border-radius: 12px; padding: 3px;">
+                <div style="flex: 1; text-align: center; padding: 7px 0; border-radius: 9px; background: #FFFFFF; font-size: 13px; font-weight: 700; color: #1F2A24; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">الملاحظات</div>
+                <div style="flex: 1; text-align: center; padding: 7px 0; font-size: 13px; color: #6B7A70;">العلامات المرجعية</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="font-family: 'Amiri', serif; font-size: 17px; color: #2A342C; line-height: 1.9;">العبادة لا تصح إلا بشرطين: الإخلاص لله، والمتابعة للنبي ﷺ — وهذا معنى شهادة أن محمدًا رسول الله.</div>
+                  <div style="display: flex; align-items: center; gap: 8px; background: #F4F8F5; border-radius: 10px; padding: 8px 12px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#1E5B45"></path></svg>
+                    <div style="font-size: 11.5px; color: #1E5B45; font-weight: 600;">شرح ثلاثة الأصول · الدرس ١٤ · عند ٢٢:١٠</div>
+                  </div>
+                  <div style="font-size: 11px; color: #B0AC9C;">قبل يومين</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="font-family: 'Amiri', serif; font-size: 17px; color: #2A342C; line-height: 1.9;">قاعدة: كل ماء طهور ما لم يتغير أحد أوصافه الثلاثة بنجاسة.</div>
+                  <div style="display: flex; align-items: center; gap: 8px; background: #F4F8F5; border-radius: 10px; padding: 8px 12px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#1E5B45"></path></svg>
+                    <div style="font-size: 11.5px; color: #1E5B45; font-weight: 600;">الشرح الممتع · الدرس ١٢ · عند ٠٨:٤٥</div>
+                  </div>
+                  <div style="font-size: 11px; color: #B0AC9C;">الأسبوع الماضي</div>
+                </div>
+                <div style="background: #FFFFFF; border: 1px solid #E7E3D6; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                  <div style="font-family: 'Amiri', serif; font-size: 17px; color: #2A342C; line-height: 1.9;">مراجعة: الفرق بين القاعدة الأولى والثانية في القواعد الأربع.</div>
+                  <div style="display: flex; align-items: center; gap: 8px; background: #F4F8F5; border-radius: 10px; padding: 8px 12px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#1E5B45"></path></svg>
+                    <div style="font-size: 11.5px; color: #1E5B45; font-weight: 600;">شرح القواعد الأربع · الدرس ٣ · عند ١٥:٢٠</div>
+                  </div>
+                  <div style="font-size: 11px; color: #B0AC9C;">قبل ساعتين</div>
+                </div>
+              </div>
+              <div style="align-self: flex-end; width: 56px; height: 56px; border-radius: 50%; background: #1E5B45; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(30,91,69,0.35); margin-top: auto; margin-bottom: 20px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#F3EFE0" stroke-width="2.2" stroke-linecap="round"></path></svg>
+              </div>
+            </div>
+          </div>
+        </x-import>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}">
+          <div dir="ltr" style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #77735F; max-width: 380px; line-height: 1.6;">Phase 3 · Notes — every note is pinned to a lesson + minute, so it jumps straight back to the moment.</div>
+        </sc-if>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showAnnotations&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Canvas&quot;}, &quot;playerPct&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 40, &quot;min&quot;: 0, &quot;max&quot;: 100, &quot;step&quot;: 1, &quot;unit&quot;: &quot;%&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Player (1h)&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showAnnotations: this.props.showAnnotations ?? true,
+      playerPct: this.props.playerPct ?? 40,
+    };
+  }
+}
+</script>
+</body>
+</html>

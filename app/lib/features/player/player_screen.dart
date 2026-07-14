@@ -5,8 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
 import '../../core/formatters.dart';
+import '../../core/widgets/back_circle.dart';
 import '../../core/widgets/empty_state.dart';
-import '../../core/widgets/lesson_tile.dart';
+import '../../core/widgets/lesson_row.dart';
 import '../../data/models/enums.dart';
 import '../../data/providers.dart';
 import '../../data/view_models.dart';
@@ -15,9 +16,9 @@ import '../settings/theme_mode_provider.dart';
 import 'player_engine.dart';
 import 'progress_tracker.dart';
 
-/// The lesson player: official YouTube embed + local progress tracking.
-/// Resumes from the saved position, marks completion at >=90%, and (with
-/// autoplay on) rolls into the next lesson of the series.
+/// The lesson player — always dark per the design. Official YouTube embed,
+/// live position bar, auto-save badge, prev/play/next, autoplay-next card
+/// with up-next preview, and the بقية الدروس list.
 class PlayerScreen extends ConsumerStatefulWidget {
   const PlayerScreen({super.key, required this.videoId, this.seriesSlug});
 
@@ -34,6 +35,11 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   ProgressTracker? _tracker;
   StreamSubscription<Duration>? _positionsSub;
   StreamSubscription<void>? _endedSub;
+  StreamSubscription<bool>? _playingSub;
+
+  Duration _position = Duration.zero;
+  bool _isPlaying = false;
+  bool _hasSavedOnce = false;
 
   @override
   void initState() {
@@ -42,6 +48,9 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     _engine = ref.read(playerEngineFactoryProvider)();
     _positionsSub = _engine.positions.listen(_onPosition);
     _endedSub = _engine.ended.listen((_) => _onEnded());
+    _playingSub = _engine.playing.listen((playing) {
+      if (mounted) setState(() => _isPlaying = playing);
+    });
     _startLesson(_currentVideoId, initial: true);
   }
 
@@ -50,6 +59,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     _tracker?.flush();
     _positionsSub?.cancel();
     _endedSub?.cancel();
+    _playingSub?.cancel();
     _engine.dispose();
     super.dispose();
   }
@@ -91,11 +101,15 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       totalDuration: catalogDuration == null
           ? null
           : Duration(seconds: catalogDuration),
-      persist: (position) => progressRepo.saveWatchPosition(
-        videoId: videoId,
-        watchedSeconds: position.inSeconds,
-        durationSeconds: _tracker?.totalDuration?.inSeconds ?? catalogDuration,
-      ),
+      persist: (position) {
+        if (mounted && !_hasSavedOnce) setState(() => _hasSavedOnce = true);
+        progressRepo.saveWatchPosition(
+          videoId: videoId,
+          watchedSeconds: position.inSeconds,
+          durationSeconds:
+              _tracker?.totalDuration?.inSeconds ?? catalogDuration,
+        );
+      },
       complete: (position) => progressRepo.markCompleted(
         videoId,
         durationSeconds: _tracker?.totalDuration?.inSeconds ?? catalogDuration,
@@ -109,18 +123,26 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
         : Duration.zero;
 
     if (!initial || !mounted) {
-      setState(() => _currentVideoId = videoId);
+      setState(() {
+        _currentVideoId = videoId;
+        _position = resumeFrom;
+        _hasSavedOnce = false;
+      });
+    } else {
+      _position = resumeFrom;
     }
     await _engine.load(videoId, start: resumeFrom);
 
-    // Prefer the player-reported duration once metadata is available.
     final reported = await _engine.currentDuration();
     if (reported != null && identical(_tracker, tracker)) {
       tracker.totalDuration = reported;
     }
   }
 
-  void _onPosition(Duration position) => _tracker?.onPosition(position);
+  void _onPosition(Duration position) {
+    _tracker?.onPosition(position);
+    if (mounted) setState(() => _position = position);
+  }
 
   void _onEnded() {
     _tracker?.onEnded();
@@ -143,8 +165,17 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // The design specifies the player in dark, always.
+    return Theme(
+      data: buildTheme(Brightness.dark),
+      child: Builder(builder: (context) => _buildBody(context)),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final autoplay = ref.watch(autoplayProvider);
     final detailAsync = widget.seriesSlug == null
         ? null
         : ref.watch(seriesDetailProvider(widget.seriesSlug!));
@@ -157,93 +188,358 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     final previous = _neighbor(-1);
     final next = _neighbor(1);
 
-    // Catalog metadata may arrive after _startLesson ran in initState —
-    // backfill the duration so the 90% completion rule can engage.
+    // Backfill duration from catalog metadata if the engine hasn't reported.
     final tracker = _tracker;
     if (tracker != null &&
         tracker.totalDuration == null &&
         current?.durationSeconds != null) {
       tracker.totalDuration = Duration(seconds: current!.durationSeconds!);
     }
+    final total =
+        tracker?.totalDuration ??
+        (current?.durationSeconds == null
+            ? null
+            : Duration(seconds: current!.durationSeconds!));
 
     if (current != null && current.status != LessonStatus.active) {
       return Scaffold(
-        appBar: AppBar(),
-        body: const EmptyState(
-          icon: Icons.link_off_rounded,
-          title: 'هذا الدرس غير متاح حاليًا',
-          message: 'ربما تغير مصدر المقطع. جرّب درسًا آخر من السلسلة.',
+        backgroundColor: scheme.surface,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(padding: EdgeInsets.all(20), child: BackCircle()),
+              const Expanded(
+                child: EmptyState(
+                  icon: Icons.link_off_rounded,
+                  title: 'هذا الدرس غير متاح حاليًا',
+                  message: 'ربما تغير مصدر المقطع. جرّب درسًا آخر من السلسلة.',
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
 
+    final remaining = [
+      if (currentIndex >= 0)
+        ...lessons
+            .skip(currentIndex + 1)
+            .where((l) => l.status == LessonStatus.active)
+            .take(4),
+    ];
+
     return Scaffold(
-      appBar: AppBar(
-        title: detail == null ? null : Text(detail.series.titleAr),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AspectRatio(aspectRatio: 16 / 9, child: _engine.buildView(context)),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              children: [
-                if (current != null) ...[
-                  Text(current.titleAr, style: theme.textTheme.titleMedium),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'الدرس ${arabicDigits(currentIndex + 1)} من ${arabicDigits(lessons.length)}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
+      backgroundColor: scheme.surface,
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.only(top: 12, bottom: 24),
+          children: [
+            // ── Top bar: back + breadcrumb ────────────────────────────
+            Padding(
+              padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const BackCircle(),
+                  if (detail != null && currentIndex >= 0)
+                    Text(
+                      '${detail.series.titleAr} · ${arabicDigits(currentIndex + 1)} / ${arabicDigits(lessons.length)}',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // ── Video ────────────────────────────────────────────────
+            AspectRatio(aspectRatio: 16 / 9, child: _engine.buildView(context)),
+            const SizedBox(height: 16),
+
+            // ── Live position + auto-save badge ──────────────────────
+            Padding(
+              padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: Row(
+                      children: [
+                        Text(
+                          _clockLtr(_position),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(AppRadius.chip),
+                            child: LinearProgressIndicator(
+                              value: total == null || total == Duration.zero
+                                  ? 0
+                                  : (_position.inMilliseconds /
+                                            total.inMilliseconds)
+                                        .clamp(0.0, 1.0),
+                              minHeight: 4,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          total == null ? '--:--' : _clockLtr(total),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: FilledButton.tonalIcon(
-                          onPressed: previous == null
-                              ? null
-                              : () => _startLesson(previous.videoId),
-                          icon: const Icon(Icons.skip_previous_rounded),
-                          label: const Text('السابق'),
+                  if (_hasSavedOnce) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.check_rounded,
+                          size: 13,
+                          color: scheme.primary,
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: FilledButton.icon(
-                          onPressed: next == null
-                              ? null
-                              : () => _startLesson(next.videoId),
-                          icon: const Icon(Icons.skip_next_rounded),
-                          label: const Text('التالي'),
+                        const SizedBox(width: 6),
+                        Text(
+                          'حُفظ موضع التوقف تلقائيًا',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: scheme.primary,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  const Divider(),
-                  const SizedBox(height: AppSpacing.sm),
+                      ],
+                    ),
+                  ],
                 ],
-                for (final lesson in lessons)
-                  LessonTile(
-                    index: lesson.position,
-                    title: lesson.titleAr,
-                    duration: lesson.durationSeconds == null
-                        ? null
-                        : Duration(seconds: lesson.durationSeconds!),
-                    progress: lesson.progress,
-                    isPlaying: lesson.videoId == _currentVideoId,
-                    unavailable: lesson.status != LessonStatus.active,
-                    onTap: lesson.videoId == _currentVideoId
-                        ? null
-                        : () => _startLesson(lesson.videoId),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // ── Title + breadcrumb ────────────────────────────────────
+            if (current != null)
+              Padding(
+                padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'الدرس ${arabicDigits(current.position)} — ${current.titleAr}',
+                      style: serif(22, scheme.onSurface, height: 1.4),
+                    ),
+                    const SizedBox(height: 4),
+                    if (detail != null)
+                      Text(
+                        detail.series.titleAr,
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 16),
+
+            // ── Controls ──────────────────────────────────────────────
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _SideControl(
+                  label: 'السابق',
+                  icon: Icons.skip_next_rounded,
+                  enabled: previous != null,
+                  onTap: previous == null
+                      ? null
+                      : () => _startLesson(previous.videoId),
+                ),
+                const SizedBox(width: 26),
+                GestureDetector(
+                  onTap: _engine.togglePlay,
+                  child: Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: scheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      _isPlaying
+                          ? Icons.pause_rounded
+                          : Icons.play_arrow_rounded,
+                      size: 30,
+                      color: scheme.onPrimary,
+                    ),
                   ),
+                ),
+                const SizedBox(width: 26),
+                _SideControl(
+                  label: 'التالي',
+                  icon: Icons.skip_previous_rounded,
+                  enabled: next != null,
+                  onTap: next == null ? null : () => _startLesson(next.videoId),
+                ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+
+            // ── Autoplay-next card ────────────────────────────────────
+            Padding(
+              padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
+              child: Container(
+                padding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(AppRadius.banner),
+                  border: Border.all(color: scheme.outlineVariant),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'التشغيل التلقائي للدرس التالي',
+                            style: theme.textTheme.titleSmall,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            next == null
+                                ? 'هذا آخر دروس السلسلة'
+                                : 'التالي: الدرس ${arabicDigits(next.position)} — ${next.titleAr}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: autoplay,
+                      onChanged: (v) =>
+                          ref.read(autoplayProvider.notifier).set(v),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ── بقية الدروس ───────────────────────────────────────────
+            if (remaining.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'بقية الدروس',
+                      style: theme.textTheme.titleSmall?.copyWith(fontSize: 14),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(AppRadius.banner),
+                        border: Border.all(color: scheme.outlineVariant),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Column(
+                        children: [
+                          for (final (index, lesson) in remaining.indexed)
+                            LessonRow(
+                              title:
+                                  'الدرس ${arabicDigits(lesson.position)} — ${lesson.titleAr}',
+                              state: LessonRowState.upcoming,
+                              duration: lesson.durationSeconds == null
+                                  ? null
+                                  : Duration(seconds: lesson.durationSeconds!),
+                              showDivider: index != remaining.length - 1,
+                              onTap: () => _startLesson(lesson.videoId),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Western-digit mm:ss for the LTR mono position row, per the design.
+  static String _clockLtr(Duration d) {
+    final h = d.inHours;
+    final m = d.inMinutes.remainder(60);
+    final s = d.inSeconds.remainder(60);
+    String two(int v) => v.toString().padLeft(2, '0');
+    return h > 0 ? '$h:${two(m)}:${two(s)}' : '${two(m)}:${two(s)}';
+  }
+}
+
+class _SideControl extends StatelessWidget {
+  const _SideControl({
+    required this.label,
+    required this.icon,
+    required this.enabled,
+    this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Opacity(
+      opacity: enabled ? 1 : 0.4,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Column(
+          children: [
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: scheme.surfaceContainerLow,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Icon(icon, size: 20, color: scheme.onSurface),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: scheme.onSurfaceVariant,
+                fontSize: 10.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -8,7 +8,7 @@ void main() {
   Future<void> openFirstUsulLesson(WidgetTester tester) async {
     await tapVisible(tester, find.text('مسار العقيدة'));
     await tapVisible(tester, find.text('شرح ثلاثة الأصول'));
-    await tapVisible(tester, find.text('ابدأ المشاهدة'));
+    await tapVisible(tester, find.textContaining('ابدأ — الدرس'));
   }
 
   testApp('player resumes from the saved position', (tester, app) async {
@@ -21,10 +21,10 @@ void main() {
 
     await tapVisible(tester, find.text('مسار العقيدة'));
     await tapVisible(tester, find.text('شرح ثلاثة الأصول'));
-    await tapVisible(tester, find.text('استئناف'));
+    await tapVisible(tester, find.textContaining('استئناف — الدرس'));
 
     expect(app.engine.loads, [('fx-usul-01', const Duration(seconds: 600))]);
-    expect(find.text('الدرس ١ من ٨'), findsOneWidget);
+    expect(find.textContaining('١ / ٨'), findsOneWidget);
   });
 
   testApp('positions persist throttled and 90% completes the lesson', (
@@ -36,17 +36,15 @@ void main() {
 
     final progress = ProgressRepository(app.db);
 
-    // First tick beyond the 5s throttle persists.
     app.engine.positionsController.add(const Duration(seconds: 42));
     await tester.pumpAndSettle();
     expect((await progress.getProgress('fx-usul-01'))?.watchedSeconds, 42);
+    expect(find.text('حُفظ موضع التوقف تلقائيًا'), findsOneWidget);
 
-    // A tick within the throttle window does not.
     app.engine.positionsController.add(const Duration(seconds: 44));
     await tester.pumpAndSettle();
     expect((await progress.getProgress('fx-usul-01'))?.watchedSeconds, 42);
 
-    // 90% of 2700s = 2430s → completed.
     app.engine.positionsController.add(const Duration(seconds: 2430));
     await tester.pumpAndSettle();
     final row = await progress.getProgress('fx-usul-01');
@@ -64,13 +62,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(app.engine.loads.last.$1, 'fx-usul-02');
-    // Ended → completed even without hitting the 90% mark first.
     final row = await ProgressRepository(app.db).getProgress('fx-usul-01');
     expect(row?.completed, isTrue);
-    expect(find.text('الدرس ٢ من ٨'), findsOneWidget);
+    expect(find.textContaining('٢ / ٨'), findsOneWidget);
   });
 
-  testApp('next/previous buttons move within the series', (tester, app) async {
+  testApp('next/previous controls move within the series', (tester, app) async {
     await openFirstUsulLesson(tester);
 
     await tapVisible(tester, find.text('التالي'));
@@ -84,7 +81,7 @@ void main() {
     tester,
     app,
   ) async {
-    final context = tester.element(find.text('مسار ابن عثيمين'));
+    final context = tester.element(find.text('أهلًا بك يا طالب العلم'));
     GoRouter.of(context).push('/player/fx-wast-06?series=sharh-alwasitiyah');
     await tester.pumpAndSettle();
 

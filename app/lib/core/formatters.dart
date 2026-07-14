@@ -41,6 +41,21 @@ String stageCountLabel(int count) {
   );
 }
 
+/// "حلقة واحدة" / "حلقتان" / "٣ حلقات" / "٣٤٨ حلقة" — the design's series-card counts.
+String episodeCountLabel(int count) {
+  final n = arabicDigits(count);
+  return Intl.pluralLogic(
+    count,
+    locale: 'ar',
+    zero: 'لا حلقات',
+    one: 'حلقة واحدة',
+    two: 'حلقتان',
+    few: '$n حلقات',
+    many: '$n حلقة',
+    other: '$n حلقة',
+  );
+}
+
 /// "سلسلة واحدة" / "سلسلتان" / "٣ سلاسل" / "١١ سلسلة"
 String seriesCountLabel(int count) {
   final n = arabicDigits(count);
