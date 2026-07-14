@@ -63,6 +63,21 @@ async function main(): Promise<void> {
       // TODO(M5b, needs Supabase project): upload dist/ to Supabase Storage.
       break;
     }
+    case 'discover-playlists': {
+      const apiKey = process.env.YT_API_KEY;
+      if (!apiKey) {
+        console.error('YT_API_KEY environment variable is required (YouTube Data API v3 key).');
+        process.exit(64);
+      }
+      const handle = rest.find((a) => !a.startsWith('--')) ?? 'ibnothaimeentv';
+      const playlists = await createYoutubeClient(apiKey).fetchChannelPlaylists(handle);
+      playlists.sort((a, b) => b.itemCount - a.itemCount);
+      for (const p of playlists) {
+        console.log(`${p.playlistId}  ${String(p.itemCount).padStart(4)}  ${p.title}`);
+      }
+      console.log(`\n${playlists.length} playlists on @${handle}. Paste the IDs into seed/series/*.yaml.`);
+      break;
+    }
     case 'apply-seeds':
       console.error(
         'apply-seeds mirrors seeds into Supabase Postgres and needs SUPABASE_URL / ' +
@@ -73,7 +88,7 @@ async function main(): Promise<void> {
       break;
     default:
       console.error(
-        'Usage: cli.ts <validate-seeds|sync-youtube|publish-catalog|apply-seeds> ' +
+        'Usage: cli.ts <validate-seeds|sync-youtube|publish-catalog|discover-playlists [handle]|apply-seeds> ' +
           '[--dry-run] [--seed-dir=PATH] [--data-dir=PATH] [--out-dir=PATH] [--no-app-asset]',
       );
       process.exit(64);

@@ -11,6 +11,7 @@
     "sync:youtube": "tsx src/cli.ts sync-youtube",
     "apply:seeds": "tsx src/cli.ts apply-seeds",
     "publish:catalog": "tsx src/cli.ts publish-catalog",
+    "discover:playlists": "tsx src/cli.ts discover-playlists",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

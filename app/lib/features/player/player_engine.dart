@@ -1,5 +1,9 @@
-import 'package:flutter/widgets.dart';
+import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 /// Thin abstraction over the video player so the player screen (and its
@@ -63,8 +67,67 @@ class YoutubeLessonPlayerEngine implements LessonPlayerEngine {
   void dispose() => _controller.close();
 }
 
+/// Desktop dev-preview fallback: no WebView on Windows/Linux — show a notice
+/// and open the lesson in the browser instead. Mobile uses the real embed.
+class ExternalLinkPlayerEngine implements LessonPlayerEngine {
+  String? _videoId;
+
+  @override
+  Widget buildView(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return ColoredBox(
+      color: scheme.surfaceContainerHighest,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'تشغيل الفيديو داخل التطبيق متاح على الجوال',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: _videoId == null
+                  ? null
+                  : () => launchUrl(
+                      Uri.parse('https://www.youtube.com/watch?v=$_videoId'),
+                      mode: LaunchMode.externalApplication,
+                    ),
+              icon: const Icon(Icons.open_in_new_rounded),
+              label: const Text('المشاهدة على يوتيوب'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Stream<Duration> get positions => const Stream.empty();
+
+  @override
+  Stream<void> get ended => const Stream.empty();
+
+  @override
+  Future<Duration?> currentDuration() async => null;
+
+  @override
+  Future<void> load(String videoId, {Duration start = Duration.zero}) async {
+    _videoId = videoId;
+  }
+
+  @override
+  void dispose() {}
+}
+
 /// Factory so each player screen gets a fresh engine; tests override this
 /// with a fake that never creates a WebView.
-final playerEngineFactoryProvider = Provider<LessonPlayerEngine Function()>(
-  (ref) => YoutubeLessonPlayerEngine.new,
-);
+final playerEngineFactoryProvider = Provider<LessonPlayerEngine Function()>((
+  ref,
+) {
+  final isDesktop =
+      !kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS);
+  return isDesktop
+      ? ExternalLinkPlayerEngine.new
+      : YoutubeLessonPlayerEngine.new;
+});

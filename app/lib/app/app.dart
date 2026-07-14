@@ -29,6 +29,21 @@ class MasarApp extends ConsumerWidget {
       darkTheme: buildTheme(Brightness.dark),
       themeMode: themeMode,
       routerConfig: router,
+      // Phone-first layout: on wide windows (desktop preview, tablets)
+      // letterbox the app to a phone-ish width instead of stretching cards.
+      builder: (context, child) {
+        if (child == null) return const SizedBox.shrink();
+        if (MediaQuery.sizeOf(context).width <= 560) return child;
+        return ColoredBox(
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: ClipRect(child: child),
+            ),
+          ),
+        );
+      },
     );
   }
 }

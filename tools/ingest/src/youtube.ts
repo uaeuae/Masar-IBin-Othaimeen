@@ -10,9 +10,17 @@ export interface YoutubeVideo {
   playable: boolean;
 }
 
+export interface YoutubePlaylistInfo {
+  playlistId: string;
+  title: string;
+  itemCount: number;
+}
+
 export interface YoutubeClient {
   /** All videos of a playlist, in playlist order. */
   fetchPlaylistVideos(playlistId: string): Promise<YoutubeVideo[]>;
+  /** Every public playlist of a channel, by @handle — used for curation. */
+  fetchChannelPlaylists(handle: string): Promise<YoutubePlaylistInfo[]>;
 }
 
 type FetchLike = (url: string) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>;
@@ -103,6 +111,37 @@ export function createYoutubeClient(apiKey: string, fetchFn: FetchLike = fetch a
         // playlist still lists it.
         playable: v.playable && durations.has(v.videoId),
       }));
+    },
+
+    async fetchChannelPlaylists(handle: string): Promise<YoutubePlaylistInfo[]> {
+      const channelPage = await getJson<{ items?: Array<{ id?: string }> }>(
+        `${API}/channels?part=id&forHandle=${encodeURIComponent(handle)}&key=${apiKey}`,
+      );
+      const channelId = channelPage.items?.[0]?.id;
+      if (!channelId) throw new Error(`No channel found for handle "${handle}"`);
+
+      const playlists: YoutubePlaylistInfo[] = [];
+      let pageToken: string | undefined;
+      do {
+        const page = await getJson<{
+          nextPageToken?: string;
+          items?: Array<{ id?: string; snippet?: { title?: string }; contentDetails?: { itemCount?: number } }>;
+        }>(
+          `${API}/playlists?part=snippet,contentDetails&maxResults=50&channelId=${channelId}` +
+            `${pageToken ? `&pageToken=${pageToken}` : ''}&key=${apiKey}`,
+        );
+        for (const item of page.items ?? []) {
+          if (!item.id) continue;
+          playlists.push({
+            playlistId: item.id,
+            title: item.snippet?.title ?? '',
+            itemCount: item.contentDetails?.itemCount ?? 0,
+          });
+        }
+        pageToken = page.nextPageToken;
+      } while (pageToken);
+
+      return playlists;
     },
   };
 }

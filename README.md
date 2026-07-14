@@ -31,10 +31,11 @@ seed/*.yaml ───────┘                              │
 ## Development
 
 ```powershell
-# Flutter app
+# Flutter app (Android needs Android Studio installed; Windows desktop works for UI preview)
 cd app
 flutter pub get
-flutter run
+flutter run -d windows   # quick UI preview (video playback = mobile only)
+flutter test
 
 # Ingestion tool
 cd tools/ingest
@@ -42,6 +43,10 @@ npm install
 npm run validate:seeds
 npm test
 ```
+
+**Going live with real content:** see [docs/CURATION.md](docs/CURATION.md)
+(one YouTube API key + ~30 minutes of playlist curation).
+**Publishing to Google Play:** see [docs/RELEASE-CHECKLIST.md](docs/RELEASE-CHECKLIST.md).
 
 ## Attribution
 

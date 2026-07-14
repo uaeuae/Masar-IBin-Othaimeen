@@ -1,0 +1,13 @@
+# مسار الحديث — شرح رياض الصالحين.
+slug: masar-alhadith
+title_ar: مسار الحديث
+description_ar: الأخلاق والآداب والرقائق مع شرح رياض الصالحين للإمام النووي
+level: beginner
+science: hadith
+sort_order: 3
+is_published: false
+stages:
+  - title_ar: "المرحلة الأولى: رياض الصالحين"
+    description_ar: شرح الكتاب بترتيب أبوابه
+    items:
+      - series: sharh-riyad-alsalihin

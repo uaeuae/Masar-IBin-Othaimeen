@@ -11,3 +11,7 @@ stages:
     description_ar: معرفة العبد ربه ودينه ونبيه صلى الله عليه وسلم
     items:
       - series: sharh-thalathat-alusul
+  - title_ar: "المرحلة الثانية: العقيدة الواسطية"
+    description_ar: منهج أهل السنة والجماعة في أسماء الله وصفاته
+    items:
+      - series: sharh-alwasitiyah

@@ -1,0 +1,13 @@
+# مسار الفقه — الشرح الممتع على زاد المستقنع.
+slug: masar-alfiqh
+title_ar: مسار الفقه
+description_ar: من الطهارة إلى المعاملات — رحلة مع الشرح الممتع على زاد المستقنع
+level: intermediate
+science: fiqh
+sort_order: 2
+is_published: false
+stages:
+  - title_ar: "المرحلة الأولى: زاد المستقنع"
+    description_ar: الشرح الممتع كاملًا بترتيب أبواب المتن
+    items:
+      - series: sharh-zad-almustaqni

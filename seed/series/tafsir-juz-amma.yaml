@@ -1,0 +1,10 @@
+# تفسير جزء عمّ — المدخل المناسب لمسار التفسير.
+slug: tafsir-juz-amma
+title_ar: تفسير جزء عمّ
+description_ar: تفسير قصار السور من جزء عمّ لفضيلة الشيخ رحمه الله
+science: tafsir
+status: draft
+youtube_playlists: [] # from @ibnothaimeentv — run: npm run discover:playlists
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

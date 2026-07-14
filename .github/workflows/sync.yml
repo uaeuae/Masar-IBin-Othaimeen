@@ -1,0 +1,41 @@
+name: Weekly content sync
+
+on:
+  schedule:
+    # Sundays 03:00 UTC — refresh lesson metadata from YouTube.
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/ingest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: tools/ingest/package-lock.json
+      - run: npm ci
+      - run: npm run validate:seeds
+      - name: Sync playlists from YouTube
+        env:
+          YT_API_KEY: ${{ secrets.YT_API_KEY }}
+        run: npm run sync:youtube
+      - name: Publish catalog snapshot (also refreshes the bundled app asset)
+        run: npm run publish:catalog
+      - name: Commit changes
+        working-directory: .
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add tools/ingest/data tools/ingest/dist app/assets/catalog/catalog.json
+          git diff --cached --quiet && echo "No content changes." && exit 0
+          git commit -m "chore: weekly content sync"
+          git push
