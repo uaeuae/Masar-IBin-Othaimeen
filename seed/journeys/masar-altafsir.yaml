@@ -1,13 +1,17 @@
-# مسار التفسير — يبدأ بقصار السور.
+# مسار التفسير — يبدأ بقصار السور ثم قواعد التفسير.
 slug: masar-altafsir
 title_ar: مسار التفسير
-description_ar: رحلة مع كلام الله تبدأ بتفسير جزء عمّ
+description_ar: رحلة مع كلام الله تبدأ بتفسير جزء عمّ ثم أصول فهم الكتاب العزيز
 level: beginner
 science: tafsir
 sort_order: 4
-is_published: false
+is_published: true
 stages:
   - title_ar: "المرحلة الأولى: جزء عمّ"
     description_ar: تفسير قصار السور التي يقرؤها المسلم في صلاته
     items:
       - series: tafsir-juz-amma
+  - title_ar: "المرحلة الثانية: أصول في التفسير"
+    description_ar: القواعد والأدوات التي يُفهم بها كتاب الله
+    items:
+      - series: usul-altafsir

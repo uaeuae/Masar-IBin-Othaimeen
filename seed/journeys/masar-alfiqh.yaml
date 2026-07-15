@@ -1,13 +1,41 @@
-# مسار الفقه — الشرح الممتع على زاد المستقنع.
+# مسار الفقه — الشرح الممتع على زاد المستقنع، مرحلة لكل كتاب بترتيب المتن.
 slug: masar-alfiqh
 title_ar: مسار الفقه
-description_ar: من الطهارة إلى المعاملات — رحلة مع الشرح الممتع على زاد المستقنع
+description_ar: من الطهارة إلى المعاملات — رحلة مع الشرح الممتع على زاد المستقنع كتابًا كتابًا
 level: intermediate
 science: fiqh
 sort_order: 2
-is_published: false
+is_published: true
 stages:
-  - title_ar: "المرحلة الأولى: زاد المستقنع"
-    description_ar: الشرح الممتع كاملًا بترتيب أبواب المتن
+  - title_ar: "المرحلة الأولى: كتاب الطهارة"
+    description_ar: أحكام المياه والوضوء والغسل والتيمم
     items:
-      - series: sharh-zad-almustaqni
+      - series: sharh-zad-taharah
+  - title_ar: "المرحلة الثانية: كتاب الصلاة"
+    description_ar: شروط الصلاة وأركانها وواجباتها وصلاة الجماعة وأهل الأعذار
+    items:
+      - series: sharh-zad-salah
+  - title_ar: "المرحلة الثالثة: كتاب الجنائز"
+    description_ar: أحكام المحتضر وغسل الميت والصلاة عليه ودفنه
+    items:
+      - series: sharh-zad-janaiz
+  - title_ar: "المرحلة الرابعة: كتاب الزكاة"
+    description_ar: زكاة الأموال والخارج من الأرض وزكاة الفطر وأهل الزكاة
+    items:
+      - series: sharh-zad-zakah
+  - title_ar: "المرحلة الخامسة: كتاب الصيام"
+    description_ar: أحكام الصيام والاعتكاف وما يتعلق بهما
+    items:
+      - series: sharh-zad-siyam
+  - title_ar: "المرحلة السادسة: كتاب المناسك"
+    description_ar: أحكام الحج والعمرة والهدي والأضحية
+    items:
+      - series: sharh-zad-hajj
+  - title_ar: "المرحلة السابعة: كتاب الجهاد"
+    description_ar: أحكام الجهاد وعقد الذمة والأمان
+    items:
+      - series: sharh-zad-jihad
+  - title_ar: "المرحلة الثامنة: كتاب البيوع"
+    description_ar: مدخل المعاملات — البيع وشروطه والخيار والربا
+    items:
+      - series: sharh-zad-buyu

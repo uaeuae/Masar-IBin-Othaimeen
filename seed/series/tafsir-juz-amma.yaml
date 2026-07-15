@@ -3,8 +3,10 @@ slug: tafsir-juz-amma
 title_ar: تفسير جزء عمّ
 description_ar: تفسير قصار السور من جزء عمّ لفضيلة الشيخ رحمه الله
 science: tafsir
-status: draft
-youtube_playlists: [] # from @ibnothaimeentv — run: npm run discover:playlists
+level: beginner
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXmHKKU7s3JnzDg1-f0FkXoA # تفسير جزء عم (٢١)
 overrides:
   exclude_videos: []
   title_cleanup: '^\s*\d+\s*[-|/]\s*'

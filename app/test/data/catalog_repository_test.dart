@@ -11,7 +11,7 @@ import 'package:masar/data/progress_repository.dart';
 import '../support/test_db.dart';
 
 CatalogData loadFixture() {
-  final raw = File('assets/catalog/catalog.json').readAsStringSync();
+  final raw = File('test/support/fixture_catalog.json').readAsStringSync();
   return CatalogData.fromJson(jsonDecode(raw) as Map<String, dynamic>);
 }
 

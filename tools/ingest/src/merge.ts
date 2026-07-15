@@ -2,6 +2,38 @@ import type { SeriesSeed } from './schemas.js';
 import type { StoredLesson } from './store.js';
 import type { YoutubeVideo } from './youtube.js';
 
+const TRAILING_NUMBER = /([0-9٠-٩]+)\s*$/;
+
+function trailingNumber(title: string): number | null {
+  const match = title.trim().match(TRAILING_NUMBER);
+  if (!match) return null;
+  const western = match[1].replace(/[٠-٩]/g, (d) =>
+    String(d.charCodeAt(0) - 0x0660),
+  );
+  return Number.parseInt(western, 10);
+}
+
+/**
+ * Some channel playlists are not in episode order, but every lesson title ends
+ * with its episode number — that number is authoritative. Sorts one playlist's
+ * videos by it when EVERY playable video has one; otherwise returns the input
+ * order untouched (ties and numberless videos keep playlist order).
+ */
+export function sortByEpisodeNumber(videos: YoutubeVideo[]): YoutubeVideo[] {
+  const playable = videos.filter((v) => v.playable);
+  if (playable.length === 0 || playable.some((v) => trailingNumber(v.title) === null)) {
+    return videos;
+  }
+  return videos
+    .map((video, index) => ({ video, index, episode: trailingNumber(video.title) }))
+    .sort(
+      (a, b) =>
+        (a.episode ?? Number.POSITIVE_INFINITY) - (b.episode ?? Number.POSITIVE_INFINITY) ||
+        a.index - b.index,
+    )
+    .map((entry) => entry.video);
+}
+
 export interface MergeResult {
   lessons: StoredLesson[];
   added: string[];

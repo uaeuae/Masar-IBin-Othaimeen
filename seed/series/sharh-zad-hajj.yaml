@@ -1,0 +1,12 @@
+# الشرح الممتع — كتاب الحج من زاد المستقنع (الشرح الثاني هو المتوفر على القناة).
+slug: sharh-zad-hajj
+title_ar: كتاب الحج من زاد المستقنع
+description_ar: الشرح الممتع — كتاب المناسك من متن زاد المستقنع للحجاوي رحمه الله
+science: fiqh
+level: intermediate
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXkMDmj8neDnkqTr42Zm6cQ0 # الشرح الثاني لكتاب الحج من زاد المستقنع (٥٨)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

@@ -1,16 +1,17 @@
-# مسار العقيدة — beginner aqeedah journey.
+# مسار العقيدة — رحلة متدرجة تبدأ بكتاب التوحيد.
+# (شرح ثلاثة الأصول غير متوفر على القناة الرسمية — يُضاف متى ما توفر.)
 slug: masar-alaqeedah
 title_ar: مسار العقيدة
-description_ar: رحلة متدرجة في تعلم العقيدة الصحيحة، تبدأ بثلاثة الأصول التي يُسأل عنها العبد في قبره
+description_ar: رحلة متدرجة في تعلم العقيدة الصحيحة، تبدأ بكتاب التوحيد الذي هو حق الله على العبيد
 level: beginner
 science: aqeedah
 sort_order: 1
-is_published: false # published in M6 once series are synced
+is_published: true
 stages:
-  - title_ar: "المرحلة الأولى: الأصول الثلاثة"
-    description_ar: معرفة العبد ربه ودينه ونبيه صلى الله عليه وسلم
+  - title_ar: "المرحلة الأولى: كتاب التوحيد"
+    description_ar: تحقيق التوحيد وبيان ما ينافيه أو ينافي كماله
     items:
-      - series: sharh-thalathat-alusul
+      - series: sharh-kitab-altawhid
   - title_ar: "المرحلة الثانية: العقيدة الواسطية"
     description_ar: منهج أهل السنة والجماعة في أسماء الله وصفاته
     items:

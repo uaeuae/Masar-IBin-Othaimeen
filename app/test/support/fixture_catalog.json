@@ -1,0 +1,346 @@
+{
+  "version": 1,
+  "generated_at": "2026-07-13T00:00:00Z",
+  "sciences": [
+    {
+      "slug": "aqeedah",
+      "name_ar": "العقيدة",
+      "description_ar": "التوحيد وأصول الاعتقاد",
+      "icon": "mosque",
+      "sort_order": 1
+    },
+    {
+      "slug": "fiqh",
+      "name_ar": "الفقه",
+      "description_ar": "الأحكام العملية وفقه العبادات والمعاملات",
+      "icon": "scale",
+      "sort_order": 2
+    },
+    {
+      "slug": "hadith",
+      "name_ar": "الحديث",
+      "description_ar": "شروح كتب السنة والأحاديث النبوية",
+      "icon": "book",
+      "sort_order": 3
+    },
+    {
+      "slug": "tafsir",
+      "name_ar": "التفسير",
+      "description_ar": "تفسير القرآن الكريم وعلومه",
+      "icon": "quran",
+      "sort_order": 4
+    },
+    {
+      "slug": "usul-fiqh",
+      "name_ar": "أصول الفقه",
+      "description_ar": "القواعد التي يُبنى عليها استنباط الأحكام",
+      "icon": "foundation",
+      "sort_order": 5
+    },
+    {
+      "slug": "seerah-adab",
+      "name_ar": "السيرة والآداب",
+      "description_ar": "السيرة النبوية والأخلاق والآداب الشرعية",
+      "icon": "heart",
+      "sort_order": 6
+    }
+  ],
+  "series": [
+    {
+      "slug": "sharh-thalathat-alusul",
+      "science": "aqeedah",
+      "title_ar": "شرح ثلاثة الأصول",
+      "description_ar": "شرح رسالة ثلاثة الأصول وأدلتها لشيخ الإسلام محمد بن عبدالوهاب رحمه الله",
+      "lessons": [
+        {
+          "youtube_video_id": "fx-usul-01",
+          "position": 1,
+          "title_ar": "مقدمة الشرح والتعريف بالرسالة ومنهجها",
+          "duration_seconds": 2700
+        },
+        {
+          "youtube_video_id": "fx-usul-02",
+          "position": 2,
+          "title_ar": "المسائل الأربع التي تجب معرفتها",
+          "duration_seconds": 3120
+        },
+        {
+          "youtube_video_id": "fx-usul-03",
+          "position": 3,
+          "title_ar": "الأصل الأول: معرفة العبد ربه",
+          "duration_seconds": 2880
+        },
+        {
+          "youtube_video_id": "fx-usul-04",
+          "position": 4,
+          "title_ar": "أنواع العبادة التي أمر الله بها",
+          "duration_seconds": 3300
+        },
+        {
+          "youtube_video_id": "fx-usul-05",
+          "position": 5,
+          "title_ar": "الأصل الثاني: معرفة دين الإسلام بالأدلة",
+          "duration_seconds": 3000
+        },
+        {
+          "youtube_video_id": "fx-usul-06",
+          "position": 6,
+          "title_ar": "مراتب الدين: الإسلام والإيمان والإحسان",
+          "duration_seconds": 3480
+        },
+        {
+          "youtube_video_id": "fx-usul-07",
+          "position": 7,
+          "title_ar": "الأصل الثالث: معرفة النبي صلى الله عليه وسلم",
+          "duration_seconds": 2940
+        },
+        {
+          "youtube_video_id": "fx-usul-08",
+          "position": 8,
+          "title_ar": "خاتمة الرسالة: البعث والحساب وحكم الطاغوت",
+          "duration_seconds": 3180
+        }
+      ],
+      "level": "beginner"
+    },
+    {
+      "slug": "sharh-alwasitiyah",
+      "science": "aqeedah",
+      "title_ar": "شرح العقيدة الواسطية",
+      "description_ar": "شرح العقيدة الواسطية لشيخ الإسلام ابن تيمية رحمه الله",
+      "lessons": [
+        {
+          "youtube_video_id": "fx-wast-01",
+          "position": 1,
+          "title_ar": "مقدمة في التعريف بالعقيدة الواسطية وسبب تأليفها",
+          "duration_seconds": 3060
+        },
+        {
+          "youtube_video_id": "fx-wast-02",
+          "position": 2,
+          "title_ar": "منهج أهل السنة والجماعة في أسماء الله وصفاته",
+          "duration_seconds": 3420
+        },
+        {
+          "youtube_video_id": "fx-wast-03",
+          "position": 3,
+          "title_ar": "قاعدة: من غير تحريف ولا تعطيل ولا تكييف ولا تمثيل",
+          "duration_seconds": 3240
+        },
+        {
+          "youtube_video_id": "fx-wast-04",
+          "position": 4,
+          "title_ar": "الآيات الواردة في صفات الله تعالى",
+          "duration_seconds": 2820
+        },
+        {
+          "youtube_video_id": "fx-wast-05",
+          "position": 5,
+          "title_ar": "الأحاديث الواردة في الصفات وطريقة أهل السنة فيها",
+          "duration_seconds": 3360
+        },
+        {
+          "youtube_video_id": "fx-wast-06",
+          "position": 6,
+          "title_ar": "الإيمان باليوم الآخر وأشراط الساعة",
+          "duration_seconds": 3000,
+          "status": "unavailable"
+        }
+      ],
+      "level": "intermediate"
+    },
+    {
+      "slug": "sharh-zad-almustaqni",
+      "science": "fiqh",
+      "title_ar": "شرح زاد المستقنع",
+      "description_ar": "الشرح الممتع على زاد المستقنع في اختصار المقنع",
+      "lessons": [
+        {
+          "youtube_video_id": "fx-zad-01",
+          "position": 1,
+          "title_ar": "مقدمة الشرح والتعريف بالمتن ومصطلحاته",
+          "duration_seconds": 3600
+        },
+        {
+          "youtube_video_id": "fx-zad-02",
+          "position": 2,
+          "title_ar": "كتاب الطهارة: أقسام المياه",
+          "duration_seconds": 3480
+        },
+        {
+          "youtube_video_id": "fx-zad-03",
+          "position": 3,
+          "title_ar": "باب الآنية وأحكام استعمالها",
+          "duration_seconds": 3120
+        },
+        {
+          "youtube_video_id": "fx-zad-04",
+          "position": 4,
+          "title_ar": "باب الاستنجاء وآداب قضاء الحاجة",
+          "duration_seconds": 3300
+        },
+        {
+          "youtube_video_id": "fx-zad-05",
+          "position": 5,
+          "title_ar": "باب السواك وسنن الفطرة",
+          "duration_seconds": 2940
+        },
+        {
+          "youtube_video_id": "fx-zad-06",
+          "position": 6,
+          "title_ar": "باب الوضوء: فروضه وصفته",
+          "duration_seconds": 3660
+        },
+        {
+          "youtube_video_id": "fx-zad-07",
+          "position": 7,
+          "title_ar": "باب المسح على الخفين",
+          "duration_seconds": 2760
+        },
+        {
+          "youtube_video_id": "fx-zad-08",
+          "position": 8,
+          "title_ar": "باب نواقض الوضوء",
+          "duration_seconds": 3180
+        },
+        {
+          "youtube_video_id": "fx-zad-09",
+          "position": 9,
+          "title_ar": "باب الغسل وموجباته",
+          "duration_seconds": 3240
+        },
+        {
+          "youtube_video_id": "fx-zad-10",
+          "position": 10,
+          "title_ar": "باب التيمم وأحكامه",
+          "duration_seconds": 3060
+        }
+      ],
+      "level": "advanced"
+    },
+    {
+      "slug": "sharh-riyad-alsalihin",
+      "science": "hadith",
+      "title_ar": "شرح رياض الصالحين",
+      "description_ar": "شرح كتاب رياض الصالحين للإمام النووي رحمه الله",
+      "lessons": [
+        {
+          "youtube_video_id": "fx-riyd-01",
+          "position": 1,
+          "title_ar": "باب الإخلاص: حديث إنما الأعمال بالنيات",
+          "duration_seconds": 2580
+        },
+        {
+          "youtube_video_id": "fx-riyd-02",
+          "position": 2,
+          "title_ar": "باب التوبة: شروطها وفضلها",
+          "duration_seconds": 2760
+        },
+        {
+          "youtube_video_id": "fx-riyd-03",
+          "position": 3,
+          "title_ar": "باب الصبر: الآيات والأحاديث الواردة فيه",
+          "duration_seconds": 2940
+        },
+        {
+          "youtube_video_id": "fx-riyd-04",
+          "position": 4,
+          "title_ar": "باب الصدق ومنزلته",
+          "duration_seconds": 2400
+        },
+        {
+          "youtube_video_id": "fx-riyd-05",
+          "position": 5,
+          "title_ar": "باب المراقبة ومنزلة الإحسان",
+          "duration_seconds": 2700
+        },
+        {
+          "youtube_video_id": "fx-riyd-06",
+          "position": 6,
+          "title_ar": "باب التقوى ووصية النبي ﷺ بها",
+          "duration_seconds": 2520
+        },
+        {
+          "youtube_video_id": "fx-riyd-07",
+          "position": 7,
+          "title_ar": "باب اليقين والتوكل",
+          "duration_seconds": 2880
+        },
+        {
+          "youtube_video_id": "fx-riyd-08",
+          "position": 8,
+          "title_ar": "باب الاستقامة والمحافظة على الأعمال",
+          "duration_seconds": 2640
+        }
+      ],
+      "level": "beginner"
+    }
+  ],
+  "journeys": [
+    {
+      "slug": "masar-alaqeedah",
+      "title_ar": "مسار العقيدة",
+      "description_ar": "رحلة متدرجة في تعلم العقيدة الصحيحة، تبدأ بثلاثة الأصول ثم العقيدة الواسطية",
+      "level": "beginner",
+      "science": "aqeedah",
+      "sort_order": 1,
+      "stages": [
+        {
+          "title_ar": "المرحلة الأولى: الأصول الثلاثة",
+          "description_ar": "معرفة العبد ربه ودينه ونبيه صلى الله عليه وسلم",
+          "items": [
+            {
+              "series": "sharh-thalathat-alusul"
+            }
+          ]
+        },
+        {
+          "title_ar": "المرحلة الثانية: العقيدة الواسطية",
+          "description_ar": "منهج أهل السنة والجماعة في الأسماء والصفات",
+          "items": [
+            {
+              "series": "sharh-alwasitiyah"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "masar-alfiqh",
+      "title_ar": "مسار الفقه",
+      "description_ar": "من الطهارة إلى المعاملات مع الشرح الممتع على زاد المستقنع",
+      "level": "intermediate",
+      "science": "fiqh",
+      "sort_order": 2,
+      "stages": [
+        {
+          "title_ar": "المرحلة الأولى: كتاب الطهارة",
+          "description_ar": "أبواب الطهارة من الشرح الممتع",
+          "items": [
+            {
+              "series": "sharh-zad-almustaqni"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "masar-alhadith",
+      "title_ar": "مسار الحديث",
+      "description_ar": "شرح رياض الصالحين — الأخلاق والآداب من كلام سيد المرسلين",
+      "level": "beginner",
+      "science": "hadith",
+      "sort_order": 3,
+      "stages": [
+        {
+          "title_ar": "المرحلة الأولى: أبواب الإخلاص والتوبة والصبر",
+          "items": [
+            {
+              "series": "sharh-riyad-alsalihin"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

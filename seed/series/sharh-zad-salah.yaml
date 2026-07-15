@@ -1,0 +1,13 @@
+# الشرح الممتع — كتاب الصلاة من زاد المستقنع (قائمتان بترتيب المتن).
+slug: sharh-zad-salah
+title_ar: كتاب الصلاة من زاد المستقنع
+description_ar: الشرح الممتع — كتاب الصلاة من متن زاد المستقنع للحجاوي رحمه الله
+science: fiqh
+level: intermediate
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXkvJX9HF1tOCJ3R7xdeUbDr # شرح كتاب الصلاة (٢٠٠)
+  - PLiTKQO5a7ZXklXrOCq1e10mRYEtXUd3CB # تابع كتاب الصلاة (١٩٢)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

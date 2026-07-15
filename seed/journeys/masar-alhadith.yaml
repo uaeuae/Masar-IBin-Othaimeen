@@ -1,13 +1,18 @@
-# مسار الحديث — شرح رياض الصالحين.
+# مسار الحديث — يبدأ بالأربعين النووية ثم عمدة الأحكام.
+# (شرح رياض الصالحين غير متوفر على القناة الرسمية — يُضاف متى ما توفر.)
 slug: masar-alhadith
 title_ar: مسار الحديث
-description_ar: الأخلاق والآداب والرقائق مع شرح رياض الصالحين للإمام النووي
+description_ar: رحلة مع السنة النبوية تبدأ بجوامع الكلم في الأربعين النووية ثم أحاديث الأحكام في العمدة
 level: beginner
 science: hadith
 sort_order: 3
-is_published: false
+is_published: true
 stages:
-  - title_ar: "المرحلة الأولى: رياض الصالحين"
-    description_ar: شرح الكتاب بترتيب أبوابه
+  - title_ar: "المرحلة الأولى: الأربعون النووية"
+    description_ar: الأحاديث الجامعة التي عليها مدار الدين
     items:
-      - series: sharh-riyad-alsalihin
+      - series: sharh-alarbain-alnawawiyah
+  - title_ar: "المرحلة الثانية: عمدة الأحكام"
+    description_ar: أحاديث الأحكام المتفق عليها بين الشيخين
+    items:
+      - series: sharh-umdat-alahkam

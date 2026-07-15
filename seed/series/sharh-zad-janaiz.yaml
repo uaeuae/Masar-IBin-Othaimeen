@@ -1,0 +1,12 @@
+# الشرح الممتع — كتاب الجنائز من زاد المستقنع.
+slug: sharh-zad-janaiz
+title_ar: كتاب الجنائز من زاد المستقنع
+description_ar: الشرح الممتع — كتاب الجنائز من متن زاد المستقنع للحجاوي رحمه الله
+science: fiqh
+level: intermediate
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXmK0f4vX-eHOiIC96qyra3F # شرح كتاب الجنائز من زاد المستقنع (٤٥)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

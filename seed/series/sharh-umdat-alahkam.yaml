@@ -1,0 +1,14 @@
+# شرح عمدة الأحكام — الكتب المتوفرة على القناة بترتيب المتن.
+slug: sharh-umdat-alahkam
+title_ar: شرح عمدة الأحكام
+description_ar: شرح عمدة الأحكام للحافظ عبدالغني المقدسي رحمه الله — أحاديث الأحكام المتفق عليها
+science: hadith
+level: beginner
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXmT7N3qAJPuSwszbFdRyZST # كتاب الطهارة (٤٠)
+  - PLiTKQO5a7ZXlqTUHqxMYdaQVblJTlZSRq # كتاب الصلاة والجنائز (١٣٦)
+  - PLiTKQO5a7ZXm1yaWvvQHxRFpMJN-hcEPs # كتاب الحج (٢٢)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

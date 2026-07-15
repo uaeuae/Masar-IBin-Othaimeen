@@ -1,0 +1,12 @@
+# الشرح الممتع — كتاب الزكاة من زاد المستقنع.
+slug: sharh-zad-zakah
+title_ar: كتاب الزكاة من زاد المستقنع
+description_ar: الشرح الممتع — كتاب الزكاة من متن زاد المستقنع للحجاوي رحمه الله
+science: fiqh
+level: intermediate
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXl6OORLLQxKqe3lARVHg53e # شرح كتاب الزكاة من زاد المستقنع (٨٨)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

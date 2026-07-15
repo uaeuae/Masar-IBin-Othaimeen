@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { mergeLessons } from '../src/merge.js';
+import { mergeLessons, sortByEpisodeNumber } from '../src/merge.js';
 import { seriesSeedSchema } from '../src/schemas.js';
 import type { StoredLesson } from '../src/store.js';
 import type { YoutubeVideo } from '../src/youtube.js';
@@ -39,6 +39,41 @@ function stored(id: string, position: number, opts: Partial<StoredLesson> = {}):
     ...opts,
   };
 }
+
+describe('sortByEpisodeNumber', () => {
+  it('orders a shuffled playlist by the trailing episode number', () => {
+    const shuffled = [
+      video('c', 'شرح كتاب الحج للشيخ ابن عثيمين 10'),
+      video('a', 'شرح كتاب الحج للشيخ ابن عثيمين 1'),
+      video('b', 'شرح كتاب الحج للشيخ ابن عثيمين 2'),
+    ];
+    expect(sortByEpisodeNumber(shuffled).map((v) => v.videoId)).toEqual(['a', 'b', 'c']);
+  });
+
+  it('understands Arabic-Indic digits', () => {
+    const shuffled = [video('b', 'الدرس ١٢'), video('a', 'الدرس ٣')];
+    expect(sortByEpisodeNumber(shuffled).map((v) => v.videoId)).toEqual(['a', 'b']);
+  });
+
+  it('keeps playlist order when any playable title has no trailing number', () => {
+    const mixed = [video('b', 'الدرس 2'), video('intro', 'مقدمة الشرح'), video('a', 'الدرس 1')];
+    expect(sortByEpisodeNumber(mixed).map((v) => v.videoId)).toEqual(['b', 'intro', 'a']);
+  });
+
+  it('sorts numberless unplayable videos to the end, keeping their order', () => {
+    const withDeleted = [
+      video('gone', 'Deleted video', { playable: false }),
+      video('b', 'الدرس 2'),
+      video('a', 'الدرس 1'),
+    ];
+    expect(sortByEpisodeNumber(withDeleted).map((v) => v.videoId)).toEqual(['a', 'b', 'gone']);
+  });
+
+  it('keeps playlist order for equal episode numbers (stable)', () => {
+    const dup = [video('x', 'الدرس 5'), video('y', 'الدرس 5'), video('z', 'الدرس 4')];
+    expect(sortByEpisodeNumber(dup).map((v) => v.videoId)).toEqual(['z', 'x', 'y']);
+  });
+});
 
 describe('mergeLessons', () => {
   it('builds a fresh list with cleaned titles and playlist order', () => {

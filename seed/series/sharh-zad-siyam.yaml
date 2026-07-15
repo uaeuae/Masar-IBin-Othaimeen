@@ -1,0 +1,12 @@
+# الشرح الممتع — كتاب الصيام من زاد المستقنع.
+slug: sharh-zad-siyam
+title_ar: كتاب الصيام من زاد المستقنع
+description_ar: الشرح الممتع — كتاب الصيام من متن زاد المستقنع للحجاوي رحمه الله
+science: fiqh
+level: intermediate
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXlb_sKLTCPdV49habXbb9Jo # شرح كتاب الصيام من زاد المستقنع (٥٩)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

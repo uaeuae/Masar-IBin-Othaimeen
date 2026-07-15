@@ -1,5 +1,5 @@
 import { loadSeeds } from '../seeds.js';
-import { mergeLessons } from '../merge.js';
+import { mergeLessons, sortByEpisodeNumber } from '../merge.js';
 import { readStoredLessons, writeStoredLessons } from '../store.js';
 import type { YoutubeClient, YoutubeVideo } from '../youtube.js';
 
@@ -28,7 +28,8 @@ export async function syncYoutube(options: SyncOptions): Promise<{ changedSeries
 
     const videos: YoutubeVideo[] = [];
     for (const playlistId of seed.youtube_playlists) {
-      videos.push(...(await options.client.fetchPlaylistVideos(playlistId)));
+      // Per playlist (not across them): multi-playlist series restart numbering.
+      videos.push(...sortByEpisodeNumber(await options.client.fetchPlaylistVideos(playlistId)));
     }
 
     const previous = readStoredLessons(options.dataDir, seed.slug);

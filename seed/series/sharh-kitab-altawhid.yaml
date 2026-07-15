@@ -1,0 +1,13 @@
+# شرح كتاب التوحيد — القسمان على قناة الشيخ الرسمية (الأصل ثم التتمة).
+slug: sharh-kitab-altawhid
+title_ar: شرح كتاب التوحيد
+description_ar: شرح كتاب التوحيد الذي هو حق الله على العبيد للإمام المجدد محمد بن عبدالوهاب رحمه الله
+science: aqeedah
+level: beginner
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXlMgT8KQEYSkpFt-OdZU32D # شرح كتاب التوحيد (٢٠٠)
+  - PLiTKQO5a7ZXkSnX5beeqPBp17d6Zcv6iT # 'تابع' شرح كتاب التوحيد (٣٩)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

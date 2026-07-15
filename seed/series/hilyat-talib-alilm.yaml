@@ -1,0 +1,12 @@
+# التعليق على حلية طالب العلم — للتصفح من المكتبة (ليست ضمن مسار بعد).
+slug: hilyat-talib-alilm
+title_ar: حلية طالب العلم
+description_ar: التعليق على «حلية طالب العلم» للشيخ بكر أبو زيد رحمه الله — آداب الطالب في طريق التحصيل
+science: seerah-adab
+level: beginner
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXmbjN_pAywNYHCHdOxiukLB # التعليق على كتاب حلية طالب العلم (٦٠)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

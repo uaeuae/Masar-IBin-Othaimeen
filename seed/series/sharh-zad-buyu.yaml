@@ -1,0 +1,12 @@
+# الشرح الممتع — كتاب البيوع من زاد المستقنع (الشرح الأول هو المتوفر على القناة).
+slug: sharh-zad-buyu
+title_ar: كتاب البيوع من زاد المستقنع
+description_ar: الشرح الممتع — كتاب البيوع من متن زاد المستقنع للحجاوي رحمه الله
+science: fiqh
+level: intermediate
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXk9rya_b0mZGlHiwbtiXdD_ # الشرح الأول لكتاب البيوع من زاد المستقنع (١٠٧)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

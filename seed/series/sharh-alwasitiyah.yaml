@@ -1,10 +1,13 @@
 # شرح العقيدة الواسطية لشيخ الإسلام ابن تيمية رحمه الله.
+# القناة الرسمية فيها «الشرح الثاني» فقط — وهو المعتمد هنا.
 slug: sharh-alwasitiyah
 title_ar: شرح العقيدة الواسطية
 description_ar: شرح العقيدة الواسطية لشيخ الإسلام ابن تيمية — منهج أهل السنة في الأسماء والصفات
 science: aqeedah
-status: draft # active in M6 once the official playlist ID is added and synced
-youtube_playlists: [] # from @ibnothaimeentv — run: npm run discover:playlists
+level: intermediate
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXkJGpuAxFPO4XCNl06lNSsl # الشرح الثاني للعقيدة الواسطية (٩٢)
 overrides:
   exclude_videos: []
   title_cleanup: '^\s*\d+\s*[-|/]\s*'

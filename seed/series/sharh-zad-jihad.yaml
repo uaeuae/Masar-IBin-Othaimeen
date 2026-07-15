@@ -1,0 +1,12 @@
+# الشرح الممتع — كتاب الجهاد من زاد المستقنع.
+slug: sharh-zad-jihad
+title_ar: كتاب الجهاد من زاد المستقنع
+description_ar: الشرح الممتع — كتاب الجهاد من متن زاد المستقنع للحجاوي رحمه الله
+science: fiqh
+level: intermediate
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXl145EPNBTQrnEh4y1o8dtx # شرح كتاب الجهاد من زاد المستقنع (٢٠)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

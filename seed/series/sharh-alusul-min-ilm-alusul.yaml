@@ -1,0 +1,12 @@
+# شرح الأصول من علم الأصول — للتصفح من المكتبة (ليست ضمن مسار بعد).
+slug: sharh-alusul-min-ilm-alusul
+title_ar: الأصول من علم الأصول
+description_ar: شرح رسالة «الأصول من علم الأصول» للشيخ رحمه الله — مدخل علم أصول الفقه
+science: usul-fiqh
+level: intermediate
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXluOys9QONER4krLwPkgGf- # شرح الأصول من علم الأصول (١٠٨)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

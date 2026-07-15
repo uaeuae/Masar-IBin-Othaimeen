@@ -1,0 +1,12 @@
+# شرح رسالة أصول في التفسير — قواعد فهم كتاب الله.
+slug: usul-altafsir
+title_ar: أصول في التفسير
+description_ar: شرح رسالة «أصول في التفسير» للشيخ رحمه الله — قواعد وأدوات فهم القرآن الكريم
+science: tafsir
+level: beginner
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXmw1yXJV8_UhXfxokiSIlGq # أصول في التفسير الشرح الأول (٤٧)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

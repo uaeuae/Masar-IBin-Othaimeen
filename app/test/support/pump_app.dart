@@ -44,7 +44,9 @@ void testApp(
     final engine = FakeLessonPlayerEngine();
 
     if (importCatalog) {
-      final raw = File('assets/catalog/catalog.json').readAsStringSync();
+      // Frozen copy of the original hand-written fixture: tests must not
+      // depend on the real (synced) catalog bundled in assets/.
+      final raw = File('test/support/fixture_catalog.json').readAsStringSync();
       await CatalogRepository(db).importCatalog(
         CatalogData.fromJson(jsonDecode(raw) as Map<String, dynamic>),
       );

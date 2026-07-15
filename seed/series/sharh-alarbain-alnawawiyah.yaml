@@ -1,0 +1,12 @@
+# شرح الأربعين النووية — مدخل علم الحديث لكل طالب.
+slug: sharh-alarbain-alnawawiyah
+title_ar: شرح الأربعين النووية
+description_ar: شرح الأربعين النووية للإمام النووي رحمه الله — جوامع الكلم النبوية التي عليها مدار الدين
+science: hadith
+level: beginner
+status: active
+youtube_playlists:
+  - PLiTKQO5a7ZXk7462OvRA1qTlJdX8y5ipu # كتاب الأربعين النووية (٨١)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'
