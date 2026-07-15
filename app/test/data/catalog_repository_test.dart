@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:flutter/services.dart' show AssetBundle, ByteData;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masar/data/catalog_repository.dart';
 import 'package:masar/data/db/database.dart';
@@ -13,6 +15,23 @@ import '../support/test_db.dart';
 CatalogData loadFixture() {
   final raw = File('test/support/fixture_catalog.json').readAsStringSync();
   return CatalogData.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+}
+
+/// Serves one JSON string for any asset key — a stand-in bundled catalog.
+class _JsonBundle extends AssetBundle {
+  _JsonBundle(this.json);
+
+  final String json;
+
+  @override
+  Future<ByteData> load(String key) async =>
+      ByteData.sublistView(Uint8List.fromList(utf8.encode(json)));
+
+  @override
+  Future<T> loadStructuredData<T>(
+    String key,
+    Future<T> Function(String value) parser,
+  ) => loadString(key).then(parser);
 }
 
 void main() {
@@ -48,6 +67,28 @@ void main() {
     expect(aqeedah.lessonCount, 13);
     expect(aqeedah.completedCount, 0);
     expect(aqeedah.enrolled, isFalse);
+  });
+
+  test('ensureLoaded imports newer bundled versions, skips older', () async {
+    await catalog.importCatalog(loadFixture());
+    expect(await catalog.currentVersion(), 1);
+
+    // Same version → no reimport (would be wasted work on every launch).
+    await CatalogRepository(
+      db,
+      bundle: _JsonBundle(jsonEncode(loadFixture().toJson())),
+    ).ensureLoaded();
+    expect(await catalog.currentVersion(), 1);
+
+    // Newer bundled snapshot (an app update) → upgraded in place, progress kept.
+    await progress.markCompleted('fx-usul-01', durationSeconds: 2700);
+    final v2 = loadFixture().copyWith(version: 2);
+    await CatalogRepository(
+      db,
+      bundle: _JsonBundle(jsonEncode(v2.toJson())),
+    ).ensureLoaded();
+    expect(await catalog.currentVersion(), 2);
+    expect((await progress.getProgress('fx-usul-01'))?.completed, isTrue);
   });
 
   test('journey progress derives from lesson_progress', () async {

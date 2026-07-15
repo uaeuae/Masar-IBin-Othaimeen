@@ -436,6 +436,18 @@ class $SeriesEntriesTable extends SeriesEntries
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _mediaTypeMeta = const VerificationMeta(
+    'mediaType',
+  );
+  @override
+  late final GeneratedColumn<String> mediaType = GeneratedColumn<String>(
+    'media_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('video'),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     slug,
@@ -444,6 +456,7 @@ class $SeriesEntriesTable extends SeriesEntries
     descriptionAr,
     thumbnailUrl,
     level,
+    mediaType,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -508,6 +521,12 @@ class $SeriesEntriesTable extends SeriesEntries
         level.isAcceptableOrUnknown(data['level']!, _levelMeta),
       );
     }
+    if (data.containsKey('media_type')) {
+      context.handle(
+        _mediaTypeMeta,
+        mediaType.isAcceptableOrUnknown(data['media_type']!, _mediaTypeMeta),
+      );
+    }
     return context;
   }
 
@@ -541,6 +560,10 @@ class $SeriesEntriesTable extends SeriesEntries
         DriftSqlType.string,
         data['${effectivePrefix}level'],
       ),
+      mediaType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}media_type'],
+      )!,
     );
   }
 
@@ -559,6 +582,9 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
 
   /// 'beginner' | 'intermediate' | 'advanced' — optional curation metadata.
   final String? level;
+
+  /// 'video' | 'audio'
+  final String mediaType;
   const SeriesRow({
     required this.slug,
     required this.scienceSlug,
@@ -566,6 +592,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     this.descriptionAr,
     this.thumbnailUrl,
     this.level,
+    required this.mediaType,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -582,6 +609,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     if (!nullToAbsent || level != null) {
       map['level'] = Variable<String>(level);
     }
+    map['media_type'] = Variable<String>(mediaType);
     return map;
   }
 
@@ -599,6 +627,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       level: level == null && nullToAbsent
           ? const Value.absent()
           : Value(level),
+      mediaType: Value(mediaType),
     );
   }
 
@@ -614,6 +643,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       descriptionAr: serializer.fromJson<String?>(json['descriptionAr']),
       thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
       level: serializer.fromJson<String?>(json['level']),
+      mediaType: serializer.fromJson<String>(json['mediaType']),
     );
   }
   @override
@@ -626,6 +656,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       'descriptionAr': serializer.toJson<String?>(descriptionAr),
       'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
       'level': serializer.toJson<String?>(level),
+      'mediaType': serializer.toJson<String>(mediaType),
     };
   }
 
@@ -636,6 +667,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     Value<String?> descriptionAr = const Value.absent(),
     Value<String?> thumbnailUrl = const Value.absent(),
     Value<String?> level = const Value.absent(),
+    String? mediaType,
   }) => SeriesRow(
     slug: slug ?? this.slug,
     scienceSlug: scienceSlug ?? this.scienceSlug,
@@ -645,6 +677,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
         : this.descriptionAr,
     thumbnailUrl: thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
     level: level.present ? level.value : this.level,
+    mediaType: mediaType ?? this.mediaType,
   );
   SeriesRow copyWithCompanion(SeriesEntriesCompanion data) {
     return SeriesRow(
@@ -660,6 +693,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           ? data.thumbnailUrl.value
           : this.thumbnailUrl,
       level: data.level.present ? data.level.value : this.level,
+      mediaType: data.mediaType.present ? data.mediaType.value : this.mediaType,
     );
   }
 
@@ -671,7 +705,8 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           ..write('titleAr: $titleAr, ')
           ..write('descriptionAr: $descriptionAr, ')
           ..write('thumbnailUrl: $thumbnailUrl, ')
-          ..write('level: $level')
+          ..write('level: $level, ')
+          ..write('mediaType: $mediaType')
           ..write(')'))
         .toString();
   }
@@ -684,6 +719,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     descriptionAr,
     thumbnailUrl,
     level,
+    mediaType,
   );
   @override
   bool operator ==(Object other) =>
@@ -694,7 +730,8 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           other.titleAr == this.titleAr &&
           other.descriptionAr == this.descriptionAr &&
           other.thumbnailUrl == this.thumbnailUrl &&
-          other.level == this.level);
+          other.level == this.level &&
+          other.mediaType == this.mediaType);
 }
 
 class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
@@ -704,6 +741,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
   final Value<String?> descriptionAr;
   final Value<String?> thumbnailUrl;
   final Value<String?> level;
+  final Value<String> mediaType;
   final Value<int> rowid;
   const SeriesEntriesCompanion({
     this.slug = const Value.absent(),
@@ -712,6 +750,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     this.descriptionAr = const Value.absent(),
     this.thumbnailUrl = const Value.absent(),
     this.level = const Value.absent(),
+    this.mediaType = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SeriesEntriesCompanion.insert({
@@ -721,6 +760,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     this.descriptionAr = const Value.absent(),
     this.thumbnailUrl = const Value.absent(),
     this.level = const Value.absent(),
+    this.mediaType = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : slug = Value(slug),
        scienceSlug = Value(scienceSlug),
@@ -732,6 +772,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     Expression<String>? descriptionAr,
     Expression<String>? thumbnailUrl,
     Expression<String>? level,
+    Expression<String>? mediaType,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -741,6 +782,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
       if (descriptionAr != null) 'description_ar': descriptionAr,
       if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
       if (level != null) 'level': level,
+      if (mediaType != null) 'media_type': mediaType,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -752,6 +794,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     Value<String?>? descriptionAr,
     Value<String?>? thumbnailUrl,
     Value<String?>? level,
+    Value<String>? mediaType,
     Value<int>? rowid,
   }) {
     return SeriesEntriesCompanion(
@@ -761,6 +804,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
       descriptionAr: descriptionAr ?? this.descriptionAr,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       level: level ?? this.level,
+      mediaType: mediaType ?? this.mediaType,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -786,6 +830,9 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     if (level.present) {
       map['level'] = Variable<String>(level.value);
     }
+    if (mediaType.present) {
+      map['media_type'] = Variable<String>(mediaType.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -801,6 +848,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
           ..write('descriptionAr: $descriptionAr, ')
           ..write('thumbnailUrl: $thumbnailUrl, ')
           ..write('level: $level, ')
+          ..write('mediaType: $mediaType, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -877,6 +925,40 @@ class $LessonsTable extends Lessons with TableInfo<$LessonsTable, Lesson> {
     requiredDuringInsert: false,
     defaultValue: const Constant('active'),
   );
+  static const VerificationMeta _mediaTypeMeta = const VerificationMeta(
+    'mediaType',
+  );
+  @override
+  late final GeneratedColumn<String> mediaType = GeneratedColumn<String>(
+    'media_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('video'),
+  );
+  static const VerificationMeta _audioUrlMeta = const VerificationMeta(
+    'audioUrl',
+  );
+  @override
+  late final GeneratedColumn<String> audioUrl = GeneratedColumn<String>(
+    'audio_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _chaptersJsonMeta = const VerificationMeta(
+    'chaptersJson',
+  );
+  @override
+  late final GeneratedColumn<String> chaptersJson = GeneratedColumn<String>(
+    'chapters_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     videoId,
@@ -885,6 +967,9 @@ class $LessonsTable extends Lessons with TableInfo<$LessonsTable, Lesson> {
     titleAr,
     durationSeconds,
     status,
+    mediaType,
+    audioUrl,
+    chaptersJson,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -945,6 +1030,27 @@ class $LessonsTable extends Lessons with TableInfo<$LessonsTable, Lesson> {
         status.isAcceptableOrUnknown(data['status']!, _statusMeta),
       );
     }
+    if (data.containsKey('media_type')) {
+      context.handle(
+        _mediaTypeMeta,
+        mediaType.isAcceptableOrUnknown(data['media_type']!, _mediaTypeMeta),
+      );
+    }
+    if (data.containsKey('audio_url')) {
+      context.handle(
+        _audioUrlMeta,
+        audioUrl.isAcceptableOrUnknown(data['audio_url']!, _audioUrlMeta),
+      );
+    }
+    if (data.containsKey('chapters_json')) {
+      context.handle(
+        _chaptersJsonMeta,
+        chaptersJson.isAcceptableOrUnknown(
+          data['chapters_json']!,
+          _chaptersJsonMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -978,6 +1084,18 @@ class $LessonsTable extends Lessons with TableInfo<$LessonsTable, Lesson> {
         DriftSqlType.string,
         data['${effectivePrefix}status'],
       )!,
+      mediaType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}media_type'],
+      )!,
+      audioUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}audio_url'],
+      ),
+      chaptersJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chapters_json'],
+      ),
     );
   }
 
@@ -988,6 +1106,7 @@ class $LessonsTable extends Lessons with TableInfo<$LessonsTable, Lesson> {
 }
 
 class Lesson extends DataClass implements Insertable<Lesson> {
+  /// External id: YouTube video id, or the site lesson uuid for audio.
   final String videoId;
   final String seriesSlug;
   final int position;
@@ -996,6 +1115,13 @@ class Lesson extends DataClass implements Insertable<Lesson> {
 
   /// 'active' | 'hidden' | 'unavailable'
   final String status;
+
+  /// 'video' | 'audio'
+  final String mediaType;
+  final String? audioUrl;
+
+  /// JSON list of {start_seconds, title, body} chapter markers (audio only).
+  final String? chaptersJson;
   const Lesson({
     required this.videoId,
     required this.seriesSlug,
@@ -1003,6 +1129,9 @@ class Lesson extends DataClass implements Insertable<Lesson> {
     required this.titleAr,
     this.durationSeconds,
     required this.status,
+    required this.mediaType,
+    this.audioUrl,
+    this.chaptersJson,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1015,6 +1144,13 @@ class Lesson extends DataClass implements Insertable<Lesson> {
       map['duration_seconds'] = Variable<int>(durationSeconds);
     }
     map['status'] = Variable<String>(status);
+    map['media_type'] = Variable<String>(mediaType);
+    if (!nullToAbsent || audioUrl != null) {
+      map['audio_url'] = Variable<String>(audioUrl);
+    }
+    if (!nullToAbsent || chaptersJson != null) {
+      map['chapters_json'] = Variable<String>(chaptersJson);
+    }
     return map;
   }
 
@@ -1028,6 +1164,13 @@ class Lesson extends DataClass implements Insertable<Lesson> {
           ? const Value.absent()
           : Value(durationSeconds),
       status: Value(status),
+      mediaType: Value(mediaType),
+      audioUrl: audioUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(audioUrl),
+      chaptersJson: chaptersJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(chaptersJson),
     );
   }
 
@@ -1043,6 +1186,9 @@ class Lesson extends DataClass implements Insertable<Lesson> {
       titleAr: serializer.fromJson<String>(json['titleAr']),
       durationSeconds: serializer.fromJson<int?>(json['durationSeconds']),
       status: serializer.fromJson<String>(json['status']),
+      mediaType: serializer.fromJson<String>(json['mediaType']),
+      audioUrl: serializer.fromJson<String?>(json['audioUrl']),
+      chaptersJson: serializer.fromJson<String?>(json['chaptersJson']),
     );
   }
   @override
@@ -1055,6 +1201,9 @@ class Lesson extends DataClass implements Insertable<Lesson> {
       'titleAr': serializer.toJson<String>(titleAr),
       'durationSeconds': serializer.toJson<int?>(durationSeconds),
       'status': serializer.toJson<String>(status),
+      'mediaType': serializer.toJson<String>(mediaType),
+      'audioUrl': serializer.toJson<String?>(audioUrl),
+      'chaptersJson': serializer.toJson<String?>(chaptersJson),
     };
   }
 
@@ -1065,6 +1214,9 @@ class Lesson extends DataClass implements Insertable<Lesson> {
     String? titleAr,
     Value<int?> durationSeconds = const Value.absent(),
     String? status,
+    String? mediaType,
+    Value<String?> audioUrl = const Value.absent(),
+    Value<String?> chaptersJson = const Value.absent(),
   }) => Lesson(
     videoId: videoId ?? this.videoId,
     seriesSlug: seriesSlug ?? this.seriesSlug,
@@ -1074,6 +1226,9 @@ class Lesson extends DataClass implements Insertable<Lesson> {
         ? durationSeconds.value
         : this.durationSeconds,
     status: status ?? this.status,
+    mediaType: mediaType ?? this.mediaType,
+    audioUrl: audioUrl.present ? audioUrl.value : this.audioUrl,
+    chaptersJson: chaptersJson.present ? chaptersJson.value : this.chaptersJson,
   );
   Lesson copyWithCompanion(LessonsCompanion data) {
     return Lesson(
@@ -1087,6 +1242,11 @@ class Lesson extends DataClass implements Insertable<Lesson> {
           ? data.durationSeconds.value
           : this.durationSeconds,
       status: data.status.present ? data.status.value : this.status,
+      mediaType: data.mediaType.present ? data.mediaType.value : this.mediaType,
+      audioUrl: data.audioUrl.present ? data.audioUrl.value : this.audioUrl,
+      chaptersJson: data.chaptersJson.present
+          ? data.chaptersJson.value
+          : this.chaptersJson,
     );
   }
 
@@ -1098,7 +1258,10 @@ class Lesson extends DataClass implements Insertable<Lesson> {
           ..write('position: $position, ')
           ..write('titleAr: $titleAr, ')
           ..write('durationSeconds: $durationSeconds, ')
-          ..write('status: $status')
+          ..write('status: $status, ')
+          ..write('mediaType: $mediaType, ')
+          ..write('audioUrl: $audioUrl, ')
+          ..write('chaptersJson: $chaptersJson')
           ..write(')'))
         .toString();
   }
@@ -1111,6 +1274,9 @@ class Lesson extends DataClass implements Insertable<Lesson> {
     titleAr,
     durationSeconds,
     status,
+    mediaType,
+    audioUrl,
+    chaptersJson,
   );
   @override
   bool operator ==(Object other) =>
@@ -1121,7 +1287,10 @@ class Lesson extends DataClass implements Insertable<Lesson> {
           other.position == this.position &&
           other.titleAr == this.titleAr &&
           other.durationSeconds == this.durationSeconds &&
-          other.status == this.status);
+          other.status == this.status &&
+          other.mediaType == this.mediaType &&
+          other.audioUrl == this.audioUrl &&
+          other.chaptersJson == this.chaptersJson);
 }
 
 class LessonsCompanion extends UpdateCompanion<Lesson> {
@@ -1131,6 +1300,9 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
   final Value<String> titleAr;
   final Value<int?> durationSeconds;
   final Value<String> status;
+  final Value<String> mediaType;
+  final Value<String?> audioUrl;
+  final Value<String?> chaptersJson;
   final Value<int> rowid;
   const LessonsCompanion({
     this.videoId = const Value.absent(),
@@ -1139,6 +1311,9 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
     this.titleAr = const Value.absent(),
     this.durationSeconds = const Value.absent(),
     this.status = const Value.absent(),
+    this.mediaType = const Value.absent(),
+    this.audioUrl = const Value.absent(),
+    this.chaptersJson = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   LessonsCompanion.insert({
@@ -1148,6 +1323,9 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
     required String titleAr,
     this.durationSeconds = const Value.absent(),
     this.status = const Value.absent(),
+    this.mediaType = const Value.absent(),
+    this.audioUrl = const Value.absent(),
+    this.chaptersJson = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : videoId = Value(videoId),
        seriesSlug = Value(seriesSlug),
@@ -1160,6 +1338,9 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
     Expression<String>? titleAr,
     Expression<int>? durationSeconds,
     Expression<String>? status,
+    Expression<String>? mediaType,
+    Expression<String>? audioUrl,
+    Expression<String>? chaptersJson,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1169,6 +1350,9 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
       if (titleAr != null) 'title_ar': titleAr,
       if (durationSeconds != null) 'duration_seconds': durationSeconds,
       if (status != null) 'status': status,
+      if (mediaType != null) 'media_type': mediaType,
+      if (audioUrl != null) 'audio_url': audioUrl,
+      if (chaptersJson != null) 'chapters_json': chaptersJson,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1180,6 +1364,9 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
     Value<String>? titleAr,
     Value<int?>? durationSeconds,
     Value<String>? status,
+    Value<String>? mediaType,
+    Value<String?>? audioUrl,
+    Value<String?>? chaptersJson,
     Value<int>? rowid,
   }) {
     return LessonsCompanion(
@@ -1189,6 +1376,9 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
       titleAr: titleAr ?? this.titleAr,
       durationSeconds: durationSeconds ?? this.durationSeconds,
       status: status ?? this.status,
+      mediaType: mediaType ?? this.mediaType,
+      audioUrl: audioUrl ?? this.audioUrl,
+      chaptersJson: chaptersJson ?? this.chaptersJson,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1214,6 +1404,15 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
     if (status.present) {
       map['status'] = Variable<String>(status.value);
     }
+    if (mediaType.present) {
+      map['media_type'] = Variable<String>(mediaType.value);
+    }
+    if (audioUrl.present) {
+      map['audio_url'] = Variable<String>(audioUrl.value);
+    }
+    if (chaptersJson.present) {
+      map['chapters_json'] = Variable<String>(chaptersJson.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1229,6 +1428,9 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
           ..write('titleAr: $titleAr, ')
           ..write('durationSeconds: $durationSeconds, ')
           ..write('status: $status, ')
+          ..write('mediaType: $mediaType, ')
+          ..write('audioUrl: $audioUrl, ')
+          ..write('chaptersJson: $chaptersJson, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3651,6 +3853,7 @@ typedef $$SeriesEntriesTableCreateCompanionBuilder =
       Value<String?> descriptionAr,
       Value<String?> thumbnailUrl,
       Value<String?> level,
+      Value<String> mediaType,
       Value<int> rowid,
     });
 typedef $$SeriesEntriesTableUpdateCompanionBuilder =
@@ -3661,6 +3864,7 @@ typedef $$SeriesEntriesTableUpdateCompanionBuilder =
       Value<String?> descriptionAr,
       Value<String?> thumbnailUrl,
       Value<String?> level,
+      Value<String> mediaType,
       Value<int> rowid,
     });
 
@@ -3700,6 +3904,11 @@ class $$SeriesEntriesTableFilterComposer
 
   ColumnFilters<String> get level => $composableBuilder(
     column: $table.level,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mediaType => $composableBuilder(
+    column: $table.mediaType,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3742,6 +3951,11 @@ class $$SeriesEntriesTableOrderingComposer
     column: $table.level,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get mediaType => $composableBuilder(
+    column: $table.mediaType,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SeriesEntriesTableAnnotationComposer
@@ -3776,6 +3990,9 @@ class $$SeriesEntriesTableAnnotationComposer
 
   GeneratedColumn<String> get level =>
       $composableBuilder(column: $table.level, builder: (column) => column);
+
+  GeneratedColumn<String> get mediaType =>
+      $composableBuilder(column: $table.mediaType, builder: (column) => column);
 }
 
 class $$SeriesEntriesTableTableManager
@@ -3815,6 +4032,7 @@ class $$SeriesEntriesTableTableManager
                 Value<String?> descriptionAr = const Value.absent(),
                 Value<String?> thumbnailUrl = const Value.absent(),
                 Value<String?> level = const Value.absent(),
+                Value<String> mediaType = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SeriesEntriesCompanion(
                 slug: slug,
@@ -3823,6 +4041,7 @@ class $$SeriesEntriesTableTableManager
                 descriptionAr: descriptionAr,
                 thumbnailUrl: thumbnailUrl,
                 level: level,
+                mediaType: mediaType,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3833,6 +4052,7 @@ class $$SeriesEntriesTableTableManager
                 Value<String?> descriptionAr = const Value.absent(),
                 Value<String?> thumbnailUrl = const Value.absent(),
                 Value<String?> level = const Value.absent(),
+                Value<String> mediaType = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SeriesEntriesCompanion.insert(
                 slug: slug,
@@ -3841,6 +4061,7 @@ class $$SeriesEntriesTableTableManager
                 descriptionAr: descriptionAr,
                 thumbnailUrl: thumbnailUrl,
                 level: level,
+                mediaType: mediaType,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -3876,6 +4097,9 @@ typedef $$LessonsTableCreateCompanionBuilder =
       required String titleAr,
       Value<int?> durationSeconds,
       Value<String> status,
+      Value<String> mediaType,
+      Value<String?> audioUrl,
+      Value<String?> chaptersJson,
       Value<int> rowid,
     });
 typedef $$LessonsTableUpdateCompanionBuilder =
@@ -3886,6 +4110,9 @@ typedef $$LessonsTableUpdateCompanionBuilder =
       Value<String> titleAr,
       Value<int?> durationSeconds,
       Value<String> status,
+      Value<String> mediaType,
+      Value<String?> audioUrl,
+      Value<String?> chaptersJson,
       Value<int> rowid,
     });
 
@@ -3925,6 +4152,21 @@ class $$LessonsTableFilterComposer
 
   ColumnFilters<String> get status => $composableBuilder(
     column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mediaType => $composableBuilder(
+    column: $table.mediaType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get audioUrl => $composableBuilder(
+    column: $table.audioUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get chaptersJson => $composableBuilder(
+    column: $table.chaptersJson,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3967,6 +4209,21 @@ class $$LessonsTableOrderingComposer
     column: $table.status,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get mediaType => $composableBuilder(
+    column: $table.mediaType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get audioUrl => $composableBuilder(
+    column: $table.audioUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get chaptersJson => $composableBuilder(
+    column: $table.chaptersJson,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$LessonsTableAnnotationComposer
@@ -3999,6 +4256,17 @@ class $$LessonsTableAnnotationComposer
 
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get mediaType =>
+      $composableBuilder(column: $table.mediaType, builder: (column) => column);
+
+  GeneratedColumn<String> get audioUrl =>
+      $composableBuilder(column: $table.audioUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get chaptersJson => $composableBuilder(
+    column: $table.chaptersJson,
+    builder: (column) => column,
+  );
 }
 
 class $$LessonsTableTableManager
@@ -4035,6 +4303,9 @@ class $$LessonsTableTableManager
                 Value<String> titleAr = const Value.absent(),
                 Value<int?> durationSeconds = const Value.absent(),
                 Value<String> status = const Value.absent(),
+                Value<String> mediaType = const Value.absent(),
+                Value<String?> audioUrl = const Value.absent(),
+                Value<String?> chaptersJson = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => LessonsCompanion(
                 videoId: videoId,
@@ -4043,6 +4314,9 @@ class $$LessonsTableTableManager
                 titleAr: titleAr,
                 durationSeconds: durationSeconds,
                 status: status,
+                mediaType: mediaType,
+                audioUrl: audioUrl,
+                chaptersJson: chaptersJson,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -4053,6 +4327,9 @@ class $$LessonsTableTableManager
                 required String titleAr,
                 Value<int?> durationSeconds = const Value.absent(),
                 Value<String> status = const Value.absent(),
+                Value<String> mediaType = const Value.absent(),
+                Value<String?> audioUrl = const Value.absent(),
+                Value<String?> chaptersJson = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => LessonsCompanion.insert(
                 videoId: videoId,
@@ -4061,6 +4338,9 @@ class $$LessonsTableTableManager
                 titleAr: titleAr,
                 durationSeconds: durationSeconds,
                 status: status,
+                mediaType: mediaType,
+                audioUrl: audioUrl,
+                chaptersJson: chaptersJson,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

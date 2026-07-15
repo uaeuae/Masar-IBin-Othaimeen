@@ -1,3 +1,4 @@
+import 'models/catalog.dart' show CatalogChapter;
 import 'models/enums.dart';
 
 /// Plain read-models produced by repository queries for the screens.
@@ -48,6 +49,7 @@ class SeriesWithProgress {
     required this.completedCount,
     this.totalDurationSeconds = 0,
     this.level,
+    this.media = LessonMedia.video,
   });
 
   final String slug;
@@ -59,6 +61,7 @@ class SeriesWithProgress {
   final int completedCount;
   final int totalDurationSeconds;
   final JourneyLevel? level;
+  final LessonMedia media;
 
   double get progress => lessonCount == 0 ? 0 : completedCount / lessonCount;
 
@@ -108,6 +111,9 @@ class LessonWithProgress {
     required this.status,
     required this.watchedSeconds,
     required this.completed,
+    this.media = LessonMedia.video,
+    this.audioUrl,
+    this.chapters = const [],
   });
 
   final String videoId;
@@ -117,6 +123,9 @@ class LessonWithProgress {
   final LessonStatus status;
   final int watchedSeconds;
   final bool completed;
+  final LessonMedia media;
+  final String? audioUrl;
+  final List<CatalogChapter> chapters;
 
   double get progress {
     if (completed) return 1;

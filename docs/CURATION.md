@@ -40,6 +40,26 @@ credentials → API key; the free 10k units/day quota is far more than enough).
 The weekly GitHub Actions workflow (`sync.yml`) repeats steps 3+6 automatically
 once `YT_API_KEY` is added to the repo's Actions secrets.
 
+## Audio series (Phase 2 — foundation MP3s)
+
+Audio series stream from the foundation's own site (sounds.binothaimeen.net)
+— TOS-free background playback, unlike YouTube. The site API needs no key:
+
+1. Find the section id: the audio library tree lives at
+   `https://shekhapi.binothaimeen.net/course/sections/audio_library/10`,
+   children via `.../audio_library/children/{id}?pageSize=50`.
+2. In the series seed set `media: audio` and list the section ids under
+   `site_audio_sections:` (playback order; numbering restarts per section).
+3. `npm run sync:site-audio` — pulls lessons (MP3 path, chaptered study
+   text with timestamps, dates), probes each file for duration, sorts by
+   the trailing episode number, and marks zero-byte/broken uploads
+   `unavailable`. Then `npm run publish:catalog` as usual.
+
+Known quirks (2026-07-16): the API's `certificate_url` field holds the MP3
+path in three formats (rooted/unrooted/absolute); some files open with a
+~1 MB ID3 cover-art tag (the duration probe reads past it); رياض الصالحين
+lessons 66–69 are zero-byte uploads on the server (auto-marked unavailable).
+
 ## Content QA notes
 
 - Never rename a series `slug` after release — device progress keys off video

@@ -583,7 +583,7 @@ as int,
 /// @nodoc
 mixin _$CatalogSeries {
 
- String get slug; String get science; String get titleAr; String? get descriptionAr; String? get thumbnailUrl; JourneyLevel? get level; List<CatalogLesson> get lessons;
+ String get slug; String get science; String get titleAr; String? get descriptionAr; String? get thumbnailUrl; JourneyLevel? get level; LessonMedia get media; List<CatalogLesson> get lessons;
 /// Create a copy of CatalogSeries
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -596,16 +596,16 @@ $CatalogSeriesCopyWith<CatalogSeries> get copyWith => _$CatalogSeriesCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogSeries&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.science, science) || other.science == science)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.level, level) || other.level == level)&&const DeepCollectionEquality().equals(other.lessons, lessons));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogSeries&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.science, science) || other.science == science)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.level, level) || other.level == level)&&(identical(other.media, media) || other.media == media)&&const DeepCollectionEquality().equals(other.lessons, lessons));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,slug,science,titleAr,descriptionAr,thumbnailUrl,level,const DeepCollectionEquality().hash(lessons));
+int get hashCode => Object.hash(runtimeType,slug,science,titleAr,descriptionAr,thumbnailUrl,level,media,const DeepCollectionEquality().hash(lessons));
 
 @override
 String toString() {
-  return 'CatalogSeries(slug: $slug, science: $science, titleAr: $titleAr, descriptionAr: $descriptionAr, thumbnailUrl: $thumbnailUrl, level: $level, lessons: $lessons)';
+  return 'CatalogSeries(slug: $slug, science: $science, titleAr: $titleAr, descriptionAr: $descriptionAr, thumbnailUrl: $thumbnailUrl, level: $level, media: $media, lessons: $lessons)';
 }
 
 
@@ -616,7 +616,7 @@ abstract mixin class $CatalogSeriesCopyWith<$Res>  {
   factory $CatalogSeriesCopyWith(CatalogSeries value, $Res Function(CatalogSeries) _then) = _$CatalogSeriesCopyWithImpl;
 @useResult
 $Res call({
- String slug, String science, String titleAr, String? descriptionAr, String? thumbnailUrl, JourneyLevel? level, List<CatalogLesson> lessons
+ String slug, String science, String titleAr, String? descriptionAr, String? thumbnailUrl, JourneyLevel? level, LessonMedia media, List<CatalogLesson> lessons
 });
 
 
@@ -633,7 +633,7 @@ class _$CatalogSeriesCopyWithImpl<$Res>
 
 /// Create a copy of CatalogSeries
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? slug = null,Object? science = null,Object? titleAr = null,Object? descriptionAr = freezed,Object? thumbnailUrl = freezed,Object? level = freezed,Object? lessons = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? slug = null,Object? science = null,Object? titleAr = null,Object? descriptionAr = freezed,Object? thumbnailUrl = freezed,Object? level = freezed,Object? media = null,Object? lessons = null,}) {
   return _then(_self.copyWith(
 slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
 as String,science: null == science ? _self.science : science // ignore: cast_nullable_to_non_nullable
@@ -641,7 +641,8 @@ as String,titleAr: null == titleAr ? _self.titleAr : titleAr // ignore: cast_nul
 as String,descriptionAr: freezed == descriptionAr ? _self.descriptionAr : descriptionAr // ignore: cast_nullable_to_non_nullable
 as String?,thumbnailUrl: freezed == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String?,level: freezed == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
-as JourneyLevel?,lessons: null == lessons ? _self.lessons : lessons // ignore: cast_nullable_to_non_nullable
+as JourneyLevel?,media: null == media ? _self.media : media // ignore: cast_nullable_to_non_nullable
+as LessonMedia,lessons: null == lessons ? _self.lessons : lessons // ignore: cast_nullable_to_non_nullable
 as List<CatalogLesson>,
   ));
 }
@@ -727,10 +728,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String slug,  String science,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  List<CatalogLesson> lessons)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String slug,  String science,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  LessonMedia media,  List<CatalogLesson> lessons)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CatalogSeries() when $default != null:
-return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.lessons);case _:
+return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.media,_that.lessons);case _:
   return orElse();
 
 }
@@ -748,10 +749,10 @@ return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String slug,  String science,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  List<CatalogLesson> lessons)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String slug,  String science,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  LessonMedia media,  List<CatalogLesson> lessons)  $default,) {final _that = this;
 switch (_that) {
 case _CatalogSeries():
-return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.lessons);case _:
+return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.media,_that.lessons);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -768,10 +769,10 @@ return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String slug,  String science,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  List<CatalogLesson> lessons)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String slug,  String science,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  LessonMedia media,  List<CatalogLesson> lessons)?  $default,) {final _that = this;
 switch (_that) {
 case _CatalogSeries() when $default != null:
-return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.lessons);case _:
+return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.media,_that.lessons);case _:
   return null;
 
 }
@@ -783,7 +784,7 @@ return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that
 @JsonSerializable()
 
 class _CatalogSeries implements CatalogSeries {
-  const _CatalogSeries({required this.slug, required this.science, required this.titleAr, this.descriptionAr, this.thumbnailUrl, this.level, final  List<CatalogLesson> lessons = const []}): _lessons = lessons;
+  const _CatalogSeries({required this.slug, required this.science, required this.titleAr, this.descriptionAr, this.thumbnailUrl, this.level, this.media = LessonMedia.video, final  List<CatalogLesson> lessons = const []}): _lessons = lessons;
   factory _CatalogSeries.fromJson(Map<String, dynamic> json) => _$CatalogSeriesFromJson(json);
 
 @override final  String slug;
@@ -792,6 +793,7 @@ class _CatalogSeries implements CatalogSeries {
 @override final  String? descriptionAr;
 @override final  String? thumbnailUrl;
 @override final  JourneyLevel? level;
+@override@JsonKey() final  LessonMedia media;
  final  List<CatalogLesson> _lessons;
 @override@JsonKey() List<CatalogLesson> get lessons {
   if (_lessons is EqualUnmodifiableListView) return _lessons;
@@ -813,16 +815,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogSeries&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.science, science) || other.science == science)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.level, level) || other.level == level)&&const DeepCollectionEquality().equals(other._lessons, _lessons));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogSeries&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.science, science) || other.science == science)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.level, level) || other.level == level)&&(identical(other.media, media) || other.media == media)&&const DeepCollectionEquality().equals(other._lessons, _lessons));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,slug,science,titleAr,descriptionAr,thumbnailUrl,level,const DeepCollectionEquality().hash(_lessons));
+int get hashCode => Object.hash(runtimeType,slug,science,titleAr,descriptionAr,thumbnailUrl,level,media,const DeepCollectionEquality().hash(_lessons));
 
 @override
 String toString() {
-  return 'CatalogSeries(slug: $slug, science: $science, titleAr: $titleAr, descriptionAr: $descriptionAr, thumbnailUrl: $thumbnailUrl, level: $level, lessons: $lessons)';
+  return 'CatalogSeries(slug: $slug, science: $science, titleAr: $titleAr, descriptionAr: $descriptionAr, thumbnailUrl: $thumbnailUrl, level: $level, media: $media, lessons: $lessons)';
 }
 
 
@@ -833,7 +835,7 @@ abstract mixin class _$CatalogSeriesCopyWith<$Res> implements $CatalogSeriesCopy
   factory _$CatalogSeriesCopyWith(_CatalogSeries value, $Res Function(_CatalogSeries) _then) = __$CatalogSeriesCopyWithImpl;
 @override @useResult
 $Res call({
- String slug, String science, String titleAr, String? descriptionAr, String? thumbnailUrl, JourneyLevel? level, List<CatalogLesson> lessons
+ String slug, String science, String titleAr, String? descriptionAr, String? thumbnailUrl, JourneyLevel? level, LessonMedia media, List<CatalogLesson> lessons
 });
 
 
@@ -850,7 +852,7 @@ class __$CatalogSeriesCopyWithImpl<$Res>
 
 /// Create a copy of CatalogSeries
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? slug = null,Object? science = null,Object? titleAr = null,Object? descriptionAr = freezed,Object? thumbnailUrl = freezed,Object? level = freezed,Object? lessons = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? slug = null,Object? science = null,Object? titleAr = null,Object? descriptionAr = freezed,Object? thumbnailUrl = freezed,Object? level = freezed,Object? media = null,Object? lessons = null,}) {
   return _then(_CatalogSeries(
 slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
 as String,science: null == science ? _self.science : science // ignore: cast_nullable_to_non_nullable
@@ -858,7 +860,8 @@ as String,titleAr: null == titleAr ? _self.titleAr : titleAr // ignore: cast_nul
 as String,descriptionAr: freezed == descriptionAr ? _self.descriptionAr : descriptionAr // ignore: cast_nullable_to_non_nullable
 as String?,thumbnailUrl: freezed == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
 as String?,level: freezed == level ? _self.level : level // ignore: cast_nullable_to_non_nullable
-as JourneyLevel?,lessons: null == lessons ? _self._lessons : lessons // ignore: cast_nullable_to_non_nullable
+as JourneyLevel?,media: null == media ? _self.media : media // ignore: cast_nullable_to_non_nullable
+as LessonMedia,lessons: null == lessons ? _self._lessons : lessons // ignore: cast_nullable_to_non_nullable
 as List<CatalogLesson>,
   ));
 }
@@ -870,7 +873,8 @@ as List<CatalogLesson>,
 /// @nodoc
 mixin _$CatalogLesson {
 
- String get youtubeVideoId; int get position; String get titleAr; int? get durationSeconds; DateTime? get publishedAt; LessonStatus get status;
+/// External id: YouTube video id, or the site lesson uuid for audio.
+ String get youtubeVideoId; int get position; String get titleAr; int? get durationSeconds; DateTime? get publishedAt; LessonStatus get status; LessonMedia get media; String? get audioUrl; List<CatalogChapter> get chapters;
 /// Create a copy of CatalogLesson
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -883,16 +887,16 @@ $CatalogLessonCopyWith<CatalogLesson> get copyWith => _$CatalogLessonCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogLesson&&(identical(other.youtubeVideoId, youtubeVideoId) || other.youtubeVideoId == youtubeVideoId)&&(identical(other.position, position) || other.position == position)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.durationSeconds, durationSeconds) || other.durationSeconds == durationSeconds)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogLesson&&(identical(other.youtubeVideoId, youtubeVideoId) || other.youtubeVideoId == youtubeVideoId)&&(identical(other.position, position) || other.position == position)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.durationSeconds, durationSeconds) || other.durationSeconds == durationSeconds)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.media, media) || other.media == media)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl)&&const DeepCollectionEquality().equals(other.chapters, chapters));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,youtubeVideoId,position,titleAr,durationSeconds,publishedAt,status);
+int get hashCode => Object.hash(runtimeType,youtubeVideoId,position,titleAr,durationSeconds,publishedAt,status,media,audioUrl,const DeepCollectionEquality().hash(chapters));
 
 @override
 String toString() {
-  return 'CatalogLesson(youtubeVideoId: $youtubeVideoId, position: $position, titleAr: $titleAr, durationSeconds: $durationSeconds, publishedAt: $publishedAt, status: $status)';
+  return 'CatalogLesson(youtubeVideoId: $youtubeVideoId, position: $position, titleAr: $titleAr, durationSeconds: $durationSeconds, publishedAt: $publishedAt, status: $status, media: $media, audioUrl: $audioUrl, chapters: $chapters)';
 }
 
 
@@ -903,7 +907,7 @@ abstract mixin class $CatalogLessonCopyWith<$Res>  {
   factory $CatalogLessonCopyWith(CatalogLesson value, $Res Function(CatalogLesson) _then) = _$CatalogLessonCopyWithImpl;
 @useResult
 $Res call({
- String youtubeVideoId, int position, String titleAr, int? durationSeconds, DateTime? publishedAt, LessonStatus status
+ String youtubeVideoId, int position, String titleAr, int? durationSeconds, DateTime? publishedAt, LessonStatus status, LessonMedia media, String? audioUrl, List<CatalogChapter> chapters
 });
 
 
@@ -920,7 +924,7 @@ class _$CatalogLessonCopyWithImpl<$Res>
 
 /// Create a copy of CatalogLesson
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? youtubeVideoId = null,Object? position = null,Object? titleAr = null,Object? durationSeconds = freezed,Object? publishedAt = freezed,Object? status = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? youtubeVideoId = null,Object? position = null,Object? titleAr = null,Object? durationSeconds = freezed,Object? publishedAt = freezed,Object? status = null,Object? media = null,Object? audioUrl = freezed,Object? chapters = null,}) {
   return _then(_self.copyWith(
 youtubeVideoId: null == youtubeVideoId ? _self.youtubeVideoId : youtubeVideoId // ignore: cast_nullable_to_non_nullable
 as String,position: null == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
@@ -928,7 +932,10 @@ as int,titleAr: null == titleAr ? _self.titleAr : titleAr // ignore: cast_nullab
 as String,durationSeconds: freezed == durationSeconds ? _self.durationSeconds : durationSeconds // ignore: cast_nullable_to_non_nullable
 as int?,publishedAt: freezed == publishedAt ? _self.publishedAt : publishedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as LessonStatus,
+as LessonStatus,media: null == media ? _self.media : media // ignore: cast_nullable_to_non_nullable
+as LessonMedia,audioUrl: freezed == audioUrl ? _self.audioUrl : audioUrl // ignore: cast_nullable_to_non_nullable
+as String?,chapters: null == chapters ? _self.chapters : chapters // ignore: cast_nullable_to_non_nullable
+as List<CatalogChapter>,
   ));
 }
 
@@ -1013,10 +1020,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status,  LessonMedia media,  String? audioUrl,  List<CatalogChapter> chapters)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CatalogLesson() when $default != null:
-return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status);case _:
+return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status,_that.media,_that.audioUrl,_that.chapters);case _:
   return orElse();
 
 }
@@ -1034,10 +1041,10 @@ return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.duration
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status,  LessonMedia media,  String? audioUrl,  List<CatalogChapter> chapters)  $default,) {final _that = this;
 switch (_that) {
 case _CatalogLesson():
-return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status);case _:
+return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status,_that.media,_that.audioUrl,_that.chapters);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1054,10 +1061,10 @@ return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.duration
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status,  LessonMedia media,  String? audioUrl,  List<CatalogChapter> chapters)?  $default,) {final _that = this;
 switch (_that) {
 case _CatalogLesson() when $default != null:
-return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status);case _:
+return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status,_that.media,_that.audioUrl,_that.chapters);case _:
   return null;
 
 }
@@ -1069,15 +1076,25 @@ return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.duration
 @JsonSerializable()
 
 class _CatalogLesson implements CatalogLesson {
-  const _CatalogLesson({required this.youtubeVideoId, required this.position, required this.titleAr, this.durationSeconds, this.publishedAt, this.status = LessonStatus.active});
+  const _CatalogLesson({required this.youtubeVideoId, required this.position, required this.titleAr, this.durationSeconds, this.publishedAt, this.status = LessonStatus.active, this.media = LessonMedia.video, this.audioUrl, final  List<CatalogChapter> chapters = const []}): _chapters = chapters;
   factory _CatalogLesson.fromJson(Map<String, dynamic> json) => _$CatalogLessonFromJson(json);
 
+/// External id: YouTube video id, or the site lesson uuid for audio.
 @override final  String youtubeVideoId;
 @override final  int position;
 @override final  String titleAr;
 @override final  int? durationSeconds;
 @override final  DateTime? publishedAt;
 @override@JsonKey() final  LessonStatus status;
+@override@JsonKey() final  LessonMedia media;
+@override final  String? audioUrl;
+ final  List<CatalogChapter> _chapters;
+@override@JsonKey() List<CatalogChapter> get chapters {
+  if (_chapters is EqualUnmodifiableListView) return _chapters;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_chapters);
+}
+
 
 /// Create a copy of CatalogLesson
 /// with the given fields replaced by the non-null parameter values.
@@ -1092,16 +1109,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogLesson&&(identical(other.youtubeVideoId, youtubeVideoId) || other.youtubeVideoId == youtubeVideoId)&&(identical(other.position, position) || other.position == position)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.durationSeconds, durationSeconds) || other.durationSeconds == durationSeconds)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogLesson&&(identical(other.youtubeVideoId, youtubeVideoId) || other.youtubeVideoId == youtubeVideoId)&&(identical(other.position, position) || other.position == position)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.durationSeconds, durationSeconds) || other.durationSeconds == durationSeconds)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.media, media) || other.media == media)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl)&&const DeepCollectionEquality().equals(other._chapters, _chapters));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,youtubeVideoId,position,titleAr,durationSeconds,publishedAt,status);
+int get hashCode => Object.hash(runtimeType,youtubeVideoId,position,titleAr,durationSeconds,publishedAt,status,media,audioUrl,const DeepCollectionEquality().hash(_chapters));
 
 @override
 String toString() {
-  return 'CatalogLesson(youtubeVideoId: $youtubeVideoId, position: $position, titleAr: $titleAr, durationSeconds: $durationSeconds, publishedAt: $publishedAt, status: $status)';
+  return 'CatalogLesson(youtubeVideoId: $youtubeVideoId, position: $position, titleAr: $titleAr, durationSeconds: $durationSeconds, publishedAt: $publishedAt, status: $status, media: $media, audioUrl: $audioUrl, chapters: $chapters)';
 }
 
 
@@ -1112,7 +1129,7 @@ abstract mixin class _$CatalogLessonCopyWith<$Res> implements $CatalogLessonCopy
   factory _$CatalogLessonCopyWith(_CatalogLesson value, $Res Function(_CatalogLesson) _then) = __$CatalogLessonCopyWithImpl;
 @override @useResult
 $Res call({
- String youtubeVideoId, int position, String titleAr, int? durationSeconds, DateTime? publishedAt, LessonStatus status
+ String youtubeVideoId, int position, String titleAr, int? durationSeconds, DateTime? publishedAt, LessonStatus status, LessonMedia media, String? audioUrl, List<CatalogChapter> chapters
 });
 
 
@@ -1129,7 +1146,7 @@ class __$CatalogLessonCopyWithImpl<$Res>
 
 /// Create a copy of CatalogLesson
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? youtubeVideoId = null,Object? position = null,Object? titleAr = null,Object? durationSeconds = freezed,Object? publishedAt = freezed,Object? status = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? youtubeVideoId = null,Object? position = null,Object? titleAr = null,Object? durationSeconds = freezed,Object? publishedAt = freezed,Object? status = null,Object? media = null,Object? audioUrl = freezed,Object? chapters = null,}) {
   return _then(_CatalogLesson(
 youtubeVideoId: null == youtubeVideoId ? _self.youtubeVideoId : youtubeVideoId // ignore: cast_nullable_to_non_nullable
 as String,position: null == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
@@ -1137,7 +1154,279 @@ as int,titleAr: null == titleAr ? _self.titleAr : titleAr // ignore: cast_nullab
 as String,durationSeconds: freezed == durationSeconds ? _self.durationSeconds : durationSeconds // ignore: cast_nullable_to_non_nullable
 as int?,publishedAt: freezed == publishedAt ? _self.publishedAt : publishedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as LessonStatus,
+as LessonStatus,media: null == media ? _self.media : media // ignore: cast_nullable_to_non_nullable
+as LessonMedia,audioUrl: freezed == audioUrl ? _self.audioUrl : audioUrl // ignore: cast_nullable_to_non_nullable
+as String?,chapters: null == chapters ? _self._chapters : chapters // ignore: cast_nullable_to_non_nullable
+as List<CatalogChapter>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$CatalogChapter {
+
+ int? get startSeconds; String get title; String get body;
+/// Create a copy of CatalogChapter
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CatalogChapterCopyWith<CatalogChapter> get copyWith => _$CatalogChapterCopyWithImpl<CatalogChapter>(this as CatalogChapter, _$identity);
+
+  /// Serializes this CatalogChapter to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogChapter&&(identical(other.startSeconds, startSeconds) || other.startSeconds == startSeconds)&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,startSeconds,title,body);
+
+@override
+String toString() {
+  return 'CatalogChapter(startSeconds: $startSeconds, title: $title, body: $body)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CatalogChapterCopyWith<$Res>  {
+  factory $CatalogChapterCopyWith(CatalogChapter value, $Res Function(CatalogChapter) _then) = _$CatalogChapterCopyWithImpl;
+@useResult
+$Res call({
+ int? startSeconds, String title, String body
+});
+
+
+
+
+}
+/// @nodoc
+class _$CatalogChapterCopyWithImpl<$Res>
+    implements $CatalogChapterCopyWith<$Res> {
+  _$CatalogChapterCopyWithImpl(this._self, this._then);
+
+  final CatalogChapter _self;
+  final $Res Function(CatalogChapter) _then;
+
+/// Create a copy of CatalogChapter
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? startSeconds = freezed,Object? title = null,Object? body = null,}) {
+  return _then(_self.copyWith(
+startSeconds: freezed == startSeconds ? _self.startSeconds : startSeconds // ignore: cast_nullable_to_non_nullable
+as int?,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,body: null == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CatalogChapter].
+extension CatalogChapterPatterns on CatalogChapter {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CatalogChapter value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CatalogChapter() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CatalogChapter value)  $default,){
+final _that = this;
+switch (_that) {
+case _CatalogChapter():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CatalogChapter value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CatalogChapter() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? startSeconds,  String title,  String body)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CatalogChapter() when $default != null:
+return $default(_that.startSeconds,_that.title,_that.body);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? startSeconds,  String title,  String body)  $default,) {final _that = this;
+switch (_that) {
+case _CatalogChapter():
+return $default(_that.startSeconds,_that.title,_that.body);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? startSeconds,  String title,  String body)?  $default,) {final _that = this;
+switch (_that) {
+case _CatalogChapter() when $default != null:
+return $default(_that.startSeconds,_that.title,_that.body);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _CatalogChapter implements CatalogChapter {
+  const _CatalogChapter({this.startSeconds, required this.title, this.body = ''});
+  factory _CatalogChapter.fromJson(Map<String, dynamic> json) => _$CatalogChapterFromJson(json);
+
+@override final  int? startSeconds;
+@override final  String title;
+@override@JsonKey() final  String body;
+
+/// Create a copy of CatalogChapter
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CatalogChapterCopyWith<_CatalogChapter> get copyWith => __$CatalogChapterCopyWithImpl<_CatalogChapter>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$CatalogChapterToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogChapter&&(identical(other.startSeconds, startSeconds) || other.startSeconds == startSeconds)&&(identical(other.title, title) || other.title == title)&&(identical(other.body, body) || other.body == body));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,startSeconds,title,body);
+
+@override
+String toString() {
+  return 'CatalogChapter(startSeconds: $startSeconds, title: $title, body: $body)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CatalogChapterCopyWith<$Res> implements $CatalogChapterCopyWith<$Res> {
+  factory _$CatalogChapterCopyWith(_CatalogChapter value, $Res Function(_CatalogChapter) _then) = __$CatalogChapterCopyWithImpl;
+@override @useResult
+$Res call({
+ int? startSeconds, String title, String body
+});
+
+
+
+
+}
+/// @nodoc
+class __$CatalogChapterCopyWithImpl<$Res>
+    implements _$CatalogChapterCopyWith<$Res> {
+  __$CatalogChapterCopyWithImpl(this._self, this._then);
+
+  final _CatalogChapter _self;
+  final $Res Function(_CatalogChapter) _then;
+
+/// Create a copy of CatalogChapter
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? startSeconds = freezed,Object? title = null,Object? body = null,}) {
+  return _then(_CatalogChapter(
+startSeconds: freezed == startSeconds ? _self.startSeconds : startSeconds // ignore: cast_nullable_to_non_nullable
+as int?,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,body: null == body ? _self.body : body // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

@@ -13,7 +13,8 @@
     "publish:catalog": "tsx src/cli.ts publish-catalog",
     "discover:playlists": "tsx src/cli.ts discover-playlists",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "sync:site-audio": "tsx src/cli.ts sync-site-audio"
   },
   "dependencies": {
     "yaml": "^2.5.1",

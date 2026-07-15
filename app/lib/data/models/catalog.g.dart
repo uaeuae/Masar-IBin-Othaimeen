@@ -63,6 +63,9 @@ _CatalogSeries _$CatalogSeriesFromJson(Map<String, dynamic> json) =>
       descriptionAr: json['description_ar'] as String?,
       thumbnailUrl: json['thumbnail_url'] as String?,
       level: $enumDecodeNullable(_$JourneyLevelEnumMap, json['level']),
+      media:
+          $enumDecodeNullable(_$LessonMediaEnumMap, json['media']) ??
+          LessonMedia.video,
       lessons:
           (json['lessons'] as List<dynamic>?)
               ?.map((e) => CatalogLesson.fromJson(e as Map<String, dynamic>))
@@ -78,6 +81,7 @@ Map<String, dynamic> _$CatalogSeriesToJson(_CatalogSeries instance) =>
       'description_ar': instance.descriptionAr,
       'thumbnail_url': instance.thumbnailUrl,
       'level': _$JourneyLevelEnumMap[instance.level],
+      'media': _$LessonMediaEnumMap[instance.media]!,
       'lessons': instance.lessons.map((e) => e.toJson()).toList(),
     };
 
@@ -85,6 +89,11 @@ const _$JourneyLevelEnumMap = {
   JourneyLevel.beginner: 'beginner',
   JourneyLevel.intermediate: 'intermediate',
   JourneyLevel.advanced: 'advanced',
+};
+
+const _$LessonMediaEnumMap = {
+  LessonMedia.video: 'video',
+  LessonMedia.audio: 'audio',
 };
 
 _CatalogLesson _$CatalogLessonFromJson(Map<String, dynamic> json) =>
@@ -99,6 +108,15 @@ _CatalogLesson _$CatalogLessonFromJson(Map<String, dynamic> json) =>
       status:
           $enumDecodeNullable(_$LessonStatusEnumMap, json['status']) ??
           LessonStatus.active,
+      media:
+          $enumDecodeNullable(_$LessonMediaEnumMap, json['media']) ??
+          LessonMedia.video,
+      audioUrl: json['audio_url'] as String?,
+      chapters:
+          (json['chapters'] as List<dynamic>?)
+              ?.map((e) => CatalogChapter.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$CatalogLessonToJson(_CatalogLesson instance) =>
@@ -109,6 +127,9 @@ Map<String, dynamic> _$CatalogLessonToJson(_CatalogLesson instance) =>
       'duration_seconds': instance.durationSeconds,
       'published_at': instance.publishedAt?.toIso8601String(),
       'status': _$LessonStatusEnumMap[instance.status]!,
+      'media': _$LessonMediaEnumMap[instance.media]!,
+      'audio_url': instance.audioUrl,
+      'chapters': instance.chapters.map((e) => e.toJson()).toList(),
     };
 
 const _$LessonStatusEnumMap = {
@@ -116,6 +137,20 @@ const _$LessonStatusEnumMap = {
   LessonStatus.hidden: 'hidden',
   LessonStatus.unavailable: 'unavailable',
 };
+
+_CatalogChapter _$CatalogChapterFromJson(Map<String, dynamic> json) =>
+    _CatalogChapter(
+      startSeconds: (json['start_seconds'] as num?)?.toInt(),
+      title: json['title'] as String,
+      body: json['body'] as String? ?? '',
+    );
+
+Map<String, dynamic> _$CatalogChapterToJson(_CatalogChapter instance) =>
+    <String, dynamic>{
+      'start_seconds': instance.startSeconds,
+      'title': instance.title,
+      'body': instance.body,
+    };
 
 _CatalogJourney _$CatalogJourneyFromJson(Map<String, dynamic> json) =>
     _CatalogJourney(

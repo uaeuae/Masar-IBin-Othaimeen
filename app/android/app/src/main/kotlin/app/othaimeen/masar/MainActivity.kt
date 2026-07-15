@@ -1,5 +1,7 @@
 package app.othaimeen.masar
 
-import io.flutter.embedding.android.FlutterActivity
+import com.ryanheise.audioservice.AudioServiceActivity
 
-class MainActivity : FlutterActivity()
+// AudioServiceActivity keeps the media session alive when the activity is
+// backgrounded — required by just_audio_background.
+class MainActivity : AudioServiceActivity()

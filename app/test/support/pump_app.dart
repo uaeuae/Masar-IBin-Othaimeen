@@ -9,13 +9,19 @@ import 'package:masar/data/catalog_repository.dart';
 import 'package:masar/data/db/database.dart';
 import 'package:masar/data/models/catalog.dart';
 import 'package:masar/data/providers.dart';
+import 'package:masar/features/player/audio_engine.dart';
 import 'package:masar/features/player/player_engine.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'fake_audio_engine.dart';
 import 'fake_engine.dart';
 import 'test_db.dart';
 
-typedef PumpedApp = ({AppDatabase db, FakeLessonPlayerEngine engine});
+typedef PumpedApp = ({
+  AppDatabase db,
+  FakeLessonPlayerEngine engine,
+  FakeAudioLessonEngine audioEngine,
+});
 
 /// Scrolls the target into view if needed, then taps it and settles.
 Future<void> tapVisible(WidgetTester tester, Finder finder) async {
@@ -42,6 +48,7 @@ void testApp(
     final prefs = await SharedPreferences.getInstance();
     final db = openTestDatabase();
     final engine = FakeLessonPlayerEngine();
+    final audioEngine = FakeAudioLessonEngine();
 
     if (importCatalog) {
       // Frozen copy of the original hand-written fixture: tests must not
@@ -59,12 +66,17 @@ void testApp(
             databaseProvider.overrideWithValue(db),
             sharedPreferencesProvider.overrideWithValue(prefs),
             playerEngineFactoryProvider.overrideWithValue(() => engine),
+            audioEngineFactoryProvider.overrideWithValue(() => audioEngine),
+            // The fixture is imported above; the real bootstrap would load
+            // the bundled asset (real I/O — deadlocks under FakeAsync) and
+            // overwrite the fixture with the production catalog.
+            catalogReadyProvider.overrideWith((ref) async {}),
           ],
           child: const MasarApp(),
         ),
       );
       await tester.pumpAndSettle();
-      await body(tester, (db: db, engine: engine));
+      await body(tester, (db: db, engine: engine, audioEngine: audioEngine));
     } finally {
       // Unmount inside the body so drift's zero-duration stream-close timers
       // fire under our pumps, not after the binding's invariant check.

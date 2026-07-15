@@ -30,11 +30,13 @@ class CatalogRepository {
     return row?.version ?? 0;
   }
 
-  /// Called at startup: guarantees a usable catalog with zero network.
+  /// Called at startup: guarantees a usable catalog with zero network, and
+  /// upgrades in place when an app update ships a newer bundled snapshot.
+  /// User tables (progress, enrollments) survive imports untouched.
   Future<void> ensureLoaded() async {
-    if (await currentVersion() > 0) return;
     final raw = await _bundle.loadString(bundledCatalogAsset);
     final data = CatalogData.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    if (data.version <= await currentVersion()) return;
     await importCatalog(data);
   }
 
@@ -67,6 +69,7 @@ class CatalogRepository {
               descriptionAr: Value(s.descriptionAr),
               thumbnailUrl: Value(s.thumbnailUrl),
               level: Value(s.level?.name),
+              mediaType: Value(s.media.name),
             ),
         ]);
         batch.insertAll(db.lessons, [
@@ -79,6 +82,20 @@ class CatalogRepository {
                 titleAr: l.titleAr,
                 durationSeconds: Value(l.durationSeconds),
                 status: Value(l.status.name),
+                mediaType: Value(l.media.name),
+                audioUrl: Value(l.audioUrl),
+                chaptersJson: Value(
+                  l.chapters.isEmpty
+                      ? null
+                      : jsonEncode([
+                          for (final c in l.chapters)
+                            {
+                              'start_seconds': c.startSeconds,
+                              'title': c.title,
+                              'body': c.body,
+                            },
+                        ]),
+                ),
               ),
         ]);
         batch.insertAll(db.journeys, [
@@ -233,7 +250,7 @@ class CatalogRepository {
   Stream<JourneyDetail?> watchJourneyDetail(String slug) {
     final itemsQuery = db.customSelect(
       '''
-      SELECT i.stage_position, i.position, s.slug, s.title_ar, s.description_ar, s.thumbnail_url, s.science_slug, s.level,
+      SELECT i.stage_position, i.position, s.slug, s.title_ar, s.description_ar, s.thumbnail_url, s.science_slug, s.level, s.media_type,
         (SELECT COUNT(*) FROM lessons l WHERE l.series_slug = s.slug AND l.status = 'active') AS lesson_count,
         (SELECT COALESCE(SUM(l.duration_seconds), 0) FROM lessons l
           WHERE l.series_slug = s.slug AND l.status = 'active') AS total_duration,
@@ -290,6 +307,7 @@ class CatalogRepository {
                 completedCount: row.read<int>('completed_count'),
                 totalDurationSeconds: row.read<int>('total_duration'),
                 level: _levelOrNull(row.readNullable<String>('level')),
+                media: LessonMedia.fromJson(row.read<String>('media_type')),
               ),
             );
       }
@@ -315,6 +333,7 @@ class CatalogRepository {
     final lessonsQuery = db.customSelect(
       '''
       SELECT l.video_id, l.position, l.title_ar, l.duration_seconds, l.status,
+        l.media_type, l.audio_url, l.chapters_json,
         COALESCE(p.watched_seconds, 0) AS watched_seconds,
         COALESCE(p.completed, 0) AS completed
       FROM lessons l
@@ -342,6 +361,11 @@ class CatalogRepository {
             status: LessonStatus.fromJson(row.read<String>('status')),
             watchedSeconds: row.read<int>('watched_seconds'),
             completed: row.read<int>('completed') != 0,
+            media: LessonMedia.fromJson(row.read<String>('media_type')),
+            audioUrl: row.readNullable<String>('audio_url'),
+            chapters: _chaptersFromJson(
+              row.readNullable<String>('chapters_json'),
+            ),
           ),
       ];
 
@@ -362,6 +386,7 @@ class CatalogRepository {
             (sum, l) => sum + (l.durationSeconds ?? 0),
           ),
           level: _levelOrNull(seriesRow.level),
+          media: LessonMedia.fromJson(seriesRow.mediaType),
         ),
         lessons: lessons,
       );
@@ -440,7 +465,7 @@ class CatalogRepository {
     return db
         .customSelect(
           '''
-          SELECT s.slug, s.title_ar, s.description_ar, s.thumbnail_url, s.science_slug, s.level,
+          SELECT s.slug, s.title_ar, s.description_ar, s.thumbnail_url, s.science_slug, s.level, s.media_type,
             (SELECT COUNT(*) FROM lessons l WHERE l.series_slug = s.slug AND l.status = 'active') AS lesson_count,
             (SELECT COALESCE(SUM(l.duration_seconds), 0) FROM lessons l
               WHERE l.series_slug = s.slug AND l.status = 'active') AS total_duration,
@@ -468,6 +493,7 @@ class CatalogRepository {
                 completedCount: row.read<int>('completed_count'),
                 totalDurationSeconds: row.read<int>('total_duration'),
                 level: _levelOrNull(row.readNullable<String>('level')),
+                media: LessonMedia.fromJson(row.read<String>('media_type')),
               ),
           ],
         );
@@ -476,3 +502,16 @@ class CatalogRepository {
 
 JourneyLevel? _levelOrNull(String? value) =>
     value == null ? null : JourneyLevel.fromJson(value);
+
+List<CatalogChapter> _chaptersFromJson(String? json) {
+  if (json == null || json.isEmpty) return const [];
+  final raw = jsonDecode(json) as List<dynamic>;
+  return [
+    for (final entry in raw.cast<Map<String, dynamic>>())
+      CatalogChapter(
+        startSeconds: entry['start_seconds'] as int?,
+        title: entry['title'] as String? ?? '',
+        body: entry['body'] as String? ?? '',
+      ),
+  ];
+}

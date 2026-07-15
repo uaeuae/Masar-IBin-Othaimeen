@@ -43,8 +43,12 @@ export const seriesSeedSchema = z.object({
   science: slugSchema,
   level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
   status: z.enum(['active', 'draft', 'archived']).default('draft'),
+  /** 'audio' series stream foundation MP3s; 'video' series embed YouTube. */
+  media: z.enum(['video', 'audio']).default('video'),
   /** Ordered: when a long series spans multiple playlists, order here is playback order. */
   youtube_playlists: z.array(z.string().min(1)).default([]),
+  /** Audio-library section ids on shekhapi.binothaimeen.net, in playback order. */
+  site_audio_sections: z.array(z.string().min(1)).default([]),
   site_series_ids: z.array(z.string().min(1)).default([]),
   overrides: seriesOverridesSchema,
 });

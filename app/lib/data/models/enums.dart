@@ -18,6 +18,19 @@ enum JourneyLevel {
   };
 }
 
+/// How a lesson is delivered: embedded YouTube video, or the foundation's
+/// own MP3 stream (which may legally play in the background).
+enum LessonMedia {
+  video,
+  audio;
+
+  static LessonMedia fromJson(String value) => switch (value) {
+    'video' => LessonMedia.video,
+    'audio' => LessonMedia.audio,
+    _ => throw ArgumentError('Unknown lesson media: $value'),
+  };
+}
+
 enum LessonStatus {
   active,
   hidden,

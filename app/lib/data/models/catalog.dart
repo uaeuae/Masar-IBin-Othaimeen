@@ -47,6 +47,7 @@ abstract class CatalogSeries with _$CatalogSeries {
     String? descriptionAr,
     String? thumbnailUrl,
     JourneyLevel? level,
+    @Default(LessonMedia.video) LessonMedia media,
     @Default([]) List<CatalogLesson> lessons,
   }) = _CatalogSeries;
 
@@ -57,16 +58,33 @@ abstract class CatalogSeries with _$CatalogSeries {
 @freezed
 abstract class CatalogLesson with _$CatalogLesson {
   const factory CatalogLesson({
+    /// External id: YouTube video id, or the site lesson uuid for audio.
     required String youtubeVideoId,
     required int position,
     required String titleAr,
     int? durationSeconds,
     DateTime? publishedAt,
     @Default(LessonStatus.active) LessonStatus status,
+    @Default(LessonMedia.video) LessonMedia media,
+    String? audioUrl,
+    @Default([]) List<CatalogChapter> chapters,
   }) = _CatalogLesson;
 
   factory CatalogLesson.fromJson(Map<String, dynamic> json) =>
       _$CatalogLessonFromJson(json);
+}
+
+/// A timestamped marker inside an audio lesson (باب/حديث + the matn passage).
+@freezed
+abstract class CatalogChapter with _$CatalogChapter {
+  const factory CatalogChapter({
+    int? startSeconds,
+    required String title,
+    @Default('') String body,
+  }) = _CatalogChapter;
+
+  factory CatalogChapter.fromJson(Map<String, dynamic> json) =>
+      _$CatalogChapterFromJson(json);
 }
 
 @freezed

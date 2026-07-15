@@ -29,11 +29,15 @@ class SeriesEntries extends Table {
   /// 'beginner' | 'intermediate' | 'advanced' — optional curation metadata.
   TextColumn get level => text().nullable()();
 
+  /// 'video' | 'audio'
+  TextColumn get mediaType => text().withDefault(const Constant('video'))();
+
   @override
   Set<Column> get primaryKey => {slug};
 }
 
 class Lessons extends Table {
+  /// External id: YouTube video id, or the site lesson uuid for audio.
   TextColumn get videoId => text()();
   TextColumn get seriesSlug => text()();
   IntColumn get position => integer()();
@@ -42,6 +46,13 @@ class Lessons extends Table {
 
   /// 'active' | 'hidden' | 'unavailable'
   TextColumn get status => text().withDefault(const Constant('active'))();
+
+  /// 'video' | 'audio'
+  TextColumn get mediaType => text().withDefault(const Constant('video'))();
+  TextColumn get audioUrl => text().nullable()();
+
+  /// JSON list of {start_seconds, title, body} chapter markers (audio only).
+  TextColumn get chaptersJson => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {videoId};
@@ -132,13 +143,19 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
       if (from < 2) {
         await m.addColumn(seriesEntries, seriesEntries.level);
+      }
+      if (from < 3) {
+        await m.addColumn(seriesEntries, seriesEntries.mediaType);
+        await m.addColumn(lessons, lessons.mediaType);
+        await m.addColumn(lessons, lessons.audioUrl);
+        await m.addColumn(lessons, lessons.chaptersJson);
       }
     },
   );

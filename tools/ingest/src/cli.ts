@@ -3,8 +3,10 @@ import { dirname, resolve } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { loadSeeds, SeedValidationError } from './seeds.js';
 import { syncYoutube } from './commands/sync-youtube.js';
+import { syncSiteAudio } from './commands/sync-site-audio.js';
 import { publishCatalog, PublishIntegrityError } from './commands/publish-catalog.js';
 import { createYoutubeClient } from './youtube.js';
+import { createSiteClient } from './site.js';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
@@ -13,7 +15,10 @@ try {
   const envFile = readFileSync(resolve(repoRoot, 'tools', 'ingest', '.env'), 'utf8');
   for (const line of envFile.split(/\r?\n/)) {
     const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
-    if (match && process.env[match[1]] === undefined) process.env[match[1]] = match[2].trim();
+    const [, key, value] = match ?? [];
+    if (key !== undefined && process.env[key] === undefined) {
+      process.env[key] = (value ?? '').trim();
+    }
   }
 } catch {
   // No .env file — env vars may still be set by the shell/CI.
@@ -63,6 +68,21 @@ async function main(): Promise<void> {
       );
       break;
     }
+    case 'sync-site-audio': {
+      // The site API is public — no key required.
+      const { changedSeries } = await syncSiteAudio({
+        seedDir,
+        dataDir,
+        dryRun,
+        client: createSiteClient(),
+      });
+      console.log(
+        changedSeries.length === 0
+          ? 'Everything already up to date.'
+          : `${changedSeries.length} series changed: ${changedSeries.join(', ')}`,
+      );
+      break;
+    }
     case 'publish-catalog': {
       const result = publishCatalog({
         seedDir,
@@ -100,7 +120,7 @@ async function main(): Promise<void> {
       break;
     default:
       console.error(
-        'Usage: cli.ts <validate-seeds|sync-youtube|publish-catalog|discover-playlists [handle]|apply-seeds> ' +
+        'Usage: cli.ts <validate-seeds|sync-youtube|sync-site-audio|publish-catalog|discover-playlists [handle]|apply-seeds> ' +
           '[--dry-run] [--seed-dir=PATH] [--data-dir=PATH] [--out-dir=PATH] [--no-app-asset]',
       );
       process.exit(64);

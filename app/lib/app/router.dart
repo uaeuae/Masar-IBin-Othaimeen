@@ -7,7 +7,7 @@ import '../features/journeys/journey_detail_screen.dart';
 import '../features/journeys/journeys_screen.dart';
 import '../features/library/library_screen.dart';
 import '../features/library/science_series_screen.dart';
-import '../features/player/player_screen.dart';
+import '../features/player/lesson_player_dispatcher.dart';
 import '../features/series/series_detail_screen.dart';
 import '../features/settings/settings_screen.dart';
 import 'shell.dart';
@@ -70,8 +70,8 @@ GoRouter _createRouter() => GoRouter(
     ),
     GoRoute(
       path: '/player/:videoId',
-      builder: (context, state) => PlayerScreen(
-        videoId: state.pathParameters['videoId']!,
+      builder: (context, state) => LessonPlayerDispatcher(
+        lessonId: state.pathParameters['videoId']!,
         seriesSlug: state.uri.queryParameters['series'],
       ),
     ),

@@ -44,6 +44,14 @@ export function publishCatalog(options: PublishOptions): { version: number; less
     if (lessons.filter((l) => l.status === 'active').length === 0) {
       problems.push(`active series "${slug}" has no active lessons (run sync:youtube?)`);
     }
+    const seed = activeSeries.find((s) => s.slug === slug);
+    if (seed?.media === 'audio') {
+      for (const lesson of lessons) {
+        if (lesson.status === 'active' && !lesson.audio_url) {
+          problems.push(`audio series "${slug}" lesson ${lesson.position} has no audio_url`);
+        }
+      }
+    }
   }
 
   const publishedJourneys = bundle.journeys.filter((j) => j.is_published);
@@ -86,6 +94,7 @@ export function publishCatalog(options: PublishOptions): { version: number; less
       description_ar: s.description_ar ?? null,
       thumbnail_url: s.thumbnail_url ?? null,
       level: s.level ?? null,
+      media: s.media,
       lessons: (lessonsBySeries.get(s.slug) ?? [])
         .filter((l) => l.status !== 'hidden')
         .map((l) => ({
@@ -95,6 +104,9 @@ export function publishCatalog(options: PublishOptions): { version: number; less
           duration_seconds: l.duration_seconds,
           published_at: l.published_at,
           status: l.status,
+          ...(l.media === 'audio'
+            ? { media: 'audio', audio_url: l.audio_url ?? null, chapters: l.chapters ?? [] }
+            : {}),
         })),
     })),
     journeys: publishedJourneys.map((j) => ({

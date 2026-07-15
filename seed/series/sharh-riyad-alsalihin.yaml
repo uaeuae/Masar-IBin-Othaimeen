@@ -1,0 +1,14 @@
+# شرح رياض الصالحين — صوتيات المؤسسة (غير متوفر مرئيًا على قناة اليوتيوب).
+# المصدر: المكتبة الصوتية على موقع المؤسسة، قسم الحديث.
+slug: sharh-riyad-alsalihin
+title_ar: شرح رياض الصالحين
+description_ar: شرح كتاب رياض الصالحين من كلام سيد المرسلين للإمام النووي رحمه الله — صوتيًا من موقع المؤسسة
+science: hadith
+level: beginner
+status: active
+media: audio
+site_audio_sections:
+  - 1678ae32-76b0-44d8-b555-6a0b9b01dbf0 # رياض الصالحين (٩٦ درسًا صوتيًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

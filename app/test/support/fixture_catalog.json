@@ -228,52 +228,165 @@
           "youtube_video_id": "fx-riyd-01",
           "position": 1,
           "title_ar": "باب الإخلاص: حديث إنما الأعمال بالنيات",
-          "duration_seconds": 2580
+          "duration_seconds": 2580,
+          "media": "audio",
+          "audio_url": "https://sounds.example.net/riyad_1.mp3",
+          "chapters": [
+            {
+              "start_seconds": 54,
+              "title": "مقدمة الباب",
+              "body": "قال الله تعالى..."
+            },
+            {
+              "start_seconds": 489,
+              "title": "الحديث الأول",
+              "body": "عن عمر رضي الله عنه..."
+            }
+          ]
         },
         {
           "youtube_video_id": "fx-riyd-02",
           "position": 2,
           "title_ar": "باب التوبة: شروطها وفضلها",
-          "duration_seconds": 2760
+          "duration_seconds": 2760,
+          "media": "audio",
+          "audio_url": "https://sounds.example.net/riyad_2.mp3",
+          "chapters": [
+            {
+              "start_seconds": 54,
+              "title": "مقدمة الباب",
+              "body": "قال الله تعالى..."
+            },
+            {
+              "start_seconds": 489,
+              "title": "الحديث الأول",
+              "body": "عن عمر رضي الله عنه..."
+            }
+          ]
         },
         {
           "youtube_video_id": "fx-riyd-03",
           "position": 3,
           "title_ar": "باب الصبر: الآيات والأحاديث الواردة فيه",
-          "duration_seconds": 2940
+          "duration_seconds": 2940,
+          "media": "audio",
+          "audio_url": "https://sounds.example.net/riyad_3.mp3",
+          "chapters": [
+            {
+              "start_seconds": 54,
+              "title": "مقدمة الباب",
+              "body": "قال الله تعالى..."
+            },
+            {
+              "start_seconds": 489,
+              "title": "الحديث الأول",
+              "body": "عن عمر رضي الله عنه..."
+            }
+          ]
         },
         {
           "youtube_video_id": "fx-riyd-04",
           "position": 4,
           "title_ar": "باب الصدق ومنزلته",
-          "duration_seconds": 2400
+          "duration_seconds": 2400,
+          "media": "audio",
+          "audio_url": "https://sounds.example.net/riyad_4.mp3",
+          "chapters": [
+            {
+              "start_seconds": 54,
+              "title": "مقدمة الباب",
+              "body": "قال الله تعالى..."
+            },
+            {
+              "start_seconds": 489,
+              "title": "الحديث الأول",
+              "body": "عن عمر رضي الله عنه..."
+            }
+          ]
         },
         {
           "youtube_video_id": "fx-riyd-05",
           "position": 5,
           "title_ar": "باب المراقبة ومنزلة الإحسان",
-          "duration_seconds": 2700
+          "duration_seconds": 2700,
+          "media": "audio",
+          "audio_url": "https://sounds.example.net/riyad_5.mp3",
+          "chapters": [
+            {
+              "start_seconds": 54,
+              "title": "مقدمة الباب",
+              "body": "قال الله تعالى..."
+            },
+            {
+              "start_seconds": 489,
+              "title": "الحديث الأول",
+              "body": "عن عمر رضي الله عنه..."
+            }
+          ]
         },
         {
           "youtube_video_id": "fx-riyd-06",
           "position": 6,
           "title_ar": "باب التقوى ووصية النبي ﷺ بها",
-          "duration_seconds": 2520
+          "duration_seconds": 2520,
+          "media": "audio",
+          "audio_url": "https://sounds.example.net/riyad_6.mp3",
+          "chapters": [
+            {
+              "start_seconds": 54,
+              "title": "مقدمة الباب",
+              "body": "قال الله تعالى..."
+            },
+            {
+              "start_seconds": 489,
+              "title": "الحديث الأول",
+              "body": "عن عمر رضي الله عنه..."
+            }
+          ]
         },
         {
           "youtube_video_id": "fx-riyd-07",
           "position": 7,
           "title_ar": "باب اليقين والتوكل",
-          "duration_seconds": 2880
+          "duration_seconds": 2880,
+          "media": "audio",
+          "audio_url": "https://sounds.example.net/riyad_7.mp3",
+          "chapters": [
+            {
+              "start_seconds": 54,
+              "title": "مقدمة الباب",
+              "body": "قال الله تعالى..."
+            },
+            {
+              "start_seconds": 489,
+              "title": "الحديث الأول",
+              "body": "عن عمر رضي الله عنه..."
+            }
+          ]
         },
         {
           "youtube_video_id": "fx-riyd-08",
           "position": 8,
           "title_ar": "باب الاستقامة والمحافظة على الأعمال",
-          "duration_seconds": 2640
+          "duration_seconds": 2640,
+          "media": "audio",
+          "audio_url": "https://sounds.example.net/riyad_8.mp3",
+          "chapters": [
+            {
+              "start_seconds": 54,
+              "title": "مقدمة الباب",
+              "body": "قال الله تعالى..."
+            },
+            {
+              "start_seconds": 489,
+              "title": "الحديث الأول",
+              "body": "عن عمر رضي الله عنه..."
+            }
+          ]
         }
       ],
-      "level": "beginner"
+      "level": "beginner",
+      "media": "audio"
     }
   ],
   "journeys": [

@@ -1,13 +1,14 @@
 import type { SeriesSeed } from './schemas.js';
 import type { StoredLesson } from './store.js';
+import type { SiteAudioLesson } from './site.js';
 import type { YoutubeVideo } from './youtube.js';
 
 const TRAILING_NUMBER = /([0-9٠-٩]+)\s*$/;
 
 function trailingNumber(title: string): number | null {
-  const match = title.trim().match(TRAILING_NUMBER);
-  if (!match) return null;
-  const western = match[1].replace(/[٠-٩]/g, (d) =>
+  const digits = title.trim().match(TRAILING_NUMBER)?.[1];
+  if (digits === undefined) return null;
+  const western = digits.replace(/[٠-٩]/g, (d) =>
     String(d.charCodeAt(0) - 0x0660),
   );
   return Number.parseInt(western, 10);
@@ -19,8 +20,10 @@ function trailingNumber(title: string): number | null {
  * videos by it when EVERY playable video has one; otherwise returns the input
  * order untouched (ties and numberless videos keep playlist order).
  */
-export function sortByEpisodeNumber(videos: YoutubeVideo[]): YoutubeVideo[] {
-  const playable = videos.filter((v) => v.playable);
+export function sortByEpisodeNumber<T extends { title: string; playable?: boolean }>(
+  videos: T[],
+): T[] {
+  const playable = videos.filter((v) => v.playable !== false);
   if (playable.length === 0 || playable.some((v) => trailingNumber(v.title) === null)) {
     return videos;
   }
@@ -91,6 +94,7 @@ export function mergeLessons(
     } else if (
       old.title_ar !== lesson.title_ar ||
       old.duration_seconds !== lesson.duration_seconds ||
+      old.published_at !== lesson.published_at ||
       old.status !== lesson.status ||
       old.position !== lesson.position
     ) {
@@ -102,6 +106,88 @@ export function mergeLessons(
   }
 
   // Vanished lessons: keep them, at the end, unavailable.
+  for (const old of previous) {
+    if (seen.has(old.youtube_video_id) || excluded.has(old.youtube_video_id)) continue;
+    const lesson: StoredLesson = {
+      ...old,
+      position: next.length + 1,
+      status: old.status === 'hidden' ? 'hidden' : 'unavailable',
+    };
+    next.push(lesson);
+    if (old.status !== lesson.status) {
+      updated.push(old.youtube_video_id);
+      markedUnavailable.push(old.youtube_video_id);
+    }
+  }
+
+  return { lessons: next, added, updated, markedUnavailable };
+}
+
+/**
+ * Audio counterpart of [mergeLessons] — same rules (seed overrides win,
+ * order defines positions, vanished lessons become 'unavailable' at the end,
+ * manual 'hidden' survives), for lessons synced from the foundation's site.
+ */
+export function mergeAudioLessons(
+  seed: SeriesSeed,
+  previous: StoredLesson[],
+  lessonsInOrder: SiteAudioLesson[],
+  durations: Map<string, number | null>,
+  playability?: Map<string, boolean>,
+): MergeResult {
+  const excluded = new Set(seed.overrides.exclude_videos);
+  const cleanup = seed.overrides.title_cleanup ? new RegExp(seed.overrides.title_cleanup) : null;
+  const previousById = new Map(previous.map((l) => [l.youtube_video_id, l]));
+
+  const added: string[] = [];
+  const updated: string[] = [];
+  const markedUnavailable: string[] = [];
+  const next: StoredLesson[] = [];
+  const seen = new Set<string>();
+
+  for (const audio of lessonsInOrder) {
+    if (excluded.has(audio.siteId) || seen.has(audio.siteId)) continue;
+    seen.add(audio.siteId);
+
+    const old = previousById.get(audio.siteId);
+    const cleanTitle = (cleanup ? audio.title.replace(cleanup, '') : audio.title).trim();
+    const playable = playability?.get(audio.siteId) !== false;
+    const lesson: StoredLesson = {
+      youtube_video_id: audio.siteId,
+      position: next.length + 1,
+      title_ar: cleanTitle,
+      duration_seconds: durations.get(audio.siteId) ?? old?.duration_seconds ?? null,
+      published_at: audio.publishedAt ?? old?.published_at ?? null,
+      thumbnail_url: null,
+      status: old?.status === 'hidden' ? 'hidden' : playable ? 'active' : 'unavailable',
+      media: 'audio',
+      audio_url: audio.audioUrl,
+      chapters: audio.chapters.map((c) => ({
+        start_seconds: c.startSeconds,
+        title: c.title,
+        body: c.body,
+      })),
+    };
+    next.push(lesson);
+
+    if (!old) {
+      added.push(audio.siteId);
+    } else if (
+      old.title_ar !== lesson.title_ar ||
+      old.duration_seconds !== lesson.duration_seconds ||
+      old.published_at !== lesson.published_at ||
+      old.audio_url !== lesson.audio_url ||
+      old.status !== lesson.status ||
+      old.position !== lesson.position ||
+      JSON.stringify(old.chapters ?? []) !== JSON.stringify(lesson.chapters)
+    ) {
+      updated.push(audio.siteId);
+      if (old.status !== 'unavailable' && lesson.status === 'unavailable') {
+        markedUnavailable.push(audio.siteId);
+      }
+    }
+  }
+
   for (const old of previous) {
     if (seen.has(old.youtube_video_id) || excluded.has(old.youtube_video_id)) continue;
     const lesson: StoredLesson = {

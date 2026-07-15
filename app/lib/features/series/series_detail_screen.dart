@@ -93,7 +93,9 @@ class _SeriesDetailBody extends ConsumerWidget {
             lessonCountLabel(series.lessonCount),
             if (series.totalDurationSeconds > 0)
               durationLabel(Duration(seconds: series.totalDurationSeconds)),
-            'قناة الشيخ الرسمية',
+            series.media == LessonMedia.audio
+                ? 'صوتيات المؤسسة'
+                : 'قناة الشيخ الرسمية',
           ].join(' · '),
           style: theme.textTheme.bodySmall?.copyWith(
             color: scheme.onSurfaceVariant,
