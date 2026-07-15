@@ -16,6 +16,9 @@ class FakeLessonPlayerEngine implements LessonPlayerEngine {
   bool disposed = false;
   int togglePlayCalls = 0;
 
+  /// Every seekTo() target, in order.
+  final seeks = <Duration>[];
+
   @override
   Widget buildView(BuildContext context) => const SizedBox.expand();
 
@@ -39,6 +42,11 @@ class FakeLessonPlayerEngine implements LessonPlayerEngine {
   @override
   Future<void> load(String videoId, {Duration start = Duration.zero}) async {
     loads.add((videoId, start));
+  }
+
+  @override
+  Future<void> seekTo(Duration position) async {
+    seeks.add(position);
   }
 
   @override

@@ -28,6 +28,10 @@ abstract class LessonPlayerEngine {
 
   Future<void> togglePlay();
 
+  /// Jumps to [position]; the app's own bar is the only seek surface since
+  /// the embed's native controls are hidden.
+  Future<void> seekTo(Duration position);
+
   void dispose();
 }
 
@@ -36,7 +40,9 @@ class YoutubeLessonPlayerEngine implements LessonPlayerEngine {
     params: const YoutubePlayerParams(
       playsInline: true,
       strictRelatedVideos: true,
-      showFullscreenButton: true,
+      // The app renders its own play/pause + seek bar per the design, so the
+      // embed's native control bar is hidden (official `controls=0` param).
+      showControls: false,
     ),
   );
 
@@ -89,8 +95,24 @@ class YoutubeLessonPlayerEngine implements LessonPlayerEngine {
         videoId: videoId,
         startSeconds: start.inSeconds.toDouble(),
       );
+      // Old lecture recordings are quiet; make sure the embed's internal
+      // volume never caps them further.
+      await _controller.unMute();
+      await _controller.setVolume(100);
     } on Exception catch (error) {
       debugPrint('load($videoId) failed: $error');
+    }
+  }
+
+  @override
+  Future<void> seekTo(Duration position) async {
+    try {
+      await _controller.seekTo(
+        seconds: position.inMilliseconds / 1000,
+        allowSeekAhead: true,
+      );
+    } on Exception catch (error) {
+      debugPrint('seekTo failed: $error');
     }
   }
 
@@ -152,6 +174,9 @@ class ExternalLinkPlayerEngine implements LessonPlayerEngine {
 
   @override
   Future<void> togglePlay() async {}
+
+  @override
+  Future<void> seekTo(Duration position) async {}
 
   @override
   void dispose() {}

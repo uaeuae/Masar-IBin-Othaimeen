@@ -41,6 +41,10 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   bool _isPlaying = false;
   bool _hasSavedOnce = false;
 
+  /// Non-null while the user drags the seek bar (fraction 0–1); position
+  /// stream updates must not fight the finger.
+  double? _dragFraction;
+
   @override
   void initState() {
     super.initState();
@@ -141,7 +145,20 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
 
   void _onPosition(Duration position) {
     _tracker?.onPosition(position);
-    if (mounted) setState(() => _position = position);
+    if (mounted && _dragFraction == null) {
+      setState(() => _position = position);
+    }
+  }
+
+  Future<void> _seekToFraction(double fraction, Duration total) async {
+    final target = Duration(
+      milliseconds: (total.inMilliseconds * fraction).round(),
+    );
+    setState(() {
+      _position = target;
+      _dragFraction = null;
+    });
+    await _engine.seekTo(target);
   }
 
   void _onEnded() {
@@ -269,40 +286,74 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                 children: [
                   Directionality(
                     textDirection: TextDirection.ltr,
-                    child: Row(
-                      children: [
-                        Text(
-                          clockLabelLtr(_position),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontFamily: kMonoFont,
-                            fontSize: 11,
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(AppRadius.chip),
-                            child: LinearProgressIndicator(
-                              value: total == null || total == Duration.zero
-                                  ? 0
-                                  : (_position.inMilliseconds /
-                                            total.inMilliseconds)
-                                        .clamp(0.0, 1.0),
-                              minHeight: 4,
+                    child: Builder(
+                      builder: (context) {
+                        final seekable = total != null && total > Duration.zero;
+                        final fraction = !seekable
+                            ? 0.0
+                            : (_position.inMilliseconds /
+                                      total.inMilliseconds)
+                                  .clamp(0.0, 1.0);
+                        final shownFraction = _dragFraction ?? fraction;
+                        final shownPosition = !seekable
+                            ? _position
+                            : Duration(
+                                milliseconds:
+                                    (total.inMilliseconds * shownFraction)
+                                        .round(),
+                              );
+                        return Row(
+                          children: [
+                            Text(
+                              clockLabelLtr(shownPosition),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontFamily: kMonoFont,
+                                fontSize: 11,
+                                color: scheme.onSurfaceVariant,
+                              ),
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          total == null ? '--:--' : clockLabelLtr(total),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontFamily: kMonoFont,
-                            fontSize: 11,
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: SliderTheme(
+                                data: SliderThemeData(
+                                  trackHeight: 4,
+                                  activeTrackColor: scheme.primary,
+                                  inactiveTrackColor:
+                                      scheme.surfaceContainerHighest,
+                                  thumbColor: scheme.primary,
+                                  thumbShape: const RoundSliderThumbShape(
+                                    enabledThumbRadius: 6,
+                                    elevation: 0,
+                                    pressedElevation: 0,
+                                  ),
+                                  overlayShape: const RoundSliderOverlayShape(
+                                    overlayRadius: 14,
+                                  ),
+                                ),
+                                child: Slider(
+                                  value: shownFraction,
+                                  onChanged: !seekable
+                                      ? null
+                                      : (v) =>
+                                            setState(() => _dragFraction = v),
+                                  onChangeEnd: !seekable
+                                      ? null
+                                      : (v) => _seekToFraction(v, total),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              total == null ? '--:--' : clockLabelLtr(total),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontFamily: kMonoFont,
+                                fontSize: 11,
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                   if (_hasSavedOnce) ...[

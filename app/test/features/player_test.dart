@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:masar/data/progress_repository.dart';
@@ -75,6 +76,18 @@ void main() {
 
     await tapVisible(tester, find.text('السابق'));
     expect(app.engine.loads.last.$1, 'fx-usul-01');
+  });
+
+  testApp('dragging the timeline seeks the engine', (tester, app) async {
+    app.engine.durationToReport = const Duration(seconds: 2700);
+    await openFirstUsulLesson(tester);
+
+    // Drag the slider thumb from the start toward the middle.
+    await tester.drag(find.byType(Slider), const Offset(150, 0));
+    await tester.pumpAndSettle();
+
+    expect(app.engine.seeks, hasLength(1));
+    expect(app.engine.seeks.single, greaterThan(Duration.zero));
   });
 
   testApp('unavailable lesson shows a message instead of the player', (
