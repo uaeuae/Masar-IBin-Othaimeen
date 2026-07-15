@@ -69,6 +69,38 @@ describe('createYoutubeClient', () => {
     expect(calls).toHaveLength(3);
   });
 
+  it('marks videos with embedding disabled as unplayable', async () => {
+    const fetchFn = async (url: string) => {
+      const body = url.includes('playlistItems')
+        ? {
+            items: [
+              {
+                snippet: { title: 'درس 1', resourceId: { videoId: 'open' } },
+                status: { privacyStatus: 'public' },
+              },
+              {
+                snippet: { title: 'درس 2', resourceId: { videoId: 'locked' } },
+                status: { privacyStatus: 'public' },
+              },
+            ],
+          }
+        : {
+            items: [
+              { id: 'open', contentDetails: { duration: 'PT10M' }, status: { embeddable: true } },
+              { id: 'locked', contentDetails: { duration: 'PT10M' }, status: { embeddable: false } },
+            ],
+          };
+      return { ok: true, status: 200, json: async () => body };
+    };
+
+    const client = createYoutubeClient('KEY', fetchFn);
+    const videos = await client.fetchPlaylistVideos('PLx');
+    expect(videos.map((v) => [v.videoId, v.playable])).toEqual([
+      ['open', true],
+      ['locked', false],
+    ]);
+  });
+
   it('throws a readable error with the api key redacted', async () => {
     const client = createYoutubeClient('SECRET', async () => ({
       ok: false,

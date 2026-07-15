@@ -1,5 +1,5 @@
-name: masar
-description: "مسار ابن عثيمين — مسارات تعليمية منظمة لدروس الشيخ محمد بن صالح العثيمين رحمه الله"
+﻿name: masar
+description: "Ù…Ø³Ø§Ø± Ø§Ø¨Ù† Ø¹Ø«ÙŠÙ…ÙŠÙ† â€” Ù…Ø³Ø§Ø±Ø§Øª ØªØ¹Ù„ÙŠÙ…ÙŠØ© Ù…Ù†Ø¸Ù…Ø© Ù„Ø¯Ø±ÙˆØ³ Ø§Ù„Ø´ÙŠØ® Ù…Ø­Ù…Ø¯ Ø¨Ù† ØµØ§Ù„Ø­ Ø§Ù„Ø¹Ø«ÙŠÙ…ÙŠÙ† Ø±Ø­Ù…Ù‡ Ø§Ù„Ù„Ù‡"
 publish_to: 'none'
 
 version: 0.1.0+1
@@ -18,7 +18,7 @@ dependencies:
   go_router: ^17.2.3
   drift: ^2.31.0
   drift_flutter: ^0.2.8
-  youtube_player_iframe: ^5.2.2
+  youtube_player_iframe: ^6.0.2
   cached_network_image: ^3.4.1
   freezed_annotation: ^3.1.0
   json_annotation: ^4.12.0

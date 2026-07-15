@@ -50,7 +50,11 @@ interface PlaylistItemsPage {
 }
 
 interface VideosPage {
-  items?: Array<{ id?: string; contentDetails?: { duration?: string } }>;
+  items?: Array<{
+    id?: string;
+    contentDetails?: { duration?: string };
+    status?: { embeddable?: boolean };
+  }>;
 }
 
 export function createYoutubeClient(apiKey: string, fetchFn: FetchLike = fetch as unknown as FetchLike): YoutubeClient {
@@ -92,15 +96,20 @@ export function createYoutubeClient(apiKey: string, fetchFn: FetchLike = fetch a
         pageToken = page.nextPageToken;
       } while (pageToken);
 
-      // Durations come from the videos endpoint, 50 ids per call (1 unit each).
+      // Durations + embeddability come from the videos endpoint, 50 ids per
+      // call (1 unit each). The app plays via the iframe embed, so a video
+      // with embedding disabled is as unplayable as a deleted one.
       const playableIds = videos.filter((v) => v.playable).map((v) => v.videoId);
       const durations = new Map<string, number | null>();
+      const embeddable = new Map<string, boolean>();
       for (let i = 0; i < playableIds.length; i += 50) {
         const chunk = playableIds.slice(i, i + 50);
-        const url = `${API}/videos?part=contentDetails&id=${chunk.join(',')}&key=${apiKey}`;
+        const url = `${API}/videos?part=contentDetails,status&id=${chunk.join(',')}&key=${apiKey}`;
         const page = await getJson<VideosPage>(url);
         for (const item of page.items ?? []) {
-          if (item.id) durations.set(item.id, parseIso8601Duration(item.contentDetails?.duration));
+          if (!item.id) continue;
+          durations.set(item.id, parseIso8601Duration(item.contentDetails?.duration));
+          embeddable.set(item.id, item.status?.embeddable !== false);
         }
       }
 
@@ -109,7 +118,7 @@ export function createYoutubeClient(apiKey: string, fetchFn: FetchLike = fetch a
         durationSeconds: durations.get(v.videoId) ?? null,
         // A video the videos endpoint no longer returns is gone even if the
         // playlist still lists it.
-        playable: v.playable && durations.has(v.videoId),
+        playable: v.playable && durations.has(v.videoId) && embeddable.get(v.videoId) !== false,
       }));
     },
 

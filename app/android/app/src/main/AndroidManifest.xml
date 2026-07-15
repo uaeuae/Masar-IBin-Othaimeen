@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Streams lessons from YouTube; Flutter's template only grants this in
+         debug/profile manifests, so release builds must declare it here. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="مسار ابن عثيمين"
         android:name="${applicationName}"

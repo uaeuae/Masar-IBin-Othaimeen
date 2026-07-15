@@ -60,11 +60,17 @@ class YoutubeLessonPlayerEngine implements LessonPlayerEngine {
 
   @override
   Future<void> togglePlay() async {
-    final state = _controller.value.playerState;
-    if (state == PlayerState.playing) {
-      await _controller.pauseVideo();
-    } else {
-      await _controller.playVideo();
+    // If the iframe handshake never completed (no network, embed blocked),
+    // controller calls time out — degrade silently instead of crashing.
+    try {
+      final state = _controller.value.playerState;
+      if (state == PlayerState.playing) {
+        await _controller.pauseVideo();
+      } else {
+        await _controller.playVideo();
+      }
+    } on Exception catch (error) {
+      debugPrint('togglePlay failed: $error');
     }
   }
 
@@ -77,11 +83,16 @@ class YoutubeLessonPlayerEngine implements LessonPlayerEngine {
   }
 
   @override
-  Future<void> load(String videoId, {Duration start = Duration.zero}) =>
-      _controller.loadVideoById(
+  Future<void> load(String videoId, {Duration start = Duration.zero}) async {
+    try {
+      await _controller.loadVideoById(
         videoId: videoId,
         startSeconds: start.inSeconds.toDouble(),
       );
+    } on Exception catch (error) {
+      debugPrint('load($videoId) failed: $error');
+    }
+  }
 
   @override
   void dispose() => _controller.close();

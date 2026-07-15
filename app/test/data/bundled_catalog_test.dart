@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masar/data/catalog_repository.dart';
-import 'package:masar/data/db/database.dart';
 import 'package:masar/data/models/catalog.dart';
 
 import '../support/test_db.dart';
