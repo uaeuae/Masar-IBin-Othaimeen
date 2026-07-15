@@ -41,8 +41,12 @@ class YoutubeLessonPlayerEngine implements LessonPlayerEngine {
       playsInline: true,
       strictRelatedVideos: true,
       // The app renders its own play/pause + seek bar per the design, so the
-      // embed's native control bar is hidden (official `controls=0` param).
+      // embed's native control bar is hidden (official `controls=0` param)
+      // and the surface ignores taps — no tap-summoned YouTube overlays.
+      // (The brief title flash on start and the pause overlay are YouTube
+      // branding requirements and cannot be removed.)
       showControls: false,
+      pointerEvents: PointerEvents.none,
     ),
   );
 
