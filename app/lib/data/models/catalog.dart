@@ -48,6 +48,12 @@ abstract class CatalogSeries with _$CatalogSeries {
     String? thumbnailUrl,
     JourneyLevel? level,
     @Default(LessonMedia.video) LessonMedia media,
+
+    /// Audio companions: set on the audio edition (slug of the video series
+    /// it mirrors) — such series are hidden from library browse. Video series
+    /// carry the reverse link in [companionSlug].
+    String? companionOf,
+    String? companionSlug,
     @Default([]) List<CatalogLesson> lessons,
   }) = _CatalogSeries;
 

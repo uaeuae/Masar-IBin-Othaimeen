@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة شرح الأربعين النووية — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-alarbain-alnawawiyah-audio
+title_ar: شرح الأربعين النووية (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة شرح الأربعين النووية من موقع المؤسسة — للاستماع في الخلفية
+science: hadith
+level: beginner
+status: active
+media: audio
+companion_of: sharh-alarbain-alnawawiyah
+site_audio_sections:
+  - 24996a56-f88a-4f44-b74e-3d5a2a0f1909 # شرح الأربعين النووية (١٩ درسًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/theme.dart';
 import '../../core/formatters.dart';
@@ -13,6 +14,7 @@ import '../../data/providers.dart';
 import '../../data/view_models.dart';
 import '../series/series_providers.dart';
 import '../settings/theme_mode_provider.dart';
+import 'pip_controller.dart';
 import 'player_engine.dart';
 import 'progress_tracker.dart';
 
@@ -32,6 +34,10 @@ class PlayerScreen extends ConsumerStatefulWidget {
 class _PlayerScreenState extends ConsumerState<PlayerScreen> {
   late final LessonPlayerEngine _engine;
   late String _currentVideoId;
+
+  /// Keeps the live video WebView alive when the layout swaps between the
+  /// full screen and the chrome-less PiP arrangement.
+  final GlobalKey _videoKey = GlobalKey();
   ProgressTracker? _tracker;
   StreamSubscription<Duration>? _positionsSub;
   StreamSubscription<void>? _endedSub;
@@ -55,11 +61,19 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
     _playingSub = _engine.playing.listen((playing) {
       if (mounted) setState(() => _isPlaying = playing);
     });
+    PipController.inPip.addListener(_onPipChanged);
+    PipController.setActive(true);
     _startLesson(_currentVideoId, initial: true);
+  }
+
+  void _onPipChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    PipController.inPip.removeListener(_onPipChanged);
+    PipController.setActive(false);
     _tracker?.flush();
     _positionsSub?.cancel();
     _endedSub?.cancel();
@@ -239,6 +253,23 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
       );
     }
 
+    // In a PiP window only the video surface fits — drop all chrome. The
+    // GlobalKey reparents the live WebView instead of recreating it.
+    if (PipController.inPip.value) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: KeyedSubtree(
+              key: _videoKey,
+              child: _engine.buildView(context),
+            ),
+          ),
+        ),
+      );
+    }
+
     final remaining = [
       if (currentIndex >= 0)
         ...lessons
@@ -262,11 +293,26 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                 children: [
                   const BackCircle(),
                   if (detail != null && currentIndex >= 0)
-                    Text(
-                      '${detail.series.titleAr} · ${arabicDigits(currentIndex + 1)} / ${arabicDigits(lessons.length)}',
-                      style: theme.textTheme.labelMedium?.copyWith(
+                    Expanded(
+                      child: Text(
+                        '${detail.series.titleAr} · ${arabicDigits(currentIndex + 1)} / ${arabicDigits(lessons.length)}',
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  if (detail?.series.companionSlug != null)
+                    IconButton(
+                      tooltip: 'الاستماع للنسخة الصوتية',
+                      onPressed: () => context.pushReplacement(
+                        '/series/${detail!.series.companionSlug}',
+                      ),
+                      icon: Icon(
+                        Icons.headphones_rounded,
                         color: scheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w400,
                       ),
                     ),
                 ],
@@ -275,7 +321,13 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
             const SizedBox(height: 16),
 
             // ── Video ────────────────────────────────────────────────
-            AspectRatio(aspectRatio: 16 / 9, child: _engine.buildView(context)),
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: KeyedSubtree(
+                key: _videoKey,
+                child: _engine.buildView(context),
+              ),
+            ),
             const SizedBox(height: 16),
 
             // ── Live position + auto-save badge ──────────────────────

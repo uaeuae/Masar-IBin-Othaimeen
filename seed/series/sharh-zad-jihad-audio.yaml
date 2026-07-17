@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة كتاب الجهاد من زاد المستقنع — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-zad-jihad-audio
+title_ar: كتاب الجهاد من زاد المستقنع (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة كتاب الجهاد من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية
+science: fiqh
+level: intermediate
+status: active
+media: audio
+companion_of: sharh-zad-jihad
+site_audio_sections:
+  - f03a3278-afcf-4b82-bd7d-43cb361ac953 # كتاب الجهاد (٤ دروس)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة كتاب الزكاة من زاد المستقنع — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-zad-zakah-audio
+title_ar: كتاب الزكاة من زاد المستقنع (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة كتاب الزكاة من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية
+science: fiqh
+level: intermediate
+status: active
+media: audio
+companion_of: sharh-zad-zakah
+site_audio_sections:
+  - 6d711876-dab3-417e-8e74-17eeadfafc1d # كتاب الزكاة — الشرح الثاني (١٥ درسًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

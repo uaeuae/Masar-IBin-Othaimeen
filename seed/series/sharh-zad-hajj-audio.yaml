@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة كتاب الحج من زاد المستقنع — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-zad-hajj-audio
+title_ar: كتاب الحج من زاد المستقنع (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة كتاب الحج من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية
+science: fiqh
+level: intermediate
+status: active
+media: audio
+companion_of: sharh-zad-hajj
+site_audio_sections:
+  - 662c6ebc-6adf-420f-b510-5be4d10a88d9 # كتاب الحج — الشرح الثاني (١٢ درسًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

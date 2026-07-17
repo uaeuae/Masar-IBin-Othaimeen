@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة الأصول من علم الأصول — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-alusul-min-ilm-alusul-audio
+title_ar: الأصول من علم الأصول (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة الأصول من علم الأصول من موقع المؤسسة — للاستماع في الخلفية
+science: usul-fiqh
+level: intermediate
+status: active
+media: audio
+companion_of: sharh-alusul-min-ilm-alusul
+site_audio_sections:
+  - 6b0de0d5-ac5d-48e9-b1f7-6ef60269d9fb # شرح الأصول من علم الأصول (٢٢ درسًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

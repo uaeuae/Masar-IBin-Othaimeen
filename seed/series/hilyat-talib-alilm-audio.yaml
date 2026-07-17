@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة حلية طالب العلم — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: hilyat-talib-alilm-audio
+title_ar: حلية طالب العلم (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة حلية طالب العلم من موقع المؤسسة — للاستماع في الخلفية
+science: seerah-adab
+level: beginner
+status: active
+media: audio
+companion_of: hilyat-talib-alilm
+site_audio_sections:
+  - 459fcbb4-b23d-4055-abad-cc72c6443830 # حلية طالب العلم (١٢ درسًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

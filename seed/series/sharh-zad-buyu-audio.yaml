@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة كتاب البيوع من زاد المستقنع — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-zad-buyu-audio
+title_ar: كتاب البيوع من زاد المستقنع (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة كتاب البيوع من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية
+science: fiqh
+level: intermediate
+status: active
+media: audio
+companion_of: sharh-zad-buyu
+site_audio_sections:
+  - ac807ebe-f2a7-4ff9-ae7b-6064d9216b88 # كتاب البيع — الشرح الأول (٤٢ درسًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

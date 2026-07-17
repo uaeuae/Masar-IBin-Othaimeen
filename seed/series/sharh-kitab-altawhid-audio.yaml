@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة شرح كتاب التوحيد — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-kitab-altawhid-audio
+title_ar: شرح كتاب التوحيد (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة شرح كتاب التوحيد من موقع المؤسسة — للاستماع في الخلفية
+science: aqeedah
+level: beginner
+status: active
+media: audio
+companion_of: sharh-kitab-altawhid
+site_audio_sections:
+  - 81e72c36-9e26-415d-9af4-405f4fbe853a # شرح كتاب التوحيد (٥٤ درسًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

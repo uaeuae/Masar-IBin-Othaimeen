@@ -32,6 +32,13 @@ class SeriesEntries extends Table {
   /// 'video' | 'audio'
   TextColumn get mediaType => text().withDefault(const Constant('video'))();
 
+  /// Audio editions: slug of the video series this one mirrors. Companion
+  /// series are hidden from library browse.
+  TextColumn get companionOf => text().nullable()();
+
+  /// Video series: slug of their full audio edition, if one exists.
+  TextColumn get companionSlug => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {slug};
 }
@@ -143,7 +150,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -156,6 +163,10 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(lessons, lessons.mediaType);
         await m.addColumn(lessons, lessons.audioUrl);
         await m.addColumn(lessons, lessons.chaptersJson);
+      }
+      if (from < 4) {
+        await m.addColumn(seriesEntries, seriesEntries.companionOf);
+        await m.addColumn(seriesEntries, seriesEntries.companionSlug);
       }
     },
   );

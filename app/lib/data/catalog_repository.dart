@@ -70,6 +70,8 @@ class CatalogRepository {
               thumbnailUrl: Value(s.thumbnailUrl),
               level: Value(s.level?.name),
               mediaType: Value(s.media.name),
+              companionOf: Value(s.companionOf),
+              companionSlug: Value(s.companionSlug),
             ),
         ]);
         batch.insertAll(db.lessons, [
@@ -387,6 +389,8 @@ class CatalogRepository {
           ),
           level: _levelOrNull(seriesRow.level),
           media: LessonMedia.fromJson(seriesRow.mediaType),
+          companionOf: seriesRow.companionOf,
+          companionSlug: seriesRow.companionSlug,
         ),
         lessons: lessons,
       );
@@ -435,10 +439,12 @@ class CatalogRepository {
         .customSelect(
           '''
           SELECT sc.slug, sc.name_ar, sc.description_ar, sc.icon, sc.sort_order,
-            (SELECT COUNT(*) FROM series s WHERE s.science_slug = sc.slug) AS series_count,
+            (SELECT COUNT(*) FROM series s
+              WHERE s.science_slug = sc.slug AND s.companion_of IS NULL) AS series_count,
             (SELECT COUNT(*) FROM lessons l
                JOIN series s ON s.slug = l.series_slug
-              WHERE s.science_slug = sc.slug AND l.status = 'active') AS lesson_count
+              WHERE s.science_slug = sc.slug AND s.companion_of IS NULL
+                AND l.status = 'active') AS lesson_count
           FROM sciences sc
           ORDER BY sc.sort_order
           ''',
@@ -473,7 +479,7 @@ class CatalogRepository {
                JOIN lesson_progress p ON p.video_id = l.video_id AND p.completed = 1
               WHERE l.series_slug = s.slug AND l.status = 'active') AS completed_count
           FROM series s
-          WHERE s.science_slug = ?
+          WHERE s.science_slug = ? AND s.companion_of IS NULL
           ORDER BY s.title_ar
           ''',
           variables: [Variable.withString(scienceSlug)],

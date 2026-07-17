@@ -60,6 +60,29 @@ path in three formats (rooted/unrooted/absolute); some files open with a
 ~1 MB ID3 cover-art tag (the duration probe reads past it); رياض الصالحين
 lessons 66–69 are zero-byte uploads on the server (auto-marked unavailable).
 
+### Companion audio editions («النسخة الصوتية»)
+
+The YouTube videos are *clips* — the channel chopped the original lessons
+into short segments (e.g. كتاب التوحيد: 239 clips vs 54 full audio lessons),
+so lesson-level video↔audio matching is impossible. Instead, every video
+series can declare a full audio edition as a separate series seed with
+`companion_of: <video-slug>` (plus `media: audio` + `site_audio_sections`).
+Effects:
+
+- publish emits `companion_of` on the audio series and the computed reverse
+  `companion_slug` on the video series (integrity: the target must be an
+  active video series, one companion max).
+- The app hides companion series from library browse and science counters;
+  they're reached via the «الاستماع للنسخة الصوتية» banner on the video
+  series (and the player's headphones button). Progress is per-edition.
+- Chapter `body` texts are NOT exported to the app catalog (~10 MB across
+  the library; the app only renders chapter titles + timestamps). They stay
+  in `data/series/*.json` for a future transcript-reading feature.
+
+All 16 video series have companion seeds (2026-07-17). For تفسير جزء عم the
+audio side is 37 single-lesson per-surah sections listed in mushaf order —
+the episode sort falls back to seed order when titles carry no numbers.
+
 ## Content QA notes
 
 - Never rename a series `slug` after release — device progress keys off video

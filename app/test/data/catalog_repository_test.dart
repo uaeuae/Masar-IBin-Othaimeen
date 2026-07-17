@@ -69,6 +69,25 @@ void main() {
     expect(aqeedah.enrolled, isFalse);
   });
 
+  test('companion audio series are linked and hidden from browse', () async {
+    await catalog.importCatalog(loadFixture());
+
+    final video = (await catalog.watchSeriesDetail('sharh-alwasitiyah').first)!;
+    expect(video.series.companionSlug, 'sharh-riyad-alsalihin');
+    expect(video.series.companionOf, isNull);
+
+    final audio =
+        (await catalog.watchSeriesDetail('sharh-riyad-alsalihin').first)!;
+    expect(audio.series.companionOf, 'sharh-alwasitiyah');
+
+    // Companions are reached from their video series, not the library —
+    // they must not appear in browse nor inflate the science counters.
+    final hadith = await catalog.watchSeriesByScience('hadith').first;
+    expect(hadith.where((s) => s.slug == 'sharh-riyad-alsalihin'), isEmpty);
+    final sciences = await catalog.watchSciences().first;
+    expect(sciences.firstWhere((s) => s.slug == 'hadith').seriesCount, 0);
+  });
+
   test('ensureLoaded imports newer bundled versions, skips older', () async {
     await catalog.importCatalog(loadFixture());
     expect(await catalog.currentVersion(), 1);

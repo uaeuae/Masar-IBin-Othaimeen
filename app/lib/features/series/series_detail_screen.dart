@@ -167,6 +167,25 @@ class _SeriesDetailBody extends ConsumerWidget {
           const SizedBox(height: 16),
         ],
 
+        // ── Audio edition / video edition cross-link ──────────────────
+        if (series.companionSlug != null) ...[
+          _CompanionBanner(
+            icon: Icons.headphones_rounded,
+            title: 'الاستماع للنسخة الصوتية',
+            subtitle: 'دروس المؤسسة الكاملة — تعمل في الخلفية وبالشاشة مقفلة',
+            onTap: () => context.push('/series/${series.companionSlug}'),
+          ),
+          const SizedBox(height: 16),
+        ] else if (series.companionOf != null) ...[
+          _CompanionBanner(
+            icon: Icons.ondemand_video_rounded,
+            title: 'مشاهدة النسخة المرئية',
+            subtitle: 'مقاطع الدروس على قناة الشيخ الرسمية',
+            onTap: () => context.push('/series/${series.companionOf}'),
+          ),
+          const SizedBox(height: 16),
+        ],
+
         // ── Lesson list (one grouped card) ────────────────────────────
         Container(
           decoration: BoxDecoration(
@@ -201,6 +220,86 @@ class _SeriesDetailBody extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Cross-link between a video series and its full audio edition.
+class _CompanionBanner extends StatelessWidget {
+  const _CompanionBanner({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsetsDirectional.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(AppRadius.group),
+          border: Border.all(color: scheme.outlineVariant),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: scheme.primary.withAlpha(0x1F),
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Icon(icon, size: 22, color: scheme.primary),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: kUiFont,
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      color: scheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontFamily: kUiFont,
+                      fontSize: 11.5,
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_left_rounded,
+              color: scheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

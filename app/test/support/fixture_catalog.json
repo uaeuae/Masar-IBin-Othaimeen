@@ -108,6 +108,7 @@
       "science": "aqeedah",
       "title_ar": "شرح العقيدة الواسطية",
       "description_ar": "شرح العقيدة الواسطية لشيخ الإسلام ابن تيمية رحمه الله",
+      "companion_slug": "sharh-riyad-alsalihin",
       "lessons": [
         {
           "youtube_video_id": "fx-wast-01",
@@ -223,6 +224,7 @@
       "science": "hadith",
       "title_ar": "شرح رياض الصالحين",
       "description_ar": "شرح كتاب رياض الصالحين للإمام النووي رحمه الله",
+      "companion_of": "sharh-alwasitiyah",
       "lessons": [
         {
           "youtube_video_id": "fx-riyd-01",

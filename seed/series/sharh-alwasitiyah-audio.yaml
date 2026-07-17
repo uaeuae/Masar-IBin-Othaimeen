@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة شرح العقيدة الواسطية — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-alwasitiyah-audio
+title_ar: شرح العقيدة الواسطية (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة شرح العقيدة الواسطية من موقع المؤسسة — للاستماع في الخلفية
+science: aqeedah
+level: intermediate
+status: active
+media: audio
+companion_of: sharh-alwasitiyah
+site_audio_sections:
+  - 441fd5c1-4747-4a03-b2f3-d698208102fd # العقيدة الواسطية — الشرح الثاني (١٩ درسًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

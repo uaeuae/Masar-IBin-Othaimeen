@@ -448,6 +448,28 @@ class $SeriesEntriesTable extends SeriesEntries
     requiredDuringInsert: false,
     defaultValue: const Constant('video'),
   );
+  static const VerificationMeta _companionOfMeta = const VerificationMeta(
+    'companionOf',
+  );
+  @override
+  late final GeneratedColumn<String> companionOf = GeneratedColumn<String>(
+    'companion_of',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _companionSlugMeta = const VerificationMeta(
+    'companionSlug',
+  );
+  @override
+  late final GeneratedColumn<String> companionSlug = GeneratedColumn<String>(
+    'companion_slug',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     slug,
@@ -457,6 +479,8 @@ class $SeriesEntriesTable extends SeriesEntries
     thumbnailUrl,
     level,
     mediaType,
+    companionOf,
+    companionSlug,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -527,6 +551,24 @@ class $SeriesEntriesTable extends SeriesEntries
         mediaType.isAcceptableOrUnknown(data['media_type']!, _mediaTypeMeta),
       );
     }
+    if (data.containsKey('companion_of')) {
+      context.handle(
+        _companionOfMeta,
+        companionOf.isAcceptableOrUnknown(
+          data['companion_of']!,
+          _companionOfMeta,
+        ),
+      );
+    }
+    if (data.containsKey('companion_slug')) {
+      context.handle(
+        _companionSlugMeta,
+        companionSlug.isAcceptableOrUnknown(
+          data['companion_slug']!,
+          _companionSlugMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -564,6 +606,14 @@ class $SeriesEntriesTable extends SeriesEntries
         DriftSqlType.string,
         data['${effectivePrefix}media_type'],
       )!,
+      companionOf: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}companion_of'],
+      ),
+      companionSlug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}companion_slug'],
+      ),
     );
   }
 
@@ -585,6 +635,13 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
 
   /// 'video' | 'audio'
   final String mediaType;
+
+  /// Audio editions: slug of the video series this one mirrors. Companion
+  /// series are hidden from library browse.
+  final String? companionOf;
+
+  /// Video series: slug of their full audio edition, if one exists.
+  final String? companionSlug;
   const SeriesRow({
     required this.slug,
     required this.scienceSlug,
@@ -593,6 +650,8 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     this.thumbnailUrl,
     this.level,
     required this.mediaType,
+    this.companionOf,
+    this.companionSlug,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -610,6 +669,12 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       map['level'] = Variable<String>(level);
     }
     map['media_type'] = Variable<String>(mediaType);
+    if (!nullToAbsent || companionOf != null) {
+      map['companion_of'] = Variable<String>(companionOf);
+    }
+    if (!nullToAbsent || companionSlug != null) {
+      map['companion_slug'] = Variable<String>(companionSlug);
+    }
     return map;
   }
 
@@ -628,6 +693,12 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           ? const Value.absent()
           : Value(level),
       mediaType: Value(mediaType),
+      companionOf: companionOf == null && nullToAbsent
+          ? const Value.absent()
+          : Value(companionOf),
+      companionSlug: companionSlug == null && nullToAbsent
+          ? const Value.absent()
+          : Value(companionSlug),
     );
   }
 
@@ -644,6 +715,8 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
       level: serializer.fromJson<String?>(json['level']),
       mediaType: serializer.fromJson<String>(json['mediaType']),
+      companionOf: serializer.fromJson<String?>(json['companionOf']),
+      companionSlug: serializer.fromJson<String?>(json['companionSlug']),
     );
   }
   @override
@@ -657,6 +730,8 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
       'level': serializer.toJson<String?>(level),
       'mediaType': serializer.toJson<String>(mediaType),
+      'companionOf': serializer.toJson<String?>(companionOf),
+      'companionSlug': serializer.toJson<String?>(companionSlug),
     };
   }
 
@@ -668,6 +743,8 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     Value<String?> thumbnailUrl = const Value.absent(),
     Value<String?> level = const Value.absent(),
     String? mediaType,
+    Value<String?> companionOf = const Value.absent(),
+    Value<String?> companionSlug = const Value.absent(),
   }) => SeriesRow(
     slug: slug ?? this.slug,
     scienceSlug: scienceSlug ?? this.scienceSlug,
@@ -678,6 +755,10 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     thumbnailUrl: thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
     level: level.present ? level.value : this.level,
     mediaType: mediaType ?? this.mediaType,
+    companionOf: companionOf.present ? companionOf.value : this.companionOf,
+    companionSlug: companionSlug.present
+        ? companionSlug.value
+        : this.companionSlug,
   );
   SeriesRow copyWithCompanion(SeriesEntriesCompanion data) {
     return SeriesRow(
@@ -694,6 +775,12 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           : this.thumbnailUrl,
       level: data.level.present ? data.level.value : this.level,
       mediaType: data.mediaType.present ? data.mediaType.value : this.mediaType,
+      companionOf: data.companionOf.present
+          ? data.companionOf.value
+          : this.companionOf,
+      companionSlug: data.companionSlug.present
+          ? data.companionSlug.value
+          : this.companionSlug,
     );
   }
 
@@ -706,7 +793,9 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           ..write('descriptionAr: $descriptionAr, ')
           ..write('thumbnailUrl: $thumbnailUrl, ')
           ..write('level: $level, ')
-          ..write('mediaType: $mediaType')
+          ..write('mediaType: $mediaType, ')
+          ..write('companionOf: $companionOf, ')
+          ..write('companionSlug: $companionSlug')
           ..write(')'))
         .toString();
   }
@@ -720,6 +809,8 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     thumbnailUrl,
     level,
     mediaType,
+    companionOf,
+    companionSlug,
   );
   @override
   bool operator ==(Object other) =>
@@ -731,7 +822,9 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           other.descriptionAr == this.descriptionAr &&
           other.thumbnailUrl == this.thumbnailUrl &&
           other.level == this.level &&
-          other.mediaType == this.mediaType);
+          other.mediaType == this.mediaType &&
+          other.companionOf == this.companionOf &&
+          other.companionSlug == this.companionSlug);
 }
 
 class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
@@ -742,6 +835,8 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
   final Value<String?> thumbnailUrl;
   final Value<String?> level;
   final Value<String> mediaType;
+  final Value<String?> companionOf;
+  final Value<String?> companionSlug;
   final Value<int> rowid;
   const SeriesEntriesCompanion({
     this.slug = const Value.absent(),
@@ -751,6 +846,8 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     this.thumbnailUrl = const Value.absent(),
     this.level = const Value.absent(),
     this.mediaType = const Value.absent(),
+    this.companionOf = const Value.absent(),
+    this.companionSlug = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SeriesEntriesCompanion.insert({
@@ -761,6 +858,8 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     this.thumbnailUrl = const Value.absent(),
     this.level = const Value.absent(),
     this.mediaType = const Value.absent(),
+    this.companionOf = const Value.absent(),
+    this.companionSlug = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : slug = Value(slug),
        scienceSlug = Value(scienceSlug),
@@ -773,6 +872,8 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     Expression<String>? thumbnailUrl,
     Expression<String>? level,
     Expression<String>? mediaType,
+    Expression<String>? companionOf,
+    Expression<String>? companionSlug,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -783,6 +884,8 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
       if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
       if (level != null) 'level': level,
       if (mediaType != null) 'media_type': mediaType,
+      if (companionOf != null) 'companion_of': companionOf,
+      if (companionSlug != null) 'companion_slug': companionSlug,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -795,6 +898,8 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     Value<String?>? thumbnailUrl,
     Value<String?>? level,
     Value<String>? mediaType,
+    Value<String?>? companionOf,
+    Value<String?>? companionSlug,
     Value<int>? rowid,
   }) {
     return SeriesEntriesCompanion(
@@ -805,6 +910,8 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       level: level ?? this.level,
       mediaType: mediaType ?? this.mediaType,
+      companionOf: companionOf ?? this.companionOf,
+      companionSlug: companionSlug ?? this.companionSlug,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -833,6 +940,12 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     if (mediaType.present) {
       map['media_type'] = Variable<String>(mediaType.value);
     }
+    if (companionOf.present) {
+      map['companion_of'] = Variable<String>(companionOf.value);
+    }
+    if (companionSlug.present) {
+      map['companion_slug'] = Variable<String>(companionSlug.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -849,6 +962,8 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
           ..write('thumbnailUrl: $thumbnailUrl, ')
           ..write('level: $level, ')
           ..write('mediaType: $mediaType, ')
+          ..write('companionOf: $companionOf, ')
+          ..write('companionSlug: $companionSlug, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3854,6 +3969,8 @@ typedef $$SeriesEntriesTableCreateCompanionBuilder =
       Value<String?> thumbnailUrl,
       Value<String?> level,
       Value<String> mediaType,
+      Value<String?> companionOf,
+      Value<String?> companionSlug,
       Value<int> rowid,
     });
 typedef $$SeriesEntriesTableUpdateCompanionBuilder =
@@ -3865,6 +3982,8 @@ typedef $$SeriesEntriesTableUpdateCompanionBuilder =
       Value<String?> thumbnailUrl,
       Value<String?> level,
       Value<String> mediaType,
+      Value<String?> companionOf,
+      Value<String?> companionSlug,
       Value<int> rowid,
     });
 
@@ -3909,6 +4028,16 @@ class $$SeriesEntriesTableFilterComposer
 
   ColumnFilters<String> get mediaType => $composableBuilder(
     column: $table.mediaType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get companionOf => $composableBuilder(
+    column: $table.companionOf,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get companionSlug => $composableBuilder(
+    column: $table.companionSlug,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3956,6 +4085,16 @@ class $$SeriesEntriesTableOrderingComposer
     column: $table.mediaType,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get companionOf => $composableBuilder(
+    column: $table.companionOf,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get companionSlug => $composableBuilder(
+    column: $table.companionSlug,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SeriesEntriesTableAnnotationComposer
@@ -3993,6 +4132,16 @@ class $$SeriesEntriesTableAnnotationComposer
 
   GeneratedColumn<String> get mediaType =>
       $composableBuilder(column: $table.mediaType, builder: (column) => column);
+
+  GeneratedColumn<String> get companionOf => $composableBuilder(
+    column: $table.companionOf,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get companionSlug => $composableBuilder(
+    column: $table.companionSlug,
+    builder: (column) => column,
+  );
 }
 
 class $$SeriesEntriesTableTableManager
@@ -4033,6 +4182,8 @@ class $$SeriesEntriesTableTableManager
                 Value<String?> thumbnailUrl = const Value.absent(),
                 Value<String?> level = const Value.absent(),
                 Value<String> mediaType = const Value.absent(),
+                Value<String?> companionOf = const Value.absent(),
+                Value<String?> companionSlug = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SeriesEntriesCompanion(
                 slug: slug,
@@ -4042,6 +4193,8 @@ class $$SeriesEntriesTableTableManager
                 thumbnailUrl: thumbnailUrl,
                 level: level,
                 mediaType: mediaType,
+                companionOf: companionOf,
+                companionSlug: companionSlug,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -4053,6 +4206,8 @@ class $$SeriesEntriesTableTableManager
                 Value<String?> thumbnailUrl = const Value.absent(),
                 Value<String?> level = const Value.absent(),
                 Value<String> mediaType = const Value.absent(),
+                Value<String?> companionOf = const Value.absent(),
+                Value<String?> companionSlug = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SeriesEntriesCompanion.insert(
                 slug: slug,
@@ -4062,6 +4217,8 @@ class $$SeriesEntriesTableTableManager
                 thumbnailUrl: thumbnailUrl,
                 level: level,
                 mediaType: mediaType,
+                companionOf: companionOf,
+                companionSlug: companionSlug,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

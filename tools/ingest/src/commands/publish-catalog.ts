@@ -54,6 +54,27 @@ export function publishCatalog(options: PublishOptions): { version: number; less
     }
   }
 
+  const companionByVideoSlug = new Map<string, string>();
+  for (const s of activeSeries) {
+    if (!s.companion_of) continue;
+    if (s.media !== 'audio') {
+      problems.push(`series "${s.slug}" sets companion_of but is not media: audio`);
+      continue;
+    }
+    const target = activeSeries.find((v) => v.slug === s.companion_of);
+    if (!target || target.media !== 'video') {
+      problems.push(
+        `series "${s.slug}" companion_of "${s.companion_of}" is not an active video series`,
+      );
+      continue;
+    }
+    if (companionByVideoSlug.has(s.companion_of)) {
+      problems.push(`video series "${s.companion_of}" has more than one audio companion`);
+      continue;
+    }
+    companionByVideoSlug.set(s.companion_of, s.slug);
+  }
+
   const publishedJourneys = bundle.journeys.filter((j) => j.is_published);
   for (const journey of publishedJourneys) {
     for (const stage of journey.stages) {
@@ -95,6 +116,8 @@ export function publishCatalog(options: PublishOptions): { version: number; less
       thumbnail_url: s.thumbnail_url ?? null,
       level: s.level ?? null,
       media: s.media,
+      companion_of: s.companion_of ?? null,
+      companion_slug: companionByVideoSlug.get(s.slug) ?? null,
       lessons: (lessonsBySeries.get(s.slug) ?? [])
         .filter((l) => l.status !== 'hidden')
         .map((l) => ({
@@ -105,7 +128,17 @@ export function publishCatalog(options: PublishOptions): { version: number; less
           published_at: l.published_at,
           status: l.status,
           ...(l.media === 'audio'
-            ? { media: 'audio', audio_url: l.audio_url ?? null, chapters: l.chapters ?? [] }
+            ? {
+                media: 'audio',
+                audio_url: l.audio_url ?? null,
+                // Chapter bodies (full matn passages) stay in the data files;
+                // the app only renders titles + timestamps, and bodies are
+                // ~10 MB across the library.
+                chapters: (l.chapters ?? []).map((c) => ({
+                  start_seconds: c.start_seconds,
+                  title: c.title,
+                })),
+              }
             : {}),
         })),
     })),

@@ -45,6 +45,12 @@ export const seriesSeedSchema = z.object({
   status: z.enum(['active', 'draft', 'archived']).default('draft'),
   /** 'audio' series stream foundation MP3s; 'video' series embed YouTube. */
   media: z.enum(['video', 'audio']).default('video'),
+  /**
+   * Slug of the video series this audio series is the full audio edition of.
+   * Companion series are hidden from library browse; the video series links
+   * to them via «النسخة الصوتية». Audio-only field.
+   */
+  companion_of: slugSchema.optional(),
   /** Ordered: when a long series spans multiple playlists, order here is playback order. */
   youtube_playlists: z.array(z.string().min(1)).default([]),
   /** Audio-library section ids on shekhapi.binothaimeen.net, in playback order. */

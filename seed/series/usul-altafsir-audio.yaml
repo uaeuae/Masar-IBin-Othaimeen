@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة أصول في التفسير — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: usul-altafsir-audio
+title_ar: أصول في التفسير (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة أصول في التفسير من موقع المؤسسة — للاستماع في الخلفية
+science: tafsir
+level: beginner
+status: active
+media: audio
+companion_of: usul-altafsir
+site_audio_sections:
+  - 4b23c2f1-9cc2-426c-9bc0-89c8b551c7b7 # شرح أصول في التفسير — الشرح الأول (٨ دروس)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

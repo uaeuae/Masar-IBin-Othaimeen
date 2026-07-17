@@ -28,6 +28,8 @@ jobs:
         env:
           YT_API_KEY: ${{ secrets.YT_API_KEY }}
         run: npm run sync:youtube
+      - name: Sync audio series from the foundation site (no key needed)
+        run: npm run sync:site-audio
       - name: Publish catalog snapshot (also refreshes the bundled app asset)
         run: npm run publish:catalog
       - name: Commit changes

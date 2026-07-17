@@ -1,0 +1,15 @@
+# النسخة الصوتية الكاملة لسلسلة كتاب الطهارة من زاد المستقنع — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-zad-taharah-audio
+title_ar: كتاب الطهارة من زاد المستقنع (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة كتاب الطهارة من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية
+science: fiqh
+level: intermediate
+status: active
+media: audio
+companion_of: sharh-zad-taharah
+site_audio_sections:
+  - ff1778fc-ffde-4a50-bbbf-9227ad42f7a6 # كتاب الطهارة (٢٢ درسًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

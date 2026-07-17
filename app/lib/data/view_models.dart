@@ -50,6 +50,8 @@ class SeriesWithProgress {
     this.totalDurationSeconds = 0,
     this.level,
     this.media = LessonMedia.video,
+    this.companionOf,
+    this.companionSlug,
   });
 
   final String slug;
@@ -62,6 +64,12 @@ class SeriesWithProgress {
   final int totalDurationSeconds;
   final JourneyLevel? level;
   final LessonMedia media;
+
+  /// Set on audio editions: slug of the video series this one mirrors.
+  final String? companionOf;
+
+  /// Set on video series that have a full audio edition («النسخة الصوتية»).
+  final String? companionSlug;
 
   double get progress => lessonCount == 0 ? 0 : completedCount / lessonCount;
 

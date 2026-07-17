@@ -1,0 +1,16 @@
+# النسخة الصوتية الكاملة لسلسلة كتاب الصلاة من زاد المستقنع — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-zad-salah-audio
+title_ar: كتاب الصلاة من زاد المستقنع (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة كتاب الصلاة من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية
+science: fiqh
+level: intermediate
+status: active
+media: audio
+companion_of: sharh-zad-salah
+site_audio_sections:
+  - 10a32930-ebe0-49ce-8d99-a8b3521fde3b # كتاب الصلاة (٦٨ درسًا)
+  - 7fe5ceb5-ff82-4c5d-be46-e206980eee21 # باب صفة الصلاة (٥ دروس)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'

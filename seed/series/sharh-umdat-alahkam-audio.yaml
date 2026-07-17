@@ -1,0 +1,17 @@
+# النسخة الصوتية الكاملة لسلسلة شرح عمدة الأحكام — دروس المؤسسة الأصلية غير المقتطعة.
+# سلسلة مرافقة: تُفتح من صفحة السلسلة المرئية ولا تظهر في تصفح المكتبة.
+slug: sharh-umdat-alahkam-audio
+title_ar: شرح عمدة الأحكام (صوتي)
+description_ar: الدروس الصوتية الكاملة لسلسلة شرح عمدة الأحكام من موقع المؤسسة — للاستماع في الخلفية
+science: hadith
+level: beginner
+status: active
+media: audio
+companion_of: sharh-umdat-alahkam
+site_audio_sections:
+  - d477bd0c-f44b-4d56-8148-b9ab91d97dfa # كتاب الطهارة
+  - d3627543-bcf3-408a-95c7-2081f5c176ee # كتاب الصلاة وكتاب الجنائز
+  - 08bb2552-eed6-4f2e-ba6a-0a6727bad94f # كتاب الحج
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]\s*'
