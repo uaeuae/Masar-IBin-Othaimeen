@@ -4,6 +4,19 @@ part 'database.g.dart';
 
 // ── Catalog tables (replaced wholesale on catalog import) ──────────────────
 
+class Scholars extends Table {
+  TextColumn get slug => text()();
+  TextColumn get nameAr => text()();
+
+  /// Rights holder credited in attribution.
+  TextColumn get foundationAr => text()();
+  TextColumn get website => text().nullable()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column> get primaryKey => {slug};
+}
+
 class Sciences extends Table {
   TextColumn get slug => text()();
   TextColumn get nameAr => text()();
@@ -22,6 +35,8 @@ class SeriesEntries extends Table {
 
   TextColumn get slug => text()();
   TextColumn get scienceSlug => text()();
+  TextColumn get scholarSlug =>
+      text().withDefault(const Constant('ibn-uthaymeen'))();
   TextColumn get titleAr => text()();
   TextColumn get descriptionAr => text().nullable()();
   TextColumn get thumbnailUrl => text().nullable()();
@@ -135,6 +150,7 @@ class JourneyEnrollments extends Table {
 
 @DriftDatabase(
   tables: [
+    Scholars,
     Sciences,
     SeriesEntries,
     Lessons,
@@ -150,7 +166,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -167,6 +183,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 4) {
         await m.addColumn(seriesEntries, seriesEntries.companionOf);
         await m.addColumn(seriesEntries, seriesEntries.companionSlug);
+      }
+      if (from < 5) {
+        await m.createTable(scholars);
+        await m.addColumn(seriesEntries, seriesEntries.scholarSlug);
       }
     },
   );

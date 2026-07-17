@@ -11,6 +11,11 @@ _CatalogData _$CatalogDataFromJson(Map<String, dynamic> json) => _CatalogData(
   generatedAt: json['generated_at'] == null
       ? null
       : DateTime.parse(json['generated_at'] as String),
+  scholars:
+      (json['scholars'] as List<dynamic>?)
+          ?.map((e) => CatalogScholar.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
   sciences:
       (json['sciences'] as List<dynamic>?)
           ?.map((e) => CatalogScience.fromJson(e as Map<String, dynamic>))
@@ -32,9 +37,28 @@ Map<String, dynamic> _$CatalogDataToJson(_CatalogData instance) =>
     <String, dynamic>{
       'version': instance.version,
       'generated_at': instance.generatedAt?.toIso8601String(),
+      'scholars': instance.scholars.map((e) => e.toJson()).toList(),
       'sciences': instance.sciences.map((e) => e.toJson()).toList(),
       'series': instance.series.map((e) => e.toJson()).toList(),
       'journeys': instance.journeys.map((e) => e.toJson()).toList(),
+    };
+
+_CatalogScholar _$CatalogScholarFromJson(Map<String, dynamic> json) =>
+    _CatalogScholar(
+      slug: json['slug'] as String,
+      nameAr: json['name_ar'] as String,
+      foundationAr: json['foundation_ar'] as String,
+      website: json['website'] as String?,
+      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$CatalogScholarToJson(_CatalogScholar instance) =>
+    <String, dynamic>{
+      'slug': instance.slug,
+      'name_ar': instance.nameAr,
+      'foundation_ar': instance.foundationAr,
+      'website': instance.website,
+      'sort_order': instance.sortOrder,
     };
 
 _CatalogScience _$CatalogScienceFromJson(Map<String, dynamic> json) =>
@@ -59,6 +83,7 @@ _CatalogSeries _$CatalogSeriesFromJson(Map<String, dynamic> json) =>
     _CatalogSeries(
       slug: json['slug'] as String,
       science: json['science'] as String,
+      scholar: json['scholar'] as String? ?? 'ibn-uthaymeen',
       titleAr: json['title_ar'] as String,
       descriptionAr: json['description_ar'] as String?,
       thumbnailUrl: json['thumbnail_url'] as String?,
@@ -79,6 +104,7 @@ Map<String, dynamic> _$CatalogSeriesToJson(_CatalogSeries instance) =>
     <String, dynamic>{
       'slug': instance.slug,
       'science': instance.science,
+      'scholar': instance.scholar,
       'title_ar': instance.titleAr,
       'description_ar': instance.descriptionAr,
       'thumbnail_url': instance.thumbnailUrl,

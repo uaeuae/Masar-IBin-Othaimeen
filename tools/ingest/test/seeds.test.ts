@@ -32,10 +32,15 @@ stages:
       - series: sharh-zad
 `;
 
-function makeSeedTree(files: { sciences?: string; series?: Record<string, string>; journeys?: Record<string, string> }): string {
+function makeSeedTree(files: { scholars?: string; sciences?: string; series?: Record<string, string>; journeys?: Record<string, string> }): string {
   const dir = mkdtempSync(join(tmpdir(), 'masar-seeds-'));
   mkdirSync(join(dir, 'series'), { recursive: true });
   mkdirSync(join(dir, 'journeys'), { recursive: true });
+  writeFileSync(
+    join(dir, 'scholars.yaml'),
+    files.scholars ??
+      'scholars:\n  - slug: ibn-uthaymeen\n    name_ar: الشيخ محمد بن صالح العثيمين\n    foundation_ar: مؤسسة الشيخ العثيمين الخيرية\n',
+  );
   writeFileSync(join(dir, 'sciences.yaml'), files.sciences ?? validSciences);
   for (const [name, content] of Object.entries(files.series ?? { 'sharh-zad.yaml': validSeries })) {
     writeFileSync(join(dir, 'series', name), content);

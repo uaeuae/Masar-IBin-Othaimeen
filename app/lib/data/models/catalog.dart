@@ -15,6 +15,7 @@ abstract class CatalogData with _$CatalogData {
   const factory CatalogData({
     required int version,
     DateTime? generatedAt,
+    @Default([]) List<CatalogScholar> scholars,
     @Default([]) List<CatalogScience> sciences,
     @Default([]) List<CatalogSeries> series,
     @Default([]) List<CatalogJourney> journeys,
@@ -22,6 +23,23 @@ abstract class CatalogData with _$CatalogData {
 
   factory CatalogData.fromJson(Map<String, dynamic> json) =>
       _$CatalogDataFromJson(json);
+}
+
+/// A scholar whose lessons the app carries. Every series belongs to exactly
+/// one scholar; attribution is per-scholar (each has his own rights-holding
+/// foundation).
+@freezed
+abstract class CatalogScholar with _$CatalogScholar {
+  const factory CatalogScholar({
+    required String slug,
+    required String nameAr,
+    required String foundationAr,
+    String? website,
+    @Default(0) int sortOrder,
+  }) = _CatalogScholar;
+
+  factory CatalogScholar.fromJson(Map<String, dynamic> json) =>
+      _$CatalogScholarFromJson(json);
 }
 
 @freezed
@@ -43,6 +61,7 @@ abstract class CatalogSeries with _$CatalogSeries {
   const factory CatalogSeries({
     required String slug,
     required String science,
+    @Default('ibn-uthaymeen') String scholar,
     required String titleAr,
     String? descriptionAr,
     String? thumbnailUrl,

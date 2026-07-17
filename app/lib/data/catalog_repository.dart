@@ -48,8 +48,19 @@ class CatalogRepository {
       await db.delete(db.lessons).go();
       await db.delete(db.seriesEntries).go();
       await db.delete(db.sciences).go();
+      await db.delete(db.scholars).go();
 
       await db.batch((batch) {
+        batch.insertAll(db.scholars, [
+          for (final s in data.scholars)
+            ScholarsCompanion.insert(
+              slug: s.slug,
+              nameAr: s.nameAr,
+              foundationAr: s.foundationAr,
+              website: Value(s.website),
+              sortOrder: Value(s.sortOrder),
+            ),
+        ]);
         batch.insertAll(db.sciences, [
           for (final s in data.sciences)
             SciencesCompanion.insert(
@@ -65,6 +76,7 @@ class CatalogRepository {
             SeriesEntriesCompanion.insert(
               slug: s.slug,
               scienceSlug: s.science,
+              scholarSlug: Value(s.scholar),
               titleAr: s.titleAr,
               descriptionAr: Value(s.descriptionAr),
               thumbnailUrl: Value(s.thumbnailUrl),
@@ -391,6 +403,7 @@ class CatalogRepository {
           media: LessonMedia.fromJson(seriesRow.mediaType),
           companionOf: seriesRow.companionOf,
           companionSlug: seriesRow.companionSlug,
+          scholarSlug: seriesRow.scholarSlug,
         ),
         lessons: lessons,
       );

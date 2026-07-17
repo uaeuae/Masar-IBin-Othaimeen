@@ -1,0 +1,10 @@
+# العلماء الذين يضم التطبيق دروسهم. كل سلسلة تنتسب لعالم واحد
+# (`scholar:` في ملف السلسلة؛ الافتراضي ibn-uthaymeen).
+# عند إضافة عالم جديد: أضف مدخلًا هنا، ثم سلاسله بـ scholar الجديد،
+# وأدوات مزامنة خاصة بمصادره (قناته/موقعه) في tools/ingest.
+scholars:
+  - slug: ibn-uthaymeen
+    name_ar: الشيخ محمد بن صالح العثيمين
+    foundation_ar: مؤسسة الشيخ محمد بن صالح العثيمين الخيرية
+    website: https://binothaimeen.net
+    sort_order: 1

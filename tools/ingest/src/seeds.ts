@@ -3,14 +3,17 @@ import { join } from 'node:path';
 import { parse } from 'yaml';
 import {
   journeySeedSchema,
+  scholarsFileSchema,
   sciencesFileSchema,
   seriesSeedSchema,
   type JourneySeed,
+  type Scholar,
   type Science,
   type SeriesSeed,
 } from './schemas.js';
 
 export interface SeedBundle {
+  scholars: Scholar[];
   sciences: Science[];
   series: SeriesSeed[];
   journeys: JourneySeed[];
@@ -40,6 +43,19 @@ function listYamlFiles(dir: string): string[] {
  */
 export function loadSeeds(seedDir: string): SeedBundle {
   const problems: string[] = [];
+
+  let scholars: Scholar[] = [];
+  try {
+    const raw = parse(readFileSync(join(seedDir, 'scholars.yaml'), 'utf8'));
+    const parsed = scholarsFileSchema.safeParse(raw);
+    if (parsed.success) {
+      scholars = parsed.data.scholars;
+    } else {
+      problems.push(`scholars.yaml: ${parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ')}`);
+    }
+  } catch (e) {
+    problems.push(`scholars.yaml: cannot read (${(e as Error).message})`);
+  }
 
   let sciences: Science[] = [];
   try {
@@ -75,9 +91,11 @@ export function loadSeeds(seedDir: string): SeedBundle {
   }
 
   // Referential integrity — only meaningful if shapes parsed.
+  const scholarSlugs = new Set(scholars.map((s) => s.slug));
   const scienceSlugs = new Set(sciences.map((s) => s.slug));
   const seriesBySlug = new Map(series.map((s) => [s.slug, s]));
 
+  checkUnique(scholars.map((s) => s.slug), 'scholar slug', problems);
   checkUnique(sciences.map((s) => s.slug), 'science slug', problems);
   checkUnique(series.map((s) => s.slug), 'series slug', problems);
   checkUnique(journeys.map((j) => j.slug), 'journey slug', problems);
@@ -90,6 +108,9 @@ export function loadSeeds(seedDir: string): SeedBundle {
   for (const s of series) {
     if (!scienceSlugs.has(s.science)) {
       problems.push(`series "${s.slug}": unknown science "${s.science}"`);
+    }
+    if (!scholarSlugs.has(s.scholar)) {
+      problems.push(`series "${s.slug}": unknown scholar "${s.scholar}"`);
     }
   }
 
@@ -113,7 +134,7 @@ export function loadSeeds(seedDir: string): SeedBundle {
     throw new SeedValidationError(problems);
   }
 
-  return { sciences, series, journeys };
+  return { scholars, sciences, series, journeys };
 }
 
 function checkUnique(values: string[], label: string, problems: string[]): void {

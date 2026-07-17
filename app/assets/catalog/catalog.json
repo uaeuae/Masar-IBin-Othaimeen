@@ -1,6 +1,15 @@
 {
-  "version": 6,
-  "generated_at": "2026-07-17T03:24:55.909Z",
+  "version": 7,
+  "generated_at": "2026-07-17T19:47:39.663Z",
+  "scholars": [
+    {
+      "slug": "ibn-uthaymeen",
+      "name_ar": "الشيخ محمد بن صالح العثيمين",
+      "foundation_ar": "مؤسسة الشيخ محمد بن صالح العثيمين الخيرية",
+      "website": "https://binothaimeen.net",
+      "sort_order": 1
+    }
+  ],
   "sciences": [
     {
       "slug": "aqeedah",
@@ -49,6 +58,7 @@
     {
       "slug": "hilyat-talib-alilm-audio",
       "science": "seerah-adab",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "حلية طالب العلم (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة حلية طالب العلم من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -194,6 +204,7 @@
     {
       "slug": "hilyat-talib-alilm",
       "science": "seerah-adab",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "حلية طالب العلم",
       "description_ar": "التعليق على «حلية طالب العلم» للشيخ بكر أبو زيد رحمه الله — آداب الطالب في طريق التحصيل",
       "thumbnail_url": null,
@@ -687,6 +698,7 @@
     {
       "slug": "sharh-alarbain-alnawawiyah-audio",
       "science": "hadith",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "شرح الأربعين النووية (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة شرح الأربعين النووية من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -1468,6 +1480,7 @@
     {
       "slug": "sharh-alarbain-alnawawiyah",
       "science": "hadith",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "شرح الأربعين النووية",
       "description_ar": "شرح الأربعين النووية للإمام النووي رحمه الله — جوامع الكلم النبوية التي عليها مدار الدين",
       "thumbnail_url": null,
@@ -2129,6 +2142,7 @@
     {
       "slug": "sharh-alusul-min-ilm-alusul-audio",
       "science": "usul-fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "الأصول من علم الأصول (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة الأصول من علم الأصول من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -2384,6 +2398,7 @@
     {
       "slug": "sharh-alusul-min-ilm-alusul",
       "science": "usul-fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "الأصول من علم الأصول",
       "description_ar": "شرح رسالة «الأصول من علم الأصول» للشيخ رحمه الله — مدخل علم أصول الفقه",
       "thumbnail_url": null,
@@ -3261,6 +3276,7 @@
     {
       "slug": "sharh-alwasitiyah-audio",
       "science": "aqeedah",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "شرح العقيدة الواسطية (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة شرح العقيدة الواسطية من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -3483,6 +3499,7 @@
     {
       "slug": "sharh-alwasitiyah",
       "science": "aqeedah",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "شرح العقيدة الواسطية",
       "description_ar": "شرح العقيدة الواسطية لشيخ الإسلام ابن تيمية — منهج أهل السنة في الأسماء والصفات",
       "thumbnail_url": null,
@@ -4232,6 +4249,7 @@
     {
       "slug": "sharh-kitab-altawhid-audio",
       "science": "aqeedah",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "شرح كتاب التوحيد (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة شرح كتاب التوحيد من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -5151,6 +5169,7 @@
     {
       "slug": "sharh-kitab-altawhid",
       "science": "aqeedah",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "شرح كتاب التوحيد",
       "description_ar": "شرح كتاب التوحيد الذي هو حق الله على العبيد للإمام المجدد محمد بن عبدالوهاب رحمه الله",
       "thumbnail_url": null,
@@ -7076,6 +7095,7 @@
     {
       "slug": "sharh-riyad-alsalihin",
       "science": "hadith",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "شرح رياض الصالحين",
       "description_ar": "شرح كتاب رياض الصالحين من كلام سيد المرسلين للإمام النووي رحمه الله — صوتيًا من موقع المؤسسة",
       "thumbnail_url": null,
@@ -14797,6 +14817,7 @@
     {
       "slug": "sharh-umdat-alahkam-audio",
       "science": "hadith",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "شرح عمدة الأحكام (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة شرح عمدة الأحكام من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -15327,6 +15348,7 @@
     {
       "slug": "sharh-umdat-alahkam",
       "science": "hadith",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "شرح عمدة الأحكام",
       "description_ar": "شرح عمدة الأحكام للحافظ عبدالغني المقدسي رحمه الله — أحاديث الأحكام المتفق عليها",
       "thumbnail_url": null,
@@ -16924,6 +16946,7 @@
     {
       "slug": "sharh-zad-buyu-audio",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب البيوع من زاد المستقنع (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة كتاب البيوع من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -20304,6 +20327,7 @@
     {
       "slug": "sharh-zad-buyu",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب البيوع من زاد المستقنع",
       "description_ar": "الشرح الممتع — كتاب البيوع من متن زاد المستقنع للحجاوي رحمه الله",
       "thumbnail_url": null,
@@ -21173,6 +21197,7 @@
     {
       "slug": "sharh-zad-hajj-audio",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الحج من زاد المستقنع (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة كتاب الحج من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -21372,6 +21397,7 @@
     {
       "slug": "sharh-zad-hajj",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الحج من زاد المستقنع",
       "description_ar": "الشرح الممتع — كتاب المناسك من متن زاد المستقنع للحجاوي رحمه الله",
       "thumbnail_url": null,
@@ -21849,6 +21875,7 @@
     {
       "slug": "sharh-zad-janaiz-audio",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الجنائز من زاد المستقنع (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة كتاب الجنائز من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -22498,6 +22525,7 @@
     {
       "slug": "sharh-zad-janaiz",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الجنائز من زاد المستقنع",
       "description_ar": "الشرح الممتع — كتاب الجنائز من متن زاد المستقنع للحجاوي رحمه الله",
       "thumbnail_url": null,
@@ -22871,6 +22899,7 @@
     {
       "slug": "sharh-zad-jihad-audio",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الجهاد من زاد المستقنع (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة كتاب الجهاد من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -23128,6 +23157,7 @@
     {
       "slug": "sharh-zad-jihad",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الجهاد من زاد المستقنع",
       "description_ar": "الشرح الممتع — كتاب الجهاد من متن زاد المستقنع للحجاوي رحمه الله",
       "thumbnail_url": null,
@@ -23301,6 +23331,7 @@
     {
       "slug": "sharh-zad-salah-audio",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الصلاة من زاد المستقنع (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة كتاب الصلاة من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -27210,6 +27241,7 @@
     {
       "slug": "sharh-zad-salah",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الصلاة من زاد المستقنع",
       "description_ar": "الشرح الممتع — كتاب الصلاة من متن زاد المستقنع للحجاوي رحمه الله",
       "thumbnail_url": null,
@@ -30359,6 +30391,7 @@
     {
       "slug": "sharh-zad-siyam-audio",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الصيام من زاد المستقنع (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة كتاب الصيام من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -30956,6 +30989,7 @@
     {
       "slug": "sharh-zad-siyam",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الصيام من زاد المستقنع",
       "description_ar": "الشرح الممتع — كتاب الصيام من متن زاد المستقنع للحجاوي رحمه الله",
       "thumbnail_url": null,
@@ -31441,6 +31475,7 @@
     {
       "slug": "sharh-zad-taharah-audio",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الطهارة من زاد المستقنع (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة كتاب الطهارة من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -32898,6 +32933,7 @@
     {
       "slug": "sharh-zad-taharah",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الطهارة من زاد المستقنع",
       "description_ar": "الشرح الممتع — كتاب الطهارة من متن زاد المستقنع للحجاوي رحمه الله",
       "thumbnail_url": null,
@@ -33743,6 +33779,7 @@
     {
       "slug": "sharh-zad-zakah-audio",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الزكاة من زاد المستقنع (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة كتاب الزكاة من زاد المستقنع من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -34564,6 +34601,7 @@
     {
       "slug": "sharh-zad-zakah",
       "science": "fiqh",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "كتاب الزكاة من زاد المستقنع",
       "description_ar": "الشرح الممتع — كتاب الزكاة من متن زاد المستقنع للحجاوي رحمه الله",
       "thumbnail_url": null,
@@ -35281,6 +35319,7 @@
     {
       "slug": "tafsir-juz-amma-audio",
       "science": "tafsir",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "تفسير جزء عمّ (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة تفسير جزء عمّ من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -36805,6 +36844,7 @@
     {
       "slug": "tafsir-juz-amma",
       "science": "tafsir",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "تفسير جزء عمّ",
       "description_ar": "تفسير قصار السور من جزء عمّ لفضيلة الشيخ رحمه الله",
       "thumbnail_url": null,
@@ -36986,6 +37026,7 @@
     {
       "slug": "usul-altafsir-audio",
       "science": "tafsir",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "أصول في التفسير (صوتي)",
       "description_ar": "الدروس الصوتية الكاملة لسلسلة أصول في التفسير من موقع المؤسسة — للاستماع في الخلفية",
       "thumbnail_url": null,
@@ -37251,6 +37292,7 @@
     {
       "slug": "usul-altafsir",
       "science": "tafsir",
+      "scholar": "ibn-uthaymeen",
       "title_ar": "أصول في التفسير",
       "description_ar": "شرح رسالة «أصول في التفسير» للشيخ رحمه الله — قواعد وأدوات فهم القرآن الكريم",
       "thumbnail_url": null,

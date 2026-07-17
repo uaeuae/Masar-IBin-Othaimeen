@@ -1,5 +1,17 @@
 # Content Curation Guide
 
+## Scholars
+
+Every series belongs to exactly one scholar (`scholar:` in the series seed;
+defaults to `ibn-uthaymeen`). Scholars live in `seed/scholars.yaml` with
+their rights-holding foundation for attribution. To add a scholar (e.g.
+الشيخ ابن باز): add the entry there, create series seeds with
+`scholar: <slug>`, and add sync tooling for his official sources (own
+YouTube channel id / site adapter — the current ones are Ibn-Uthaymeen
+specific). The app carries the scholar on every series; per-scholar UI
+(name on cards, filters) is intentionally deferred until a second scholar
+actually ships.
+
 Content went live 2026-07-15: 16 active series (1,719 lessons) across the
 4 launch journeys, all synced from @ibnothaimeentv. This doc now describes
 how to add or resync content. Prerequisite: a **YouTube Data API v3 key**

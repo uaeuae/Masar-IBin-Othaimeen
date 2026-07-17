@@ -15,6 +15,10 @@ function makeWorkspace(options: { publish?: boolean; seriesStatus?: string; with
   mkdirSync(join(seedDir, 'journeys'), { recursive: true });
   mkdirSync(join(dataDir, 'series'), { recursive: true });
 
+  writeFileSync(
+    join(seedDir, 'scholars.yaml'),
+    'scholars:\n  - slug: ibn-uthaymeen\n    name_ar: الشيخ محمد بن صالح العثيمين\n    foundation_ar: مؤسسة الشيخ العثيمين الخيرية\n',
+  );
   writeFileSync(join(seedDir, 'sciences.yaml'), 'sciences:\n  - slug: fiqh\n    name_ar: الفقه\n    sort_order: 1\n');
   writeFileSync(
     join(seedDir, 'series', 'sharh-zad.yaml'),

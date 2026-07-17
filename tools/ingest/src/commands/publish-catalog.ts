@@ -101,6 +101,13 @@ export function publishCatalog(options: PublishOptions): { version: number; less
   const catalog = {
     version,
     generated_at: generatedAt,
+    scholars: bundle.scholars.map((s) => ({
+      slug: s.slug,
+      name_ar: s.name_ar,
+      foundation_ar: s.foundation_ar,
+      website: s.website ?? null,
+      sort_order: s.sort_order,
+    })),
     sciences: bundle.sciences.map((s) => ({
       slug: s.slug,
       name_ar: s.name_ar,
@@ -111,6 +118,7 @@ export function publishCatalog(options: PublishOptions): { version: number; less
     series: activeSeries.map((s) => ({
       slug: s.slug,
       science: s.science,
+      scholar: s.scholar,
       title_ar: s.title_ar,
       description_ar: s.description_ar ?? null,
       thumbnail_url: s.thumbnail_url ?? null,

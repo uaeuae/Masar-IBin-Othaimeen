@@ -52,6 +52,7 @@ class SeriesWithProgress {
     this.media = LessonMedia.video,
     this.companionOf,
     this.companionSlug,
+    this.scholarSlug = 'ibn-uthaymeen',
   });
 
   final String slug;
@@ -70,6 +71,9 @@ class SeriesWithProgress {
 
   /// Set on video series that have a full audio edition («النسخة الصوتية»).
   final String? companionSlug;
+
+  /// Whose شرح this is — key into the catalog's scholars list.
+  final String scholarSlug;
 
   double get progress => lessonCount == 0 ? 0 : completedCount / lessonCount;
 

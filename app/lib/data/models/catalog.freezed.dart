@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CatalogData {
 
- int get version; DateTime? get generatedAt; List<CatalogScience> get sciences; List<CatalogSeries> get series; List<CatalogJourney> get journeys;
+ int get version; DateTime? get generatedAt; List<CatalogScholar> get scholars; List<CatalogScience> get sciences; List<CatalogSeries> get series; List<CatalogJourney> get journeys;
 /// Create a copy of CatalogData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $CatalogDataCopyWith<CatalogData> get copyWith => _$CatalogDataCopyWithImpl<Cata
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogData&&(identical(other.version, version) || other.version == version)&&(identical(other.generatedAt, generatedAt) || other.generatedAt == generatedAt)&&const DeepCollectionEquality().equals(other.sciences, sciences)&&const DeepCollectionEquality().equals(other.series, series)&&const DeepCollectionEquality().equals(other.journeys, journeys));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogData&&(identical(other.version, version) || other.version == version)&&(identical(other.generatedAt, generatedAt) || other.generatedAt == generatedAt)&&const DeepCollectionEquality().equals(other.scholars, scholars)&&const DeepCollectionEquality().equals(other.sciences, sciences)&&const DeepCollectionEquality().equals(other.series, series)&&const DeepCollectionEquality().equals(other.journeys, journeys));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,version,generatedAt,const DeepCollectionEquality().hash(sciences),const DeepCollectionEquality().hash(series),const DeepCollectionEquality().hash(journeys));
+int get hashCode => Object.hash(runtimeType,version,generatedAt,const DeepCollectionEquality().hash(scholars),const DeepCollectionEquality().hash(sciences),const DeepCollectionEquality().hash(series),const DeepCollectionEquality().hash(journeys));
 
 @override
 String toString() {
-  return 'CatalogData(version: $version, generatedAt: $generatedAt, sciences: $sciences, series: $series, journeys: $journeys)';
+  return 'CatalogData(version: $version, generatedAt: $generatedAt, scholars: $scholars, sciences: $sciences, series: $series, journeys: $journeys)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $CatalogDataCopyWith<$Res>  {
   factory $CatalogDataCopyWith(CatalogData value, $Res Function(CatalogData) _then) = _$CatalogDataCopyWithImpl;
 @useResult
 $Res call({
- int version, DateTime? generatedAt, List<CatalogScience> sciences, List<CatalogSeries> series, List<CatalogJourney> journeys
+ int version, DateTime? generatedAt, List<CatalogScholar> scholars, List<CatalogScience> sciences, List<CatalogSeries> series, List<CatalogJourney> journeys
 });
 
 
@@ -65,11 +65,12 @@ class _$CatalogDataCopyWithImpl<$Res>
 
 /// Create a copy of CatalogData
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? version = null,Object? generatedAt = freezed,Object? sciences = null,Object? series = null,Object? journeys = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? version = null,Object? generatedAt = freezed,Object? scholars = null,Object? sciences = null,Object? series = null,Object? journeys = null,}) {
   return _then(_self.copyWith(
 version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
 as int,generatedAt: freezed == generatedAt ? _self.generatedAt : generatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,sciences: null == sciences ? _self.sciences : sciences // ignore: cast_nullable_to_non_nullable
+as DateTime?,scholars: null == scholars ? _self.scholars : scholars // ignore: cast_nullable_to_non_nullable
+as List<CatalogScholar>,sciences: null == sciences ? _self.sciences : sciences // ignore: cast_nullable_to_non_nullable
 as List<CatalogScience>,series: null == series ? _self.series : series // ignore: cast_nullable_to_non_nullable
 as List<CatalogSeries>,journeys: null == journeys ? _self.journeys : journeys // ignore: cast_nullable_to_non_nullable
 as List<CatalogJourney>,
@@ -157,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int version,  DateTime? generatedAt,  List<CatalogScience> sciences,  List<CatalogSeries> series,  List<CatalogJourney> journeys)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int version,  DateTime? generatedAt,  List<CatalogScholar> scholars,  List<CatalogScience> sciences,  List<CatalogSeries> series,  List<CatalogJourney> journeys)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CatalogData() when $default != null:
-return $default(_that.version,_that.generatedAt,_that.sciences,_that.series,_that.journeys);case _:
+return $default(_that.version,_that.generatedAt,_that.scholars,_that.sciences,_that.series,_that.journeys);case _:
   return orElse();
 
 }
@@ -178,10 +179,10 @@ return $default(_that.version,_that.generatedAt,_that.sciences,_that.series,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int version,  DateTime? generatedAt,  List<CatalogScience> sciences,  List<CatalogSeries> series,  List<CatalogJourney> journeys)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int version,  DateTime? generatedAt,  List<CatalogScholar> scholars,  List<CatalogScience> sciences,  List<CatalogSeries> series,  List<CatalogJourney> journeys)  $default,) {final _that = this;
 switch (_that) {
 case _CatalogData():
-return $default(_that.version,_that.generatedAt,_that.sciences,_that.series,_that.journeys);case _:
+return $default(_that.version,_that.generatedAt,_that.scholars,_that.sciences,_that.series,_that.journeys);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +199,10 @@ return $default(_that.version,_that.generatedAt,_that.sciences,_that.series,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int version,  DateTime? generatedAt,  List<CatalogScience> sciences,  List<CatalogSeries> series,  List<CatalogJourney> journeys)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int version,  DateTime? generatedAt,  List<CatalogScholar> scholars,  List<CatalogScience> sciences,  List<CatalogSeries> series,  List<CatalogJourney> journeys)?  $default,) {final _that = this;
 switch (_that) {
 case _CatalogData() when $default != null:
-return $default(_that.version,_that.generatedAt,_that.sciences,_that.series,_that.journeys);case _:
+return $default(_that.version,_that.generatedAt,_that.scholars,_that.sciences,_that.series,_that.journeys);case _:
   return null;
 
 }
@@ -213,11 +214,18 @@ return $default(_that.version,_that.generatedAt,_that.sciences,_that.series,_tha
 @JsonSerializable()
 
 class _CatalogData implements CatalogData {
-  const _CatalogData({required this.version, this.generatedAt, final  List<CatalogScience> sciences = const [], final  List<CatalogSeries> series = const [], final  List<CatalogJourney> journeys = const []}): _sciences = sciences,_series = series,_journeys = journeys;
+  const _CatalogData({required this.version, this.generatedAt, final  List<CatalogScholar> scholars = const [], final  List<CatalogScience> sciences = const [], final  List<CatalogSeries> series = const [], final  List<CatalogJourney> journeys = const []}): _scholars = scholars,_sciences = sciences,_series = series,_journeys = journeys;
   factory _CatalogData.fromJson(Map<String, dynamic> json) => _$CatalogDataFromJson(json);
 
 @override final  int version;
 @override final  DateTime? generatedAt;
+ final  List<CatalogScholar> _scholars;
+@override@JsonKey() List<CatalogScholar> get scholars {
+  if (_scholars is EqualUnmodifiableListView) return _scholars;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_scholars);
+}
+
  final  List<CatalogScience> _sciences;
 @override@JsonKey() List<CatalogScience> get sciences {
   if (_sciences is EqualUnmodifiableListView) return _sciences;
@@ -253,16 +261,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogData&&(identical(other.version, version) || other.version == version)&&(identical(other.generatedAt, generatedAt) || other.generatedAt == generatedAt)&&const DeepCollectionEquality().equals(other._sciences, _sciences)&&const DeepCollectionEquality().equals(other._series, _series)&&const DeepCollectionEquality().equals(other._journeys, _journeys));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogData&&(identical(other.version, version) || other.version == version)&&(identical(other.generatedAt, generatedAt) || other.generatedAt == generatedAt)&&const DeepCollectionEquality().equals(other._scholars, _scholars)&&const DeepCollectionEquality().equals(other._sciences, _sciences)&&const DeepCollectionEquality().equals(other._series, _series)&&const DeepCollectionEquality().equals(other._journeys, _journeys));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,version,generatedAt,const DeepCollectionEquality().hash(_sciences),const DeepCollectionEquality().hash(_series),const DeepCollectionEquality().hash(_journeys));
+int get hashCode => Object.hash(runtimeType,version,generatedAt,const DeepCollectionEquality().hash(_scholars),const DeepCollectionEquality().hash(_sciences),const DeepCollectionEquality().hash(_series),const DeepCollectionEquality().hash(_journeys));
 
 @override
 String toString() {
-  return 'CatalogData(version: $version, generatedAt: $generatedAt, sciences: $sciences, series: $series, journeys: $journeys)';
+  return 'CatalogData(version: $version, generatedAt: $generatedAt, scholars: $scholars, sciences: $sciences, series: $series, journeys: $journeys)';
 }
 
 
@@ -273,7 +281,7 @@ abstract mixin class _$CatalogDataCopyWith<$Res> implements $CatalogDataCopyWith
   factory _$CatalogDataCopyWith(_CatalogData value, $Res Function(_CatalogData) _then) = __$CatalogDataCopyWithImpl;
 @override @useResult
 $Res call({
- int version, DateTime? generatedAt, List<CatalogScience> sciences, List<CatalogSeries> series, List<CatalogJourney> journeys
+ int version, DateTime? generatedAt, List<CatalogScholar> scholars, List<CatalogScience> sciences, List<CatalogSeries> series, List<CatalogJourney> journeys
 });
 
 
@@ -290,14 +298,290 @@ class __$CatalogDataCopyWithImpl<$Res>
 
 /// Create a copy of CatalogData
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? version = null,Object? generatedAt = freezed,Object? sciences = null,Object? series = null,Object? journeys = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? version = null,Object? generatedAt = freezed,Object? scholars = null,Object? sciences = null,Object? series = null,Object? journeys = null,}) {
   return _then(_CatalogData(
 version: null == version ? _self.version : version // ignore: cast_nullable_to_non_nullable
 as int,generatedAt: freezed == generatedAt ? _self.generatedAt : generatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,sciences: null == sciences ? _self._sciences : sciences // ignore: cast_nullable_to_non_nullable
+as DateTime?,scholars: null == scholars ? _self._scholars : scholars // ignore: cast_nullable_to_non_nullable
+as List<CatalogScholar>,sciences: null == sciences ? _self._sciences : sciences // ignore: cast_nullable_to_non_nullable
 as List<CatalogScience>,series: null == series ? _self._series : series // ignore: cast_nullable_to_non_nullable
 as List<CatalogSeries>,journeys: null == journeys ? _self._journeys : journeys // ignore: cast_nullable_to_non_nullable
 as List<CatalogJourney>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$CatalogScholar {
+
+ String get slug; String get nameAr; String get foundationAr; String? get website; int get sortOrder;
+/// Create a copy of CatalogScholar
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CatalogScholarCopyWith<CatalogScholar> get copyWith => _$CatalogScholarCopyWithImpl<CatalogScholar>(this as CatalogScholar, _$identity);
+
+  /// Serializes this CatalogScholar to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogScholar&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.nameAr, nameAr) || other.nameAr == nameAr)&&(identical(other.foundationAr, foundationAr) || other.foundationAr == foundationAr)&&(identical(other.website, website) || other.website == website)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,slug,nameAr,foundationAr,website,sortOrder);
+
+@override
+String toString() {
+  return 'CatalogScholar(slug: $slug, nameAr: $nameAr, foundationAr: $foundationAr, website: $website, sortOrder: $sortOrder)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CatalogScholarCopyWith<$Res>  {
+  factory $CatalogScholarCopyWith(CatalogScholar value, $Res Function(CatalogScholar) _then) = _$CatalogScholarCopyWithImpl;
+@useResult
+$Res call({
+ String slug, String nameAr, String foundationAr, String? website, int sortOrder
+});
+
+
+
+
+}
+/// @nodoc
+class _$CatalogScholarCopyWithImpl<$Res>
+    implements $CatalogScholarCopyWith<$Res> {
+  _$CatalogScholarCopyWithImpl(this._self, this._then);
+
+  final CatalogScholar _self;
+  final $Res Function(CatalogScholar) _then;
+
+/// Create a copy of CatalogScholar
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? slug = null,Object? nameAr = null,Object? foundationAr = null,Object? website = freezed,Object? sortOrder = null,}) {
+  return _then(_self.copyWith(
+slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
+as String,nameAr: null == nameAr ? _self.nameAr : nameAr // ignore: cast_nullable_to_non_nullable
+as String,foundationAr: null == foundationAr ? _self.foundationAr : foundationAr // ignore: cast_nullable_to_non_nullable
+as String,website: freezed == website ? _self.website : website // ignore: cast_nullable_to_non_nullable
+as String?,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CatalogScholar].
+extension CatalogScholarPatterns on CatalogScholar {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CatalogScholar value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CatalogScholar() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CatalogScholar value)  $default,){
+final _that = this;
+switch (_that) {
+case _CatalogScholar():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CatalogScholar value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CatalogScholar() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String slug,  String nameAr,  String foundationAr,  String? website,  int sortOrder)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CatalogScholar() when $default != null:
+return $default(_that.slug,_that.nameAr,_that.foundationAr,_that.website,_that.sortOrder);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String slug,  String nameAr,  String foundationAr,  String? website,  int sortOrder)  $default,) {final _that = this;
+switch (_that) {
+case _CatalogScholar():
+return $default(_that.slug,_that.nameAr,_that.foundationAr,_that.website,_that.sortOrder);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String slug,  String nameAr,  String foundationAr,  String? website,  int sortOrder)?  $default,) {final _that = this;
+switch (_that) {
+case _CatalogScholar() when $default != null:
+return $default(_that.slug,_that.nameAr,_that.foundationAr,_that.website,_that.sortOrder);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _CatalogScholar implements CatalogScholar {
+  const _CatalogScholar({required this.slug, required this.nameAr, required this.foundationAr, this.website, this.sortOrder = 0});
+  factory _CatalogScholar.fromJson(Map<String, dynamic> json) => _$CatalogScholarFromJson(json);
+
+@override final  String slug;
+@override final  String nameAr;
+@override final  String foundationAr;
+@override final  String? website;
+@override@JsonKey() final  int sortOrder;
+
+/// Create a copy of CatalogScholar
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CatalogScholarCopyWith<_CatalogScholar> get copyWith => __$CatalogScholarCopyWithImpl<_CatalogScholar>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$CatalogScholarToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogScholar&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.nameAr, nameAr) || other.nameAr == nameAr)&&(identical(other.foundationAr, foundationAr) || other.foundationAr == foundationAr)&&(identical(other.website, website) || other.website == website)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,slug,nameAr,foundationAr,website,sortOrder);
+
+@override
+String toString() {
+  return 'CatalogScholar(slug: $slug, nameAr: $nameAr, foundationAr: $foundationAr, website: $website, sortOrder: $sortOrder)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CatalogScholarCopyWith<$Res> implements $CatalogScholarCopyWith<$Res> {
+  factory _$CatalogScholarCopyWith(_CatalogScholar value, $Res Function(_CatalogScholar) _then) = __$CatalogScholarCopyWithImpl;
+@override @useResult
+$Res call({
+ String slug, String nameAr, String foundationAr, String? website, int sortOrder
+});
+
+
+
+
+}
+/// @nodoc
+class __$CatalogScholarCopyWithImpl<$Res>
+    implements _$CatalogScholarCopyWith<$Res> {
+  __$CatalogScholarCopyWithImpl(this._self, this._then);
+
+  final _CatalogScholar _self;
+  final $Res Function(_CatalogScholar) _then;
+
+/// Create a copy of CatalogScholar
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? slug = null,Object? nameAr = null,Object? foundationAr = null,Object? website = freezed,Object? sortOrder = null,}) {
+  return _then(_CatalogScholar(
+slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
+as String,nameAr: null == nameAr ? _self.nameAr : nameAr // ignore: cast_nullable_to_non_nullable
+as String,foundationAr: null == foundationAr ? _self.foundationAr : foundationAr // ignore: cast_nullable_to_non_nullable
+as String,website: freezed == website ? _self.website : website // ignore: cast_nullable_to_non_nullable
+as String?,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -583,7 +867,7 @@ as int,
 /// @nodoc
 mixin _$CatalogSeries {
 
- String get slug; String get science; String get titleAr; String? get descriptionAr; String? get thumbnailUrl; JourneyLevel? get level; LessonMedia get media;/// Audio companions: set on the audio edition (slug of the video series
+ String get slug; String get science; String get scholar; String get titleAr; String? get descriptionAr; String? get thumbnailUrl; JourneyLevel? get level; LessonMedia get media;/// Audio companions: set on the audio edition (slug of the video series
 /// it mirrors) — such series are hidden from library browse. Video series
 /// carry the reverse link in [companionSlug].
  String? get companionOf; String? get companionSlug; List<CatalogLesson> get lessons;
@@ -599,16 +883,16 @@ $CatalogSeriesCopyWith<CatalogSeries> get copyWith => _$CatalogSeriesCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogSeries&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.science, science) || other.science == science)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.level, level) || other.level == level)&&(identical(other.media, media) || other.media == media)&&(identical(other.companionOf, companionOf) || other.companionOf == companionOf)&&(identical(other.companionSlug, companionSlug) || other.companionSlug == companionSlug)&&const DeepCollectionEquality().equals(other.lessons, lessons));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogSeries&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.science, science) || other.science == science)&&(identical(other.scholar, scholar) || other.scholar == scholar)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.level, level) || other.level == level)&&(identical(other.media, media) || other.media == media)&&(identical(other.companionOf, companionOf) || other.companionOf == companionOf)&&(identical(other.companionSlug, companionSlug) || other.companionSlug == companionSlug)&&const DeepCollectionEquality().equals(other.lessons, lessons));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,slug,science,titleAr,descriptionAr,thumbnailUrl,level,media,companionOf,companionSlug,const DeepCollectionEquality().hash(lessons));
+int get hashCode => Object.hash(runtimeType,slug,science,scholar,titleAr,descriptionAr,thumbnailUrl,level,media,companionOf,companionSlug,const DeepCollectionEquality().hash(lessons));
 
 @override
 String toString() {
-  return 'CatalogSeries(slug: $slug, science: $science, titleAr: $titleAr, descriptionAr: $descriptionAr, thumbnailUrl: $thumbnailUrl, level: $level, media: $media, companionOf: $companionOf, companionSlug: $companionSlug, lessons: $lessons)';
+  return 'CatalogSeries(slug: $slug, science: $science, scholar: $scholar, titleAr: $titleAr, descriptionAr: $descriptionAr, thumbnailUrl: $thumbnailUrl, level: $level, media: $media, companionOf: $companionOf, companionSlug: $companionSlug, lessons: $lessons)';
 }
 
 
@@ -619,7 +903,7 @@ abstract mixin class $CatalogSeriesCopyWith<$Res>  {
   factory $CatalogSeriesCopyWith(CatalogSeries value, $Res Function(CatalogSeries) _then) = _$CatalogSeriesCopyWithImpl;
 @useResult
 $Res call({
- String slug, String science, String titleAr, String? descriptionAr, String? thumbnailUrl, JourneyLevel? level, LessonMedia media, String? companionOf, String? companionSlug, List<CatalogLesson> lessons
+ String slug, String science, String scholar, String titleAr, String? descriptionAr, String? thumbnailUrl, JourneyLevel? level, LessonMedia media, String? companionOf, String? companionSlug, List<CatalogLesson> lessons
 });
 
 
@@ -636,10 +920,11 @@ class _$CatalogSeriesCopyWithImpl<$Res>
 
 /// Create a copy of CatalogSeries
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? slug = null,Object? science = null,Object? titleAr = null,Object? descriptionAr = freezed,Object? thumbnailUrl = freezed,Object? level = freezed,Object? media = null,Object? companionOf = freezed,Object? companionSlug = freezed,Object? lessons = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? slug = null,Object? science = null,Object? scholar = null,Object? titleAr = null,Object? descriptionAr = freezed,Object? thumbnailUrl = freezed,Object? level = freezed,Object? media = null,Object? companionOf = freezed,Object? companionSlug = freezed,Object? lessons = null,}) {
   return _then(_self.copyWith(
 slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
 as String,science: null == science ? _self.science : science // ignore: cast_nullable_to_non_nullable
+as String,scholar: null == scholar ? _self.scholar : scholar // ignore: cast_nullable_to_non_nullable
 as String,titleAr: null == titleAr ? _self.titleAr : titleAr // ignore: cast_nullable_to_non_nullable
 as String,descriptionAr: freezed == descriptionAr ? _self.descriptionAr : descriptionAr // ignore: cast_nullable_to_non_nullable
 as String?,thumbnailUrl: freezed == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
@@ -733,10 +1018,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String slug,  String science,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  LessonMedia media,  String? companionOf,  String? companionSlug,  List<CatalogLesson> lessons)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String slug,  String science,  String scholar,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  LessonMedia media,  String? companionOf,  String? companionSlug,  List<CatalogLesson> lessons)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CatalogSeries() when $default != null:
-return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.media,_that.companionOf,_that.companionSlug,_that.lessons);case _:
+return $default(_that.slug,_that.science,_that.scholar,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.media,_that.companionOf,_that.companionSlug,_that.lessons);case _:
   return orElse();
 
 }
@@ -754,10 +1039,10 @@ return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String slug,  String science,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  LessonMedia media,  String? companionOf,  String? companionSlug,  List<CatalogLesson> lessons)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String slug,  String science,  String scholar,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  LessonMedia media,  String? companionOf,  String? companionSlug,  List<CatalogLesson> lessons)  $default,) {final _that = this;
 switch (_that) {
 case _CatalogSeries():
-return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.media,_that.companionOf,_that.companionSlug,_that.lessons);case _:
+return $default(_that.slug,_that.science,_that.scholar,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.media,_that.companionOf,_that.companionSlug,_that.lessons);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -774,10 +1059,10 @@ return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String slug,  String science,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  LessonMedia media,  String? companionOf,  String? companionSlug,  List<CatalogLesson> lessons)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String slug,  String science,  String scholar,  String titleAr,  String? descriptionAr,  String? thumbnailUrl,  JourneyLevel? level,  LessonMedia media,  String? companionOf,  String? companionSlug,  List<CatalogLesson> lessons)?  $default,) {final _that = this;
 switch (_that) {
 case _CatalogSeries() when $default != null:
-return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.media,_that.companionOf,_that.companionSlug,_that.lessons);case _:
+return $default(_that.slug,_that.science,_that.scholar,_that.titleAr,_that.descriptionAr,_that.thumbnailUrl,_that.level,_that.media,_that.companionOf,_that.companionSlug,_that.lessons);case _:
   return null;
 
 }
@@ -789,11 +1074,12 @@ return $default(_that.slug,_that.science,_that.titleAr,_that.descriptionAr,_that
 @JsonSerializable()
 
 class _CatalogSeries implements CatalogSeries {
-  const _CatalogSeries({required this.slug, required this.science, required this.titleAr, this.descriptionAr, this.thumbnailUrl, this.level, this.media = LessonMedia.video, this.companionOf, this.companionSlug, final  List<CatalogLesson> lessons = const []}): _lessons = lessons;
+  const _CatalogSeries({required this.slug, required this.science, this.scholar = 'ibn-uthaymeen', required this.titleAr, this.descriptionAr, this.thumbnailUrl, this.level, this.media = LessonMedia.video, this.companionOf, this.companionSlug, final  List<CatalogLesson> lessons = const []}): _lessons = lessons;
   factory _CatalogSeries.fromJson(Map<String, dynamic> json) => _$CatalogSeriesFromJson(json);
 
 @override final  String slug;
 @override final  String science;
+@override@JsonKey() final  String scholar;
 @override final  String titleAr;
 @override final  String? descriptionAr;
 @override final  String? thumbnailUrl;
@@ -825,16 +1111,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogSeries&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.science, science) || other.science == science)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.level, level) || other.level == level)&&(identical(other.media, media) || other.media == media)&&(identical(other.companionOf, companionOf) || other.companionOf == companionOf)&&(identical(other.companionSlug, companionSlug) || other.companionSlug == companionSlug)&&const DeepCollectionEquality().equals(other._lessons, _lessons));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogSeries&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.science, science) || other.science == science)&&(identical(other.scholar, scholar) || other.scholar == scholar)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.descriptionAr, descriptionAr) || other.descriptionAr == descriptionAr)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.level, level) || other.level == level)&&(identical(other.media, media) || other.media == media)&&(identical(other.companionOf, companionOf) || other.companionOf == companionOf)&&(identical(other.companionSlug, companionSlug) || other.companionSlug == companionSlug)&&const DeepCollectionEquality().equals(other._lessons, _lessons));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,slug,science,titleAr,descriptionAr,thumbnailUrl,level,media,companionOf,companionSlug,const DeepCollectionEquality().hash(_lessons));
+int get hashCode => Object.hash(runtimeType,slug,science,scholar,titleAr,descriptionAr,thumbnailUrl,level,media,companionOf,companionSlug,const DeepCollectionEquality().hash(_lessons));
 
 @override
 String toString() {
-  return 'CatalogSeries(slug: $slug, science: $science, titleAr: $titleAr, descriptionAr: $descriptionAr, thumbnailUrl: $thumbnailUrl, level: $level, media: $media, companionOf: $companionOf, companionSlug: $companionSlug, lessons: $lessons)';
+  return 'CatalogSeries(slug: $slug, science: $science, scholar: $scholar, titleAr: $titleAr, descriptionAr: $descriptionAr, thumbnailUrl: $thumbnailUrl, level: $level, media: $media, companionOf: $companionOf, companionSlug: $companionSlug, lessons: $lessons)';
 }
 
 
@@ -845,7 +1131,7 @@ abstract mixin class _$CatalogSeriesCopyWith<$Res> implements $CatalogSeriesCopy
   factory _$CatalogSeriesCopyWith(_CatalogSeries value, $Res Function(_CatalogSeries) _then) = __$CatalogSeriesCopyWithImpl;
 @override @useResult
 $Res call({
- String slug, String science, String titleAr, String? descriptionAr, String? thumbnailUrl, JourneyLevel? level, LessonMedia media, String? companionOf, String? companionSlug, List<CatalogLesson> lessons
+ String slug, String science, String scholar, String titleAr, String? descriptionAr, String? thumbnailUrl, JourneyLevel? level, LessonMedia media, String? companionOf, String? companionSlug, List<CatalogLesson> lessons
 });
 
 
@@ -862,10 +1148,11 @@ class __$CatalogSeriesCopyWithImpl<$Res>
 
 /// Create a copy of CatalogSeries
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? slug = null,Object? science = null,Object? titleAr = null,Object? descriptionAr = freezed,Object? thumbnailUrl = freezed,Object? level = freezed,Object? media = null,Object? companionOf = freezed,Object? companionSlug = freezed,Object? lessons = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? slug = null,Object? science = null,Object? scholar = null,Object? titleAr = null,Object? descriptionAr = freezed,Object? thumbnailUrl = freezed,Object? level = freezed,Object? media = null,Object? companionOf = freezed,Object? companionSlug = freezed,Object? lessons = null,}) {
   return _then(_CatalogSeries(
 slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
 as String,science: null == science ? _self.science : science // ignore: cast_nullable_to_non_nullable
+as String,scholar: null == scholar ? _self.scholar : scholar // ignore: cast_nullable_to_non_nullable
 as String,titleAr: null == titleAr ? _self.titleAr : titleAr // ignore: cast_nullable_to_non_nullable
 as String,descriptionAr: freezed == descriptionAr ? _self.descriptionAr : descriptionAr // ignore: cast_nullable_to_non_nullable
 as String?,thumbnailUrl: freezed == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable

@@ -80,6 +80,11 @@ void main() {
         (await catalog.watchSeriesDetail('sharh-riyad-alsalihin').first)!;
     expect(audio.series.companionOf, 'sharh-alwasitiyah');
 
+    // The scholar layer: fixture series carry no explicit scholar, so the
+    // default applies; the scholars list itself round-trips.
+    expect(video.series.scholarSlug, 'ibn-uthaymeen');
+    expect(loadFixture().scholars.single.nameAr, 'الشيخ محمد بن صالح العثيمين');
+
     // Companions are reached from their video series, not the library —
     // they must not appear in browse nor inflate the science counters.
     final hadith = await catalog.watchSeriesByScience('hadith').first;

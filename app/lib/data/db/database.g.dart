@@ -3,6 +3,375 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
+class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ScholarsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _slugMeta = const VerificationMeta('slug');
+  @override
+  late final GeneratedColumn<String> slug = GeneratedColumn<String>(
+    'slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameArMeta = const VerificationMeta('nameAr');
+  @override
+  late final GeneratedColumn<String> nameAr = GeneratedColumn<String>(
+    'name_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _foundationArMeta = const VerificationMeta(
+    'foundationAr',
+  );
+  @override
+  late final GeneratedColumn<String> foundationAr = GeneratedColumn<String>(
+    'foundation_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _websiteMeta = const VerificationMeta(
+    'website',
+  );
+  @override
+  late final GeneratedColumn<String> website = GeneratedColumn<String>(
+    'website',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    slug,
+    nameAr,
+    foundationAr,
+    website,
+    sortOrder,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'scholars';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Scholar> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('slug')) {
+      context.handle(
+        _slugMeta,
+        slug.isAcceptableOrUnknown(data['slug']!, _slugMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_slugMeta);
+    }
+    if (data.containsKey('name_ar')) {
+      context.handle(
+        _nameArMeta,
+        nameAr.isAcceptableOrUnknown(data['name_ar']!, _nameArMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameArMeta);
+    }
+    if (data.containsKey('foundation_ar')) {
+      context.handle(
+        _foundationArMeta,
+        foundationAr.isAcceptableOrUnknown(
+          data['foundation_ar']!,
+          _foundationArMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_foundationArMeta);
+    }
+    if (data.containsKey('website')) {
+      context.handle(
+        _websiteMeta,
+        website.isAcceptableOrUnknown(data['website']!, _websiteMeta),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {slug};
+  @override
+  Scholar map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Scholar(
+      slug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}slug'],
+      )!,
+      nameAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_ar'],
+      )!,
+      foundationAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}foundation_ar'],
+      )!,
+      website: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}website'],
+      ),
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
+    );
+  }
+
+  @override
+  $ScholarsTable createAlias(String alias) {
+    return $ScholarsTable(attachedDatabase, alias);
+  }
+}
+
+class Scholar extends DataClass implements Insertable<Scholar> {
+  final String slug;
+  final String nameAr;
+
+  /// Rights holder credited in attribution.
+  final String foundationAr;
+  final String? website;
+  final int sortOrder;
+  const Scholar({
+    required this.slug,
+    required this.nameAr,
+    required this.foundationAr,
+    this.website,
+    required this.sortOrder,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['slug'] = Variable<String>(slug);
+    map['name_ar'] = Variable<String>(nameAr);
+    map['foundation_ar'] = Variable<String>(foundationAr);
+    if (!nullToAbsent || website != null) {
+      map['website'] = Variable<String>(website);
+    }
+    map['sort_order'] = Variable<int>(sortOrder);
+    return map;
+  }
+
+  ScholarsCompanion toCompanion(bool nullToAbsent) {
+    return ScholarsCompanion(
+      slug: Value(slug),
+      nameAr: Value(nameAr),
+      foundationAr: Value(foundationAr),
+      website: website == null && nullToAbsent
+          ? const Value.absent()
+          : Value(website),
+      sortOrder: Value(sortOrder),
+    );
+  }
+
+  factory Scholar.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Scholar(
+      slug: serializer.fromJson<String>(json['slug']),
+      nameAr: serializer.fromJson<String>(json['nameAr']),
+      foundationAr: serializer.fromJson<String>(json['foundationAr']),
+      website: serializer.fromJson<String?>(json['website']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'slug': serializer.toJson<String>(slug),
+      'nameAr': serializer.toJson<String>(nameAr),
+      'foundationAr': serializer.toJson<String>(foundationAr),
+      'website': serializer.toJson<String?>(website),
+      'sortOrder': serializer.toJson<int>(sortOrder),
+    };
+  }
+
+  Scholar copyWith({
+    String? slug,
+    String? nameAr,
+    String? foundationAr,
+    Value<String?> website = const Value.absent(),
+    int? sortOrder,
+  }) => Scholar(
+    slug: slug ?? this.slug,
+    nameAr: nameAr ?? this.nameAr,
+    foundationAr: foundationAr ?? this.foundationAr,
+    website: website.present ? website.value : this.website,
+    sortOrder: sortOrder ?? this.sortOrder,
+  );
+  Scholar copyWithCompanion(ScholarsCompanion data) {
+    return Scholar(
+      slug: data.slug.present ? data.slug.value : this.slug,
+      nameAr: data.nameAr.present ? data.nameAr.value : this.nameAr,
+      foundationAr: data.foundationAr.present
+          ? data.foundationAr.value
+          : this.foundationAr,
+      website: data.website.present ? data.website.value : this.website,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Scholar(')
+          ..write('slug: $slug, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('foundationAr: $foundationAr, ')
+          ..write('website: $website, ')
+          ..write('sortOrder: $sortOrder')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(slug, nameAr, foundationAr, website, sortOrder);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Scholar &&
+          other.slug == this.slug &&
+          other.nameAr == this.nameAr &&
+          other.foundationAr == this.foundationAr &&
+          other.website == this.website &&
+          other.sortOrder == this.sortOrder);
+}
+
+class ScholarsCompanion extends UpdateCompanion<Scholar> {
+  final Value<String> slug;
+  final Value<String> nameAr;
+  final Value<String> foundationAr;
+  final Value<String?> website;
+  final Value<int> sortOrder;
+  final Value<int> rowid;
+  const ScholarsCompanion({
+    this.slug = const Value.absent(),
+    this.nameAr = const Value.absent(),
+    this.foundationAr = const Value.absent(),
+    this.website = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ScholarsCompanion.insert({
+    required String slug,
+    required String nameAr,
+    required String foundationAr,
+    this.website = const Value.absent(),
+    this.sortOrder = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : slug = Value(slug),
+       nameAr = Value(nameAr),
+       foundationAr = Value(foundationAr);
+  static Insertable<Scholar> custom({
+    Expression<String>? slug,
+    Expression<String>? nameAr,
+    Expression<String>? foundationAr,
+    Expression<String>? website,
+    Expression<int>? sortOrder,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (slug != null) 'slug': slug,
+      if (nameAr != null) 'name_ar': nameAr,
+      if (foundationAr != null) 'foundation_ar': foundationAr,
+      if (website != null) 'website': website,
+      if (sortOrder != null) 'sort_order': sortOrder,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ScholarsCompanion copyWith({
+    Value<String>? slug,
+    Value<String>? nameAr,
+    Value<String>? foundationAr,
+    Value<String?>? website,
+    Value<int>? sortOrder,
+    Value<int>? rowid,
+  }) {
+    return ScholarsCompanion(
+      slug: slug ?? this.slug,
+      nameAr: nameAr ?? this.nameAr,
+      foundationAr: foundationAr ?? this.foundationAr,
+      website: website ?? this.website,
+      sortOrder: sortOrder ?? this.sortOrder,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (slug.present) {
+      map['slug'] = Variable<String>(slug.value);
+    }
+    if (nameAr.present) {
+      map['name_ar'] = Variable<String>(nameAr.value);
+    }
+    if (foundationAr.present) {
+      map['foundation_ar'] = Variable<String>(foundationAr.value);
+    }
+    if (website.present) {
+      map['website'] = Variable<String>(website.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScholarsCompanion(')
+          ..write('slug: $slug, ')
+          ..write('nameAr: $nameAr, ')
+          ..write('foundationAr: $foundationAr, ')
+          ..write('website: $website, ')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $SciencesTable extends Sciences with TableInfo<$SciencesTable, Science> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -394,6 +763,18 @@ class $SeriesEntriesTable extends SeriesEntries
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _scholarSlugMeta = const VerificationMeta(
+    'scholarSlug',
+  );
+  @override
+  late final GeneratedColumn<String> scholarSlug = GeneratedColumn<String>(
+    'scholar_slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('ibn-uthaymeen'),
+  );
   static const VerificationMeta _titleArMeta = const VerificationMeta(
     'titleAr',
   );
@@ -474,6 +855,7 @@ class $SeriesEntriesTable extends SeriesEntries
   List<GeneratedColumn> get $columns => [
     slug,
     scienceSlug,
+    scholarSlug,
     titleAr,
     descriptionAr,
     thumbnailUrl,
@@ -512,6 +894,15 @@ class $SeriesEntriesTable extends SeriesEntries
       );
     } else if (isInserting) {
       context.missing(_scienceSlugMeta);
+    }
+    if (data.containsKey('scholar_slug')) {
+      context.handle(
+        _scholarSlugMeta,
+        scholarSlug.isAcceptableOrUnknown(
+          data['scholar_slug']!,
+          _scholarSlugMeta,
+        ),
+      );
     }
     if (data.containsKey('title_ar')) {
       context.handle(
@@ -586,6 +977,10 @@ class $SeriesEntriesTable extends SeriesEntries
         DriftSqlType.string,
         data['${effectivePrefix}science_slug'],
       )!,
+      scholarSlug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}scholar_slug'],
+      )!,
       titleAr: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}title_ar'],
@@ -626,6 +1021,7 @@ class $SeriesEntriesTable extends SeriesEntries
 class SeriesRow extends DataClass implements Insertable<SeriesRow> {
   final String slug;
   final String scienceSlug;
+  final String scholarSlug;
   final String titleAr;
   final String? descriptionAr;
   final String? thumbnailUrl;
@@ -645,6 +1041,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
   const SeriesRow({
     required this.slug,
     required this.scienceSlug,
+    required this.scholarSlug,
     required this.titleAr,
     this.descriptionAr,
     this.thumbnailUrl,
@@ -658,6 +1055,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     final map = <String, Expression>{};
     map['slug'] = Variable<String>(slug);
     map['science_slug'] = Variable<String>(scienceSlug);
+    map['scholar_slug'] = Variable<String>(scholarSlug);
     map['title_ar'] = Variable<String>(titleAr);
     if (!nullToAbsent || descriptionAr != null) {
       map['description_ar'] = Variable<String>(descriptionAr);
@@ -682,6 +1080,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     return SeriesEntriesCompanion(
       slug: Value(slug),
       scienceSlug: Value(scienceSlug),
+      scholarSlug: Value(scholarSlug),
       titleAr: Value(titleAr),
       descriptionAr: descriptionAr == null && nullToAbsent
           ? const Value.absent()
@@ -710,6 +1109,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     return SeriesRow(
       slug: serializer.fromJson<String>(json['slug']),
       scienceSlug: serializer.fromJson<String>(json['scienceSlug']),
+      scholarSlug: serializer.fromJson<String>(json['scholarSlug']),
       titleAr: serializer.fromJson<String>(json['titleAr']),
       descriptionAr: serializer.fromJson<String?>(json['descriptionAr']),
       thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
@@ -725,6 +1125,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     return <String, dynamic>{
       'slug': serializer.toJson<String>(slug),
       'scienceSlug': serializer.toJson<String>(scienceSlug),
+      'scholarSlug': serializer.toJson<String>(scholarSlug),
       'titleAr': serializer.toJson<String>(titleAr),
       'descriptionAr': serializer.toJson<String?>(descriptionAr),
       'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
@@ -738,6 +1139,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
   SeriesRow copyWith({
     String? slug,
     String? scienceSlug,
+    String? scholarSlug,
     String? titleAr,
     Value<String?> descriptionAr = const Value.absent(),
     Value<String?> thumbnailUrl = const Value.absent(),
@@ -748,6 +1150,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
   }) => SeriesRow(
     slug: slug ?? this.slug,
     scienceSlug: scienceSlug ?? this.scienceSlug,
+    scholarSlug: scholarSlug ?? this.scholarSlug,
     titleAr: titleAr ?? this.titleAr,
     descriptionAr: descriptionAr.present
         ? descriptionAr.value
@@ -766,6 +1169,9 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       scienceSlug: data.scienceSlug.present
           ? data.scienceSlug.value
           : this.scienceSlug,
+      scholarSlug: data.scholarSlug.present
+          ? data.scholarSlug.value
+          : this.scholarSlug,
       titleAr: data.titleAr.present ? data.titleAr.value : this.titleAr,
       descriptionAr: data.descriptionAr.present
           ? data.descriptionAr.value
@@ -789,6 +1195,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     return (StringBuffer('SeriesRow(')
           ..write('slug: $slug, ')
           ..write('scienceSlug: $scienceSlug, ')
+          ..write('scholarSlug: $scholarSlug, ')
           ..write('titleAr: $titleAr, ')
           ..write('descriptionAr: $descriptionAr, ')
           ..write('thumbnailUrl: $thumbnailUrl, ')
@@ -804,6 +1211,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
   int get hashCode => Object.hash(
     slug,
     scienceSlug,
+    scholarSlug,
     titleAr,
     descriptionAr,
     thumbnailUrl,
@@ -818,6 +1226,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       (other is SeriesRow &&
           other.slug == this.slug &&
           other.scienceSlug == this.scienceSlug &&
+          other.scholarSlug == this.scholarSlug &&
           other.titleAr == this.titleAr &&
           other.descriptionAr == this.descriptionAr &&
           other.thumbnailUrl == this.thumbnailUrl &&
@@ -830,6 +1239,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
 class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
   final Value<String> slug;
   final Value<String> scienceSlug;
+  final Value<String> scholarSlug;
   final Value<String> titleAr;
   final Value<String?> descriptionAr;
   final Value<String?> thumbnailUrl;
@@ -841,6 +1251,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
   const SeriesEntriesCompanion({
     this.slug = const Value.absent(),
     this.scienceSlug = const Value.absent(),
+    this.scholarSlug = const Value.absent(),
     this.titleAr = const Value.absent(),
     this.descriptionAr = const Value.absent(),
     this.thumbnailUrl = const Value.absent(),
@@ -853,6 +1264,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
   SeriesEntriesCompanion.insert({
     required String slug,
     required String scienceSlug,
+    this.scholarSlug = const Value.absent(),
     required String titleAr,
     this.descriptionAr = const Value.absent(),
     this.thumbnailUrl = const Value.absent(),
@@ -867,6 +1279,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
   static Insertable<SeriesRow> custom({
     Expression<String>? slug,
     Expression<String>? scienceSlug,
+    Expression<String>? scholarSlug,
     Expression<String>? titleAr,
     Expression<String>? descriptionAr,
     Expression<String>? thumbnailUrl,
@@ -879,6 +1292,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     return RawValuesInsertable({
       if (slug != null) 'slug': slug,
       if (scienceSlug != null) 'science_slug': scienceSlug,
+      if (scholarSlug != null) 'scholar_slug': scholarSlug,
       if (titleAr != null) 'title_ar': titleAr,
       if (descriptionAr != null) 'description_ar': descriptionAr,
       if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
@@ -893,6 +1307,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
   SeriesEntriesCompanion copyWith({
     Value<String>? slug,
     Value<String>? scienceSlug,
+    Value<String>? scholarSlug,
     Value<String>? titleAr,
     Value<String?>? descriptionAr,
     Value<String?>? thumbnailUrl,
@@ -905,6 +1320,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     return SeriesEntriesCompanion(
       slug: slug ?? this.slug,
       scienceSlug: scienceSlug ?? this.scienceSlug,
+      scholarSlug: scholarSlug ?? this.scholarSlug,
       titleAr: titleAr ?? this.titleAr,
       descriptionAr: descriptionAr ?? this.descriptionAr,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
@@ -924,6 +1340,9 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     }
     if (scienceSlug.present) {
       map['science_slug'] = Variable<String>(scienceSlug.value);
+    }
+    if (scholarSlug.present) {
+      map['scholar_slug'] = Variable<String>(scholarSlug.value);
     }
     if (titleAr.present) {
       map['title_ar'] = Variable<String>(titleAr.value);
@@ -957,6 +1376,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     return (StringBuffer('SeriesEntriesCompanion(')
           ..write('slug: $slug, ')
           ..write('scienceSlug: $scienceSlug, ')
+          ..write('scholarSlug: $scholarSlug, ')
           ..write('titleAr: $titleAr, ')
           ..write('descriptionAr: $descriptionAr, ')
           ..write('thumbnailUrl: $thumbnailUrl, ')
@@ -3737,6 +4157,7 @@ class JourneyEnrollmentsCompanion extends UpdateCompanion<JourneyEnrollment> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final $ScholarsTable scholars = $ScholarsTable(this);
   late final $SciencesTable sciences = $SciencesTable(this);
   late final $SeriesEntriesTable seriesEntries = $SeriesEntriesTable(this);
   late final $LessonsTable lessons = $LessonsTable(this);
@@ -3752,6 +4173,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+    scholars,
     sciences,
     seriesEntries,
     lessons,
@@ -3764,6 +4186,202 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ];
 }
 
+typedef $$ScholarsTableCreateCompanionBuilder =
+    ScholarsCompanion Function({
+      required String slug,
+      required String nameAr,
+      required String foundationAr,
+      Value<String?> website,
+      Value<int> sortOrder,
+      Value<int> rowid,
+    });
+typedef $$ScholarsTableUpdateCompanionBuilder =
+    ScholarsCompanion Function({
+      Value<String> slug,
+      Value<String> nameAr,
+      Value<String> foundationAr,
+      Value<String?> website,
+      Value<int> sortOrder,
+      Value<int> rowid,
+    });
+
+class $$ScholarsTableFilterComposer
+    extends Composer<_$AppDatabase, $ScholarsTable> {
+  $$ScholarsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get foundationAr => $composableBuilder(
+    column: $table.foundationAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get website => $composableBuilder(
+    column: $table.website,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ScholarsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ScholarsTable> {
+  $$ScholarsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get slug => $composableBuilder(
+    column: $table.slug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameAr => $composableBuilder(
+    column: $table.nameAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get foundationAr => $composableBuilder(
+    column: $table.foundationAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get website => $composableBuilder(
+    column: $table.website,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ScholarsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ScholarsTable> {
+  $$ScholarsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get slug =>
+      $composableBuilder(column: $table.slug, builder: (column) => column);
+
+  GeneratedColumn<String> get nameAr =>
+      $composableBuilder(column: $table.nameAr, builder: (column) => column);
+
+  GeneratedColumn<String> get foundationAr => $composableBuilder(
+    column: $table.foundationAr,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get website =>
+      $composableBuilder(column: $table.website, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+}
+
+class $$ScholarsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ScholarsTable,
+          Scholar,
+          $$ScholarsTableFilterComposer,
+          $$ScholarsTableOrderingComposer,
+          $$ScholarsTableAnnotationComposer,
+          $$ScholarsTableCreateCompanionBuilder,
+          $$ScholarsTableUpdateCompanionBuilder,
+          (Scholar, BaseReferences<_$AppDatabase, $ScholarsTable, Scholar>),
+          Scholar,
+          PrefetchHooks Function()
+        > {
+  $$ScholarsTableTableManager(_$AppDatabase db, $ScholarsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ScholarsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ScholarsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ScholarsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> slug = const Value.absent(),
+                Value<String> nameAr = const Value.absent(),
+                Value<String> foundationAr = const Value.absent(),
+                Value<String?> website = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ScholarsCompanion(
+                slug: slug,
+                nameAr: nameAr,
+                foundationAr: foundationAr,
+                website: website,
+                sortOrder: sortOrder,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String slug,
+                required String nameAr,
+                required String foundationAr,
+                Value<String?> website = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ScholarsCompanion.insert(
+                slug: slug,
+                nameAr: nameAr,
+                foundationAr: foundationAr,
+                website: website,
+                sortOrder: sortOrder,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ScholarsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ScholarsTable,
+      Scholar,
+      $$ScholarsTableFilterComposer,
+      $$ScholarsTableOrderingComposer,
+      $$ScholarsTableAnnotationComposer,
+      $$ScholarsTableCreateCompanionBuilder,
+      $$ScholarsTableUpdateCompanionBuilder,
+      (Scholar, BaseReferences<_$AppDatabase, $ScholarsTable, Scholar>),
+      Scholar,
+      PrefetchHooks Function()
+    >;
 typedef $$SciencesTableCreateCompanionBuilder =
     SciencesCompanion Function({
       required String slug,
@@ -3964,6 +4582,7 @@ typedef $$SeriesEntriesTableCreateCompanionBuilder =
     SeriesEntriesCompanion Function({
       required String slug,
       required String scienceSlug,
+      Value<String> scholarSlug,
       required String titleAr,
       Value<String?> descriptionAr,
       Value<String?> thumbnailUrl,
@@ -3977,6 +4596,7 @@ typedef $$SeriesEntriesTableUpdateCompanionBuilder =
     SeriesEntriesCompanion Function({
       Value<String> slug,
       Value<String> scienceSlug,
+      Value<String> scholarSlug,
       Value<String> titleAr,
       Value<String?> descriptionAr,
       Value<String?> thumbnailUrl,
@@ -4003,6 +4623,11 @@ class $$SeriesEntriesTableFilterComposer
 
   ColumnFilters<String> get scienceSlug => $composableBuilder(
     column: $table.scienceSlug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get scholarSlug => $composableBuilder(
+    column: $table.scholarSlug,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4061,6 +4686,11 @@ class $$SeriesEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get scholarSlug => $composableBuilder(
+    column: $table.scholarSlug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get titleAr => $composableBuilder(
     column: $table.titleAr,
     builder: (column) => ColumnOrderings(column),
@@ -4111,6 +4741,11 @@ class $$SeriesEntriesTableAnnotationComposer
 
   GeneratedColumn<String> get scienceSlug => $composableBuilder(
     column: $table.scienceSlug,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get scholarSlug => $composableBuilder(
+    column: $table.scholarSlug,
     builder: (column) => column,
   );
 
@@ -4177,6 +4812,7 @@ class $$SeriesEntriesTableTableManager
               ({
                 Value<String> slug = const Value.absent(),
                 Value<String> scienceSlug = const Value.absent(),
+                Value<String> scholarSlug = const Value.absent(),
                 Value<String> titleAr = const Value.absent(),
                 Value<String?> descriptionAr = const Value.absent(),
                 Value<String?> thumbnailUrl = const Value.absent(),
@@ -4188,6 +4824,7 @@ class $$SeriesEntriesTableTableManager
               }) => SeriesEntriesCompanion(
                 slug: slug,
                 scienceSlug: scienceSlug,
+                scholarSlug: scholarSlug,
                 titleAr: titleAr,
                 descriptionAr: descriptionAr,
                 thumbnailUrl: thumbnailUrl,
@@ -4201,6 +4838,7 @@ class $$SeriesEntriesTableTableManager
               ({
                 required String slug,
                 required String scienceSlug,
+                Value<String> scholarSlug = const Value.absent(),
                 required String titleAr,
                 Value<String?> descriptionAr = const Value.absent(),
                 Value<String?> thumbnailUrl = const Value.absent(),
@@ -4212,6 +4850,7 @@ class $$SeriesEntriesTableTableManager
               }) => SeriesEntriesCompanion.insert(
                 slug: slug,
                 scienceSlug: scienceSlug,
+                scholarSlug: scholarSlug,
                 titleAr: titleAr,
                 descriptionAr: descriptionAr,
                 thumbnailUrl: thumbnailUrl,
@@ -5723,6 +6362,8 @@ typedef $$JourneyEnrollmentsTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
+  $$ScholarsTableTableManager get scholars =>
+      $$ScholarsTableTableManager(_db, _db.scholars);
   $$SciencesTableTableManager get sciences =>
       $$SciencesTableTableManager(_db, _db.sciences);
   $$SeriesEntriesTableTableManager get seriesEntries =>
