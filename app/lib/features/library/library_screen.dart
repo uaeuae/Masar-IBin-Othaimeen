@@ -49,11 +49,7 @@ class LibraryScreen extends ConsumerWidget {
                     label: 'البحث',
                     child: InkWell(
                       customBorder: const CircleBorder(),
-                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('البحث يصل في تحديث قادم إن شاء الله'),
-                        ),
-                      ),
+                      onTap: () => context.push('/search'),
                       child: Container(
                         width: 40,
                         height: 40,
@@ -132,6 +128,79 @@ class LibraryScreen extends ConsumerWidget {
                       ),
                     ),
                 ],
+              ),
+              const SizedBox(height: 20),
+
+              // ── Phase 2–3 sections, shipped as previews ─────────────
+              Text('أقسام قادمة', style: theme.textTheme.titleLarge),
+              const SizedBox(height: 10),
+              Container(
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(AppRadius.card),
+                  border: Border.all(color: scheme.outlineVariant),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  children: [
+                    for (final (index, entry) in const [
+                      (Icons.question_answer_outlined, 'الفتاوى', '/fatawa'),
+                      (Icons.menu_book_outlined, 'المتون', '/soon/matn'),
+                      (
+                        Icons.bookmark_border_rounded,
+                        'ملاحظاتي',
+                        '/soon/notes',
+                      ),
+                    ].indexed)
+                      InkWell(
+                        onTap: () => context.push(entry.$3),
+                        child: Container(
+                          padding: const EdgeInsetsDirectional.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          decoration: BoxDecoration(
+                            border: index == 2
+                                ? null
+                                : Border(
+                                    bottom: BorderSide(
+                                      color: scheme.outlineVariant.withAlpha(
+                                        0x80,
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(entry.$1, size: 20, color: scheme.primary),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  entry.$2,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                'قريبًا',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Icon(
+                                Icons.chevron_left_rounded,
+                                size: 18,
+                                color: scheme.onSurfaceVariant,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
               Container(

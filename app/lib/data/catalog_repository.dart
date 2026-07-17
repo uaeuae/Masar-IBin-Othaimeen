@@ -445,6 +445,70 @@ class CatalogRepository {
         );
   }
 
+  // ── Search ────────────────────────────────────────────────────────────
+
+  /// Case-blind substring search over series and lesson titles. Companion
+  /// audio editions are searchable even though they're hidden from browse.
+  Future<CatalogSearchResults> search(String query, {int limit = 30}) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return const CatalogSearchResults();
+    final like =
+        '%${trimmed.replaceAll('!', '!!').replaceAll('%', '!%').replaceAll('_', '!_')}%';
+
+    final seriesRows = await db
+        .customSelect(
+          '''
+          SELECT s.slug, s.title_ar, s.media_type,
+            (SELECT COUNT(*) FROM lessons l
+              WHERE l.series_slug = s.slug AND l.status = 'active') AS lesson_count
+          FROM series s
+          WHERE s.title_ar LIKE ? ESCAPE '!'
+          ORDER BY s.title_ar
+          LIMIT 10
+          ''',
+          variables: [Variable.withString(like)],
+        )
+        .get();
+
+    final lessonRows = await db
+        .customSelect(
+          '''
+          SELECT l.video_id, l.title_ar, l.position, l.duration_seconds,
+            l.series_slug, s.title_ar AS series_title
+          FROM lessons l
+          JOIN series s ON s.slug = l.series_slug
+          WHERE l.status = 'active' AND l.title_ar LIKE ? ESCAPE '!'
+          ORDER BY s.title_ar, l.position
+          LIMIT $limit
+          ''',
+          variables: [Variable.withString(like)],
+        )
+        .get();
+
+    return CatalogSearchResults(
+      series: [
+        for (final row in seriesRows)
+          SeriesSearchHit(
+            slug: row.read<String>('slug'),
+            titleAr: row.read<String>('title_ar'),
+            lessonCount: row.read<int>('lesson_count'),
+            media: LessonMedia.fromJson(row.read<String>('media_type')),
+          ),
+      ],
+      lessons: [
+        for (final row in lessonRows)
+          LessonSearchHit(
+            videoId: row.read<String>('video_id'),
+            seriesSlug: row.read<String>('series_slug'),
+            seriesTitleAr: row.read<String>('series_title'),
+            position: row.read<int>('position'),
+            titleAr: row.read<String>('title_ar'),
+            durationSeconds: row.readNullable<int>('duration_seconds'),
+          ),
+      ],
+    );
+  }
+
   // ── Library queries ───────────────────────────────────────────────────
 
   Stream<List<ScienceSummary>> watchSciences() {

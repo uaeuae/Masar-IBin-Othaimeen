@@ -195,6 +195,47 @@ class ContinueWatchingItem {
   }
 }
 
+class SeriesSearchHit {
+  const SeriesSearchHit({
+    required this.slug,
+    required this.titleAr,
+    required this.lessonCount,
+    this.media = LessonMedia.video,
+  });
+
+  final String slug;
+  final String titleAr;
+  final int lessonCount;
+  final LessonMedia media;
+}
+
+class LessonSearchHit {
+  const LessonSearchHit({
+    required this.videoId,
+    required this.seriesSlug,
+    required this.seriesTitleAr,
+    required this.position,
+    required this.titleAr,
+    this.durationSeconds,
+  });
+
+  final String videoId;
+  final String seriesSlug;
+  final String seriesTitleAr;
+  final int position;
+  final String titleAr;
+  final int? durationSeconds;
+}
+
+class CatalogSearchResults {
+  const CatalogSearchResults({this.series = const [], this.lessons = const []});
+
+  final List<SeriesSearchHit> series;
+  final List<LessonSearchHit> lessons;
+
+  bool get isEmpty => series.isEmpty && lessons.isEmpty;
+}
+
 class ScienceSummary {
   const ScienceSummary({
     required this.slug,

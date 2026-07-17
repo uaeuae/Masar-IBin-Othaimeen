@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/coming_soon/coming_soon_screen.dart';
+import '../features/coming_soon/fatwa_topics_screen.dart';
 import '../features/gallery/gallery_screen.dart';
+import '../features/search/search_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/journeys/journey_detail_screen.dart';
 import '../features/journeys/journeys_screen.dart';
@@ -78,6 +81,23 @@ GoRouter _createRouter() => GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/search',
+      builder: (context, state) => const SearchScreen(),
+    ),
+    // Phase 2–3 screens from the design, shipped as previews (قريبًا).
+    GoRoute(
+      path: '/fatawa',
+      builder: (context, state) => const FatwaTopicsScreen(),
+    ),
+    GoRoute(
+      path: '/soon/matn',
+      builder: (context, state) => const ComingSoonScreen.matn(),
+    ),
+    GoRoute(
+      path: '/soon/notes',
+      builder: (context, state) => const ComingSoonScreen.notes(),
     ),
     // Internal design-system gallery (dev tool).
     GoRoute(
