@@ -1,4 +1,4 @@
--- مسار ابن عثيمين — initial schema
+-- مسار طالب العلم — initial schema
 -- Source of truth for the content catalog. The app never queries these tables
 -- directly in the MVP; the pipeline compiles them into catalog.json.
 

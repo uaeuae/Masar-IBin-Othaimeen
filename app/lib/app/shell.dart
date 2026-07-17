@@ -91,7 +91,7 @@ class _Splash extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 28),
-                  Text('مسار ابن عثيمين', style: serif(28, cream)),
+                  Text('مسار طالب العلم', style: serif(28, cream)),
                   const SizedBox(height: 8),
                   const Text(
                     'رحلة طالب العلم مع دروس الشيخ رحمه الله',

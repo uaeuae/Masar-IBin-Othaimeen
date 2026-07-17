@@ -15,7 +15,7 @@ class MasarApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title: 'مسار ابن عثيمين',
+      title: 'مسار طالب العلم',
       debugShowCheckedModeBanner: false,
       // Arabic-only, RTL-first by design.
       locale: const Locale('ar'),

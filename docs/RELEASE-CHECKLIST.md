@@ -14,13 +14,13 @@
 
 ## App identity (decide once, cannot change after first Play upload)
 - [ ] Final `applicationId` in `app/android/app/build.gradle.kts`
-      (currently the placeholder `app.othaimeen.masar`)
+      (currently the placeholder `app.masar.talib`)
 - [ ] Signing: create an upload keystore, wire `key.properties`
       (https://docs.flutter.dev/deployment/android#signing-the-app)
 
 ## Store listing
 - [ ] Play Console developer account ($25 one-time)
-- [ ] Listing (Arabic): title «مسار ابن عثيمين», short + full description, screenshots
+- [ ] Listing (Arabic): title «مسار طالب العلم», short + full description, screenshots
 - [ ] **Data safety form**: no data collected; declare only what's true.
       If Sentry is added later, declare crash diagnostics then.
 - [ ] Content rating questionnaire (education/religion, no UGC)
@@ -38,8 +38,15 @@
 - [ ] Device language Arabic: all screens RTL, no clipped text
 - [ ] Dark theme pass
 
+## iOS beta (TestFlight) — the current test path (user's phone is an iPhone)
+- [ ] Apple Developer Program enrollment ($99/yr, developer.apple.com, 1–2 days)
+- [ ] Follow the numbered setup steps at the top of `codemagic.yaml`
+      (App Store Connect API key → Codemagic integration named
+      `masar-asc-key` → register bundle id `app.masar.talib` → create the
+      App Store Connect app → run the ios-testflight workflow)
+- [ ] Add yourself as internal tester; install via the TestFlight app
+
 ## Later (Phase 2)
 - Sentry crash reporting (then update data-safety form)
 - Supabase project: apply `supabase/migrations/`, upload `dist/` snapshots,
   point the app's meta.json check at storage (currently bundled-asset only)
-- iOS: Apple Developer account + macOS CI lane + TestFlight

@@ -112,7 +112,7 @@ class JustAudioLessonEngine implements AudioLessonEngine {
 Future<void> initAudioBackground() async {
   if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) return;
   await JustAudioBackground.init(
-    androidNotificationChannelId: 'app.othaimeen.masar.audio',
+    androidNotificationChannelId: 'app.masar.talib.audio',
     androidNotificationChannelName: 'الدروس الصوتية',
     androidNotificationOngoing: true,
   );

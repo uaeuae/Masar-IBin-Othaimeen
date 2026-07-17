@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 class PipController {
   PipController._();
 
-  static const _channel = MethodChannel('app.othaimeen.masar/pip');
+  static const _channel = MethodChannel('app.masar.talib/pip');
 
   /// True while the activity is in a PiP window; the player screen renders
   /// only the video surface then.

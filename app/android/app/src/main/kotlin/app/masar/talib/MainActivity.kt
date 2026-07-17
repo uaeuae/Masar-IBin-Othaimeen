@@ -1,4 +1,4 @@
-package app.othaimeen.masar
+package app.masar.talib
 
 import android.app.PictureInPictureParams
 import android.content.res.Configuration
@@ -22,7 +22,7 @@ class MainActivity : AudioServiceActivity() {
         super.configureFlutterEngine(flutterEngine)
         pipChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
-            "app.othaimeen.masar/pip",
+            "app.masar.talib/pip",
         ).also { channel ->
             channel.setMethodCallHandler { call, result ->
                 when (call.method) {

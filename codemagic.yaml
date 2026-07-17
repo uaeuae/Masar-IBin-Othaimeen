@@ -1,0 +1,52 @@
+# iOS builds without a Mac: Codemagic (free tier: 500 macOS build minutes/month).
+#
+# One-time setup, in order (after the Apple Developer enrollment is approved):
+#   1. appstoreconnect.apple.com → Users and Access → Integrations → App Store
+#      Connect API → generate a key with the "App Manager" role. Note the
+#      Issuer ID and Key ID, download the .p8 file (single download!).
+#   2. codemagic.io → sign up with the GitHub account → add this repository.
+#   3. Codemagic → Teams → Personal → Integrations → App Store Connect →
+#      add the key from step 1 and NAME IT exactly: masar-asc-key
+#   4. App Store Connect → My Apps → "+" → New App: platform iOS, name
+#      «مسار طالب العلم», primary language Arabic, bundle ID app.masar.talib
+#      (register the bundle id at developer.apple.com → Identifiers first).
+#   5. Start the ios-testflight workflow in Codemagic. The build lands in
+#      TestFlight; add yourself as an internal tester in App Store Connect
+#      and install via the TestFlight app on the iPhone.
+#
+# Signing is automatic: Codemagic creates/fetches the certificate and
+# provisioning profile through the App Store Connect API key.
+
+workflows:
+  ios-testflight:
+    name: iOS → TestFlight
+    max_build_duration: 45
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: masar-asc-key
+    environment:
+      flutter: 3.44.6
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: app.masar.talib
+    working_directory: app
+    scripts:
+      - name: Get packages
+        script: flutter pub get
+      - name: Run tests
+        script: flutter test
+      - name: Set up signing from the App Store Connect integration
+        script: xcode-project use-profiles
+      - name: Build signed IPA
+        script: |
+          flutter build ipa --release \
+            --build-number=$PROJECT_BUILD_NUMBER \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
