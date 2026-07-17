@@ -294,7 +294,7 @@ class _CompanionBanner extends StatelessWidget {
               ),
             ),
             Icon(
-              Icons.chevron_left_rounded,
+              Icons.chevron_right_rounded,
               color: scheme.onSurfaceVariant,
             ),
           ],

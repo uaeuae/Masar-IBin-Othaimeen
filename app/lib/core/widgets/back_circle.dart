@@ -5,8 +5,9 @@ import '../../app/theme.dart';
 
 enum BackCircleStyle { surface, onHero }
 
-/// Circular back button. RTL: the chevron points "forward" (left) natively
-/// because the SVG in the design is a left-pointing chevron in RTL flow.
+/// Circular back button. Uses the semantic "back" icon: Flutter auto-mirrors
+/// it (matchTextDirection), so in RTL it renders pointing right — toward
+/// where the user came from.
 class BackCircle extends StatelessWidget {
   const BackCircle({
     super.key,
@@ -38,7 +39,7 @@ class BackCircle extends StatelessWidget {
           ),
           alignment: Alignment.center,
           child: Icon(
-            Icons.arrow_forward_ios_rounded,
+            Icons.arrow_back_ios_new_rounded,
             size: 13,
             color: onHero ? masar.onHero : masar.chipText,
           ),

@@ -191,7 +191,7 @@ class LibraryScreen extends ConsumerWidget {
                               ),
                               const SizedBox(width: 6),
                               Icon(
-                                Icons.chevron_left_rounded,
+                                Icons.chevron_right_rounded,
                                 size: 18,
                                 color: scheme.onSurfaceVariant,
                               ),

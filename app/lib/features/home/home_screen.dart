@@ -281,7 +281,7 @@ class _EnrolledJourneyRow extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Icon(
-                Icons.arrow_back_ios_new_rounded,
+                Icons.arrow_forward_ios_rounded,
                 size: 14,
                 color: masar.textMuted,
               ),
