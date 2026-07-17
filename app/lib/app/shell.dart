@@ -126,7 +126,7 @@ class _Splash extends StatelessWidget {
               left: 40,
               right: 40,
               child: Text(
-                'بإذن مؤسسة الشيخ محمد بن صالح العثيمين الخيرية\nتطبيق تطوعي غير ربحي',
+                'جميع الحقوق محفوظة لمؤسسة الشيخ محمد بن صالح العثيمين الخيرية\nتطبيق تطوعي غير ربحي',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: kUiFont,

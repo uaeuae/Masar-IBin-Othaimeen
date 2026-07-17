@@ -115,7 +115,7 @@ class SettingsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'جميع الدروس بإذن ونسبة كاملة إلى',
+                    'جميع الدروس منسوبة بالكامل إلى',
                     style: serif(17, masar.attributionText),
                   ),
                   const SizedBox(height: 8),
