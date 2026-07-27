@@ -19,12 +19,16 @@ workflows:
     name: iOS → TestFlight
     max_build_duration: 45
     instance_type: mac_mini_m2
-    integrations:
-      app_store_connect: masar-asc-key
     environment:
       flutter: 3.44.6
       xcode: latest
       cocoapods: default
+      # NOT `integrations: app_store_connect: masar-asc-key` -- that lookup
+      # failed with "integration does not exist" even with the key present and
+      # valid under Developer Portal → Manage keys. Passing the key as plain
+      # env vars skips the lookup; the CLI reads these names automatically.
+      groups:
+        - appstore_credentials
       vars:
         BUNDLE_ID: app.masar.talib
     working_directory: app
@@ -54,5 +58,7 @@ workflows:
       - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        auth: integration
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
