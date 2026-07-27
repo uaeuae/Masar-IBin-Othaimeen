@@ -43,12 +43,20 @@ workflows:
         # before any script runs. --create provisions the distribution cert and
         # the app_store profile on first build, then reuses them after.
         script: |
+          # set -e matters: a step's exit code is the LAST command's, so a
+          # failed fetch-signing-files was masked by use-profiles succeeding
+          # as a no-op, and only surfaced later as "No valid code signing
+          # certificates were found" during the archive.
+          set -e
+          set -o pipefail
           keychain initialize
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create
           keychain add-certificates
           xcode-project use-profiles
+          # Fail here, loudly, if no signing identity actually made it in.
+          security find-identity -v -p codesigning
       - name: Build signed IPA
         script: |
           flutter build ipa --release \
