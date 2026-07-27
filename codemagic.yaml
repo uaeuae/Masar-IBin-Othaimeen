@@ -1,21 +1,18 @@
 # iOS builds without a Mac: Codemagic (free tier: 500 macOS build minutes/month).
 #
-# One-time setup, in order (after the Apple Developer enrollment is approved):
-#   1. appstoreconnect.apple.com → Users and Access → Integrations → App Store
-#      Connect API → generate a key with the "App Manager" role. Note the
-#      Issuer ID and Key ID, download the .p8 file (single download!).
-#   2. codemagic.io → sign up with the GitHub account → add this repository.
-#   3. Codemagic → Teams → Personal → Integrations → App Store Connect →
-#      add the key from step 1 and NAME IT exactly: masar-asc-key
-#   4. App Store Connect → My Apps → "+" → New App: platform iOS, name
-#      «مسار طالب العلم», primary language Arabic, bundle ID app.masar.talib
-#      (register the bundle id at developer.apple.com → Identifiers first).
-#   5. Start the ios-testflight workflow in Codemagic. The build lands in
-#      TestFlight; add yourself as an internal tester in App Store Connect
-#      and install via the TestFlight app on the iPhone.
+# One-time setup: DONE 2026-07-27. Apple Developer enrolled, ASC API key
+# created (App Manager role), Codemagic integration named masar-asc-key,
+# bundle id app.masar.talib registered, App Store Connect app record created
+# (app id 6795260984). Nothing here needs redoing -- just start the workflow.
 #
-# Signing is automatic: Codemagic creates/fetches the certificate and
-# provisioning profile through the App Store Connect API key.
+# Monorepo note: this file MUST stay at the repository root (Codemagic only
+# looks for codemagic.yaml there); `working_directory: app` is what targets
+# the Flutter app. Codemagic's onboarding scanner will still complain that the
+# root has no mobile app -- ignore it, or set Project path to `app`, it does
+# not affect the yaml build.
+#
+# To add a tester: App Store Connect → TestFlight → Internal Testing. Internal
+# testers skip Beta App Review; external testers do not.
 
 workflows:
   ios-testflight:
@@ -28,9 +25,8 @@ workflows:
       flutter: 3.44.6
       xcode: latest
       cocoapods: default
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: app.masar.talib
+      vars:
+        BUNDLE_ID: app.masar.talib
     working_directory: app
     scripts:
       - name: Get packages
@@ -38,7 +34,17 @@ workflows:
       - name: Run tests
         script: flutter test
       - name: Set up signing from the App Store Connect integration
-        script: xcode-project use-profiles
+        # NOT the `ios_signing:` environment block -- that only FETCHES existing
+        # signing files and fails preparation with "No matching profiles found"
+        # before any script runs. --create provisions the distribution cert and
+        # the app_store profile on first build, then reuses them after.
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
       - name: Build signed IPA
         script: |
           flutter build ipa --release \
