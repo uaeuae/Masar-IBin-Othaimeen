@@ -23,12 +23,22 @@ workflows:
       flutter: 3.44.6
       xcode: latest
       cocoapods: default
-      # NOT `integrations: app_store_connect: masar-asc-key` -- that lookup
-      # failed with "integration does not exist" even with the key present and
-      # valid under Developer Portal → Manage keys. Passing the key as plain
-      # env vars skips the lookup; the CLI reads these names automatically.
+      # Still needed: the TestFlight upload at the bottom authenticates with
+      # these. Signing itself no longer touches the Apple API at all.
       groups:
         - appstore_credentials
+      # Reference two identities already uploaded under Code signing
+      # identities, rather than asking Codemagic to go find or create signing
+      # files at build time -- every attempt at that silently provisioned
+      # nothing and left the archive with no identity to sign with.
+      #   codemagic     -- Apple Distribution cert Codemagic generated, so it
+      #                    holds the private key (Apple id GPHQM2X78V)
+      #   masar_profile -- app_store profile for app.masar.talib, bound to it
+      ios_signing:
+        provisioning_profiles:
+          - masar_profile
+        certificates:
+          - codemagic
       vars:
         BUNDLE_ID: app.masar.talib
     working_directory: app
@@ -37,26 +47,17 @@ workflows:
         script: flutter pub get
       - name: Run tests
         script: flutter test
-      - name: Set up signing from the App Store Connect integration
-        # NOT the `ios_signing:` environment block -- that only FETCHES existing
-        # signing files and fails preparation with "No matching profiles found"
-        # before any script runs. --create provisions the distribution cert and
-        # the app_store profile on first build, then reuses them after.
+      - name: Set up code signing
         script: |
-          # set -e matters: a step's exit code is the LAST command's, so a
-          # failed fetch-signing-files was masked by use-profiles succeeding
-          # as a no-op, and only surfaced later as "No valid code signing
-          # certificates were found" during the archive.
           set -e
-          set -o pipefail
-          keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --create
-          keychain add-certificates
+          # Codemagic has already put the referenced cert in the keychain and
+          # the profile on disk by this point; this only wires them into the
+          # Xcode project.
           xcode-project use-profiles
-          # Fail here, loudly, if no signing identity actually made it in.
-          security find-identity -v -p codesigning
+          # Guard: find-identity EXITS 0 even when it finds nothing, so grep
+          # for a real identity or the build stops here instead of failing
+          # later with a misleading "no development certificates" message.
+          security find-identity -v -p codesigning | grep -q "Apple Distribution"
       - name: Build signed IPA
         script: |
           flutter build ipa --release \
