@@ -52,5 +52,10 @@
 		<array>
 			<string>audio</string>
 		</array>
+		<!-- HTTPS only, no cryptography of our own: the standard exemption.
+		     Declaring it here stops every upload from parking in TestFlight
+		     waiting on the export-compliance question. -->
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
 	</dict>
 </plist>

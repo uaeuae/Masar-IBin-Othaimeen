@@ -71,3 +71,10 @@ workflows:
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
+        # Distribute to the INTERNAL group. Without naming a group the build is
+        # pushed at external beta review, which needs Beta App Information and
+        # a review contact and fails the build without them. Internal testers
+        # skip review entirely -- add external testers only when the app is
+        # ready for strangers, and fill in the test info at that point.
+        beta_groups:
+          - Masar
