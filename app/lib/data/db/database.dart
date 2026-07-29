@@ -76,6 +76,15 @@ class Lessons extends Table {
   /// JSON list of {start_seconds, title, body} chapter markers (audio only).
   TextColumn get chaptersJson => text().nullable()();
 
+  /// 'transcript' | 'matn' — which read-along script exists under
+  /// assets/texts/, or null when the lesson has none.
+  TextColumn get textKind => text().nullable()();
+
+  /// Playback correction in dB from the measured loudness (see
+  /// `analyze:loudness`). Negative pulls a loud lesson down; positive marks a
+  /// quiet one, which only Android can actually boost.
+  RealColumn get gainDb => real().nullable()();
+
   @override
   Set<Column> get primaryKey => {videoId};
 }
@@ -148,6 +157,28 @@ class JourneyEnrollments extends Table {
   Set<Column> get primaryKey => {journeySlug};
 }
 
+/// Offline copies of audio lessons. A user table: catalog imports must never
+/// drop rows here, or an app update would silently orphan files on disk.
+class Downloads extends Table {
+  TextColumn get videoId => text()();
+  TextColumn get seriesSlug => text()();
+
+  /// 'queued' | 'downloading' | 'done' | 'failed'
+  TextColumn get state => text().withDefault(const Constant('queued'))();
+
+  /// Basename under the downloads directory — never an absolute path, which
+  /// iOS invalidates whenever the app container is relocated.
+  TextColumn get fileName => text()();
+  IntColumn get receivedBytes => integer().withDefault(const Constant(0))();
+  IntColumn get totalBytes => integer().nullable()();
+  TextColumn get error => text().nullable()();
+  DateTimeColumn get requestedAt => dateTime()();
+  DateTimeColumn get completedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {videoId};
+}
+
 @DriftDatabase(
   tables: [
     Scholars,
@@ -160,13 +191,14 @@ class JourneyEnrollments extends Table {
     CatalogInfo,
     LessonProgress,
     JourneyEnrollments,
+    Downloads,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -187,6 +219,13 @@ class AppDatabase extends _$AppDatabase {
       if (from < 5) {
         await m.createTable(scholars);
         await m.addColumn(seriesEntries, seriesEntries.scholarSlug);
+      }
+      if (from < 6) {
+        await m.addColumn(lessons, lessons.textKind);
+      }
+      if (from < 7) {
+        await m.addColumn(lessons, lessons.gainDb);
+        await m.createTable(downloads);
       }
     },
   );

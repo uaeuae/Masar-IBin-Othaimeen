@@ -38,10 +38,8 @@ class LessonPlayerDispatcher extends ConsumerWidget {
           ),
         ),
       ),
-      error: (error, stack) => PlayerScreen(
-        videoId: lessonId,
-        seriesSlug: slug,
-      ),
+      error: (error, stack) =>
+          PlayerScreen(videoId: lessonId, seriesSlug: slug),
       data: (detail) {
         final lesson = detail?.lessons
             .where((l) => l.videoId == lessonId)

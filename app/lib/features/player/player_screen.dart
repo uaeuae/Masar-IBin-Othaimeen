@@ -343,8 +343,7 @@ class _PlayerScreenState extends ConsumerState<PlayerScreen> {
                         final seekable = total != null && total > Duration.zero;
                         final fraction = !seekable
                             ? 0.0
-                            : (_position.inMilliseconds /
-                                      total.inMilliseconds)
+                            : (_position.inMilliseconds / total.inMilliseconds)
                                   .clamp(0.0, 1.0);
                         final shownFraction = _dragFraction ?? fraction;
                         final shownPosition = !seekable

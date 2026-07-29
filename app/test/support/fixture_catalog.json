@@ -253,7 +253,9 @@
               "title": "الحديث الأول",
               "body": "عن عمر رضي الله عنه..."
             }
-          ]
+          ],
+          "text_kind": "transcript",
+          "gain_db": -3.5
         },
         {
           "youtube_video_id": "fx-riyd-02",
@@ -273,7 +275,9 @@
               "title": "الحديث الأول",
               "body": "عن عمر رضي الله عنه..."
             }
-          ]
+          ],
+          "text_kind": "matn",
+          "gain_db": 2
         },
         {
           "youtube_video_id": "fx-riyd-03",

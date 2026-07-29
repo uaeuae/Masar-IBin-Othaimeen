@@ -10,6 +10,8 @@ import '../../core/widgets/lesson_row.dart';
 import '../../core/widgets/skeleton.dart';
 import '../../data/models/enums.dart';
 import '../../data/view_models.dart';
+import '../downloads/download_button.dart';
+import '../downloads/series_download_bar.dart';
 import '../library/library_providers.dart';
 import 'series_providers.dart';
 
@@ -186,6 +188,12 @@ class _SeriesDetailBody extends ConsumerWidget {
           const SizedBox(height: 16),
         ],
 
+        // ── Download the whole series ─────────────────────────────────
+        if (series.media == LessonMedia.audio) ...[
+          SeriesDownloadBar(slug: series.slug, lessons: detail.lessons),
+          const SizedBox(height: 16),
+        ],
+
         // ── Lesson list (one grouped card) ────────────────────────────
         Container(
           decoration: BoxDecoration(
@@ -212,6 +220,15 @@ class _SeriesDetailBody extends ConsumerWidget {
                       : Duration(seconds: lesson.durationSeconds!),
                   progress: lesson.progress,
                   showDivider: index != detail.lessons.length - 1,
+                  trailing:
+                      lesson.media == LessonMedia.audio &&
+                          lesson.status == LessonStatus.active
+                      ? DownloadButton(
+                          videoId: lesson.videoId,
+                          seriesSlug: series.slug,
+                          audioUrl: lesson.audioUrl,
+                        )
+                      : null,
                   onTap: () => context.push(
                     '/player/${lesson.videoId}?series=${series.slug}',
                   ),

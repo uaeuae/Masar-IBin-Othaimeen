@@ -1173,7 +1173,11 @@ as List<CatalogLesson>,
 mixin _$CatalogLesson {
 
 /// External id: YouTube video id, or the site lesson uuid for audio.
- String get youtubeVideoId; int get position; String get titleAr; int? get durationSeconds; DateTime? get publishedAt; LessonStatus get status; LessonMedia get media; String? get audioUrl; List<CatalogChapter> get chapters;
+ String get youtubeVideoId; int get position; String get titleAr; int? get durationSeconds; DateTime? get publishedAt; LessonStatus get status; LessonMedia get media; String? get audioUrl;/// Null when the lesson has no read-along script bundled under
+/// `assets/texts/` — 114 of the 500 audio lessons.
+ LessonTextKind? get textKind;/// Playback correction in dB toward a common loudness, from the measured
+/// level of the source file. Null until the lesson has been measured.
+ double? get gainDb; List<CatalogChapter> get chapters;
 /// Create a copy of CatalogLesson
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1186,16 +1190,16 @@ $CatalogLessonCopyWith<CatalogLesson> get copyWith => _$CatalogLessonCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogLesson&&(identical(other.youtubeVideoId, youtubeVideoId) || other.youtubeVideoId == youtubeVideoId)&&(identical(other.position, position) || other.position == position)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.durationSeconds, durationSeconds) || other.durationSeconds == durationSeconds)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.media, media) || other.media == media)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl)&&const DeepCollectionEquality().equals(other.chapters, chapters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogLesson&&(identical(other.youtubeVideoId, youtubeVideoId) || other.youtubeVideoId == youtubeVideoId)&&(identical(other.position, position) || other.position == position)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.durationSeconds, durationSeconds) || other.durationSeconds == durationSeconds)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.media, media) || other.media == media)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl)&&(identical(other.textKind, textKind) || other.textKind == textKind)&&(identical(other.gainDb, gainDb) || other.gainDb == gainDb)&&const DeepCollectionEquality().equals(other.chapters, chapters));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,youtubeVideoId,position,titleAr,durationSeconds,publishedAt,status,media,audioUrl,const DeepCollectionEquality().hash(chapters));
+int get hashCode => Object.hash(runtimeType,youtubeVideoId,position,titleAr,durationSeconds,publishedAt,status,media,audioUrl,textKind,gainDb,const DeepCollectionEquality().hash(chapters));
 
 @override
 String toString() {
-  return 'CatalogLesson(youtubeVideoId: $youtubeVideoId, position: $position, titleAr: $titleAr, durationSeconds: $durationSeconds, publishedAt: $publishedAt, status: $status, media: $media, audioUrl: $audioUrl, chapters: $chapters)';
+  return 'CatalogLesson(youtubeVideoId: $youtubeVideoId, position: $position, titleAr: $titleAr, durationSeconds: $durationSeconds, publishedAt: $publishedAt, status: $status, media: $media, audioUrl: $audioUrl, textKind: $textKind, gainDb: $gainDb, chapters: $chapters)';
 }
 
 
@@ -1206,7 +1210,7 @@ abstract mixin class $CatalogLessonCopyWith<$Res>  {
   factory $CatalogLessonCopyWith(CatalogLesson value, $Res Function(CatalogLesson) _then) = _$CatalogLessonCopyWithImpl;
 @useResult
 $Res call({
- String youtubeVideoId, int position, String titleAr, int? durationSeconds, DateTime? publishedAt, LessonStatus status, LessonMedia media, String? audioUrl, List<CatalogChapter> chapters
+ String youtubeVideoId, int position, String titleAr, int? durationSeconds, DateTime? publishedAt, LessonStatus status, LessonMedia media, String? audioUrl, LessonTextKind? textKind, double? gainDb, List<CatalogChapter> chapters
 });
 
 
@@ -1223,7 +1227,7 @@ class _$CatalogLessonCopyWithImpl<$Res>
 
 /// Create a copy of CatalogLesson
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? youtubeVideoId = null,Object? position = null,Object? titleAr = null,Object? durationSeconds = freezed,Object? publishedAt = freezed,Object? status = null,Object? media = null,Object? audioUrl = freezed,Object? chapters = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? youtubeVideoId = null,Object? position = null,Object? titleAr = null,Object? durationSeconds = freezed,Object? publishedAt = freezed,Object? status = null,Object? media = null,Object? audioUrl = freezed,Object? textKind = freezed,Object? gainDb = freezed,Object? chapters = null,}) {
   return _then(_self.copyWith(
 youtubeVideoId: null == youtubeVideoId ? _self.youtubeVideoId : youtubeVideoId // ignore: cast_nullable_to_non_nullable
 as String,position: null == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
@@ -1233,7 +1237,9 @@ as int?,publishedAt: freezed == publishedAt ? _self.publishedAt : publishedAt //
 as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as LessonStatus,media: null == media ? _self.media : media // ignore: cast_nullable_to_non_nullable
 as LessonMedia,audioUrl: freezed == audioUrl ? _self.audioUrl : audioUrl // ignore: cast_nullable_to_non_nullable
-as String?,chapters: null == chapters ? _self.chapters : chapters // ignore: cast_nullable_to_non_nullable
+as String?,textKind: freezed == textKind ? _self.textKind : textKind // ignore: cast_nullable_to_non_nullable
+as LessonTextKind?,gainDb: freezed == gainDb ? _self.gainDb : gainDb // ignore: cast_nullable_to_non_nullable
+as double?,chapters: null == chapters ? _self.chapters : chapters // ignore: cast_nullable_to_non_nullable
 as List<CatalogChapter>,
   ));
 }
@@ -1319,10 +1325,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status,  LessonMedia media,  String? audioUrl,  List<CatalogChapter> chapters)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status,  LessonMedia media,  String? audioUrl,  LessonTextKind? textKind,  double? gainDb,  List<CatalogChapter> chapters)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CatalogLesson() when $default != null:
-return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status,_that.media,_that.audioUrl,_that.chapters);case _:
+return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status,_that.media,_that.audioUrl,_that.textKind,_that.gainDb,_that.chapters);case _:
   return orElse();
 
 }
@@ -1340,10 +1346,10 @@ return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.duration
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status,  LessonMedia media,  String? audioUrl,  List<CatalogChapter> chapters)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status,  LessonMedia media,  String? audioUrl,  LessonTextKind? textKind,  double? gainDb,  List<CatalogChapter> chapters)  $default,) {final _that = this;
 switch (_that) {
 case _CatalogLesson():
-return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status,_that.media,_that.audioUrl,_that.chapters);case _:
+return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status,_that.media,_that.audioUrl,_that.textKind,_that.gainDb,_that.chapters);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1360,10 +1366,10 @@ return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.duration
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status,  LessonMedia media,  String? audioUrl,  List<CatalogChapter> chapters)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String youtubeVideoId,  int position,  String titleAr,  int? durationSeconds,  DateTime? publishedAt,  LessonStatus status,  LessonMedia media,  String? audioUrl,  LessonTextKind? textKind,  double? gainDb,  List<CatalogChapter> chapters)?  $default,) {final _that = this;
 switch (_that) {
 case _CatalogLesson() when $default != null:
-return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status,_that.media,_that.audioUrl,_that.chapters);case _:
+return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.durationSeconds,_that.publishedAt,_that.status,_that.media,_that.audioUrl,_that.textKind,_that.gainDb,_that.chapters);case _:
   return null;
 
 }
@@ -1375,7 +1381,7 @@ return $default(_that.youtubeVideoId,_that.position,_that.titleAr,_that.duration
 @JsonSerializable()
 
 class _CatalogLesson implements CatalogLesson {
-  const _CatalogLesson({required this.youtubeVideoId, required this.position, required this.titleAr, this.durationSeconds, this.publishedAt, this.status = LessonStatus.active, this.media = LessonMedia.video, this.audioUrl, final  List<CatalogChapter> chapters = const []}): _chapters = chapters;
+  const _CatalogLesson({required this.youtubeVideoId, required this.position, required this.titleAr, this.durationSeconds, this.publishedAt, this.status = LessonStatus.active, this.media = LessonMedia.video, this.audioUrl, this.textKind, this.gainDb, final  List<CatalogChapter> chapters = const []}): _chapters = chapters;
   factory _CatalogLesson.fromJson(Map<String, dynamic> json) => _$CatalogLessonFromJson(json);
 
 /// External id: YouTube video id, or the site lesson uuid for audio.
@@ -1387,6 +1393,12 @@ class _CatalogLesson implements CatalogLesson {
 @override@JsonKey() final  LessonStatus status;
 @override@JsonKey() final  LessonMedia media;
 @override final  String? audioUrl;
+/// Null when the lesson has no read-along script bundled under
+/// `assets/texts/` — 114 of the 500 audio lessons.
+@override final  LessonTextKind? textKind;
+/// Playback correction in dB toward a common loudness, from the measured
+/// level of the source file. Null until the lesson has been measured.
+@override final  double? gainDb;
  final  List<CatalogChapter> _chapters;
 @override@JsonKey() List<CatalogChapter> get chapters {
   if (_chapters is EqualUnmodifiableListView) return _chapters;
@@ -1408,16 +1420,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogLesson&&(identical(other.youtubeVideoId, youtubeVideoId) || other.youtubeVideoId == youtubeVideoId)&&(identical(other.position, position) || other.position == position)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.durationSeconds, durationSeconds) || other.durationSeconds == durationSeconds)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.media, media) || other.media == media)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl)&&const DeepCollectionEquality().equals(other._chapters, _chapters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogLesson&&(identical(other.youtubeVideoId, youtubeVideoId) || other.youtubeVideoId == youtubeVideoId)&&(identical(other.position, position) || other.position == position)&&(identical(other.titleAr, titleAr) || other.titleAr == titleAr)&&(identical(other.durationSeconds, durationSeconds) || other.durationSeconds == durationSeconds)&&(identical(other.publishedAt, publishedAt) || other.publishedAt == publishedAt)&&(identical(other.status, status) || other.status == status)&&(identical(other.media, media) || other.media == media)&&(identical(other.audioUrl, audioUrl) || other.audioUrl == audioUrl)&&(identical(other.textKind, textKind) || other.textKind == textKind)&&(identical(other.gainDb, gainDb) || other.gainDb == gainDb)&&const DeepCollectionEquality().equals(other._chapters, _chapters));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,youtubeVideoId,position,titleAr,durationSeconds,publishedAt,status,media,audioUrl,const DeepCollectionEquality().hash(_chapters));
+int get hashCode => Object.hash(runtimeType,youtubeVideoId,position,titleAr,durationSeconds,publishedAt,status,media,audioUrl,textKind,gainDb,const DeepCollectionEquality().hash(_chapters));
 
 @override
 String toString() {
-  return 'CatalogLesson(youtubeVideoId: $youtubeVideoId, position: $position, titleAr: $titleAr, durationSeconds: $durationSeconds, publishedAt: $publishedAt, status: $status, media: $media, audioUrl: $audioUrl, chapters: $chapters)';
+  return 'CatalogLesson(youtubeVideoId: $youtubeVideoId, position: $position, titleAr: $titleAr, durationSeconds: $durationSeconds, publishedAt: $publishedAt, status: $status, media: $media, audioUrl: $audioUrl, textKind: $textKind, gainDb: $gainDb, chapters: $chapters)';
 }
 
 
@@ -1428,7 +1440,7 @@ abstract mixin class _$CatalogLessonCopyWith<$Res> implements $CatalogLessonCopy
   factory _$CatalogLessonCopyWith(_CatalogLesson value, $Res Function(_CatalogLesson) _then) = __$CatalogLessonCopyWithImpl;
 @override @useResult
 $Res call({
- String youtubeVideoId, int position, String titleAr, int? durationSeconds, DateTime? publishedAt, LessonStatus status, LessonMedia media, String? audioUrl, List<CatalogChapter> chapters
+ String youtubeVideoId, int position, String titleAr, int? durationSeconds, DateTime? publishedAt, LessonStatus status, LessonMedia media, String? audioUrl, LessonTextKind? textKind, double? gainDb, List<CatalogChapter> chapters
 });
 
 
@@ -1445,7 +1457,7 @@ class __$CatalogLessonCopyWithImpl<$Res>
 
 /// Create a copy of CatalogLesson
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? youtubeVideoId = null,Object? position = null,Object? titleAr = null,Object? durationSeconds = freezed,Object? publishedAt = freezed,Object? status = null,Object? media = null,Object? audioUrl = freezed,Object? chapters = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? youtubeVideoId = null,Object? position = null,Object? titleAr = null,Object? durationSeconds = freezed,Object? publishedAt = freezed,Object? status = null,Object? media = null,Object? audioUrl = freezed,Object? textKind = freezed,Object? gainDb = freezed,Object? chapters = null,}) {
   return _then(_CatalogLesson(
 youtubeVideoId: null == youtubeVideoId ? _self.youtubeVideoId : youtubeVideoId // ignore: cast_nullable_to_non_nullable
 as String,position: null == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
@@ -1455,7 +1467,9 @@ as int?,publishedAt: freezed == publishedAt ? _self.publishedAt : publishedAt //
 as DateTime?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as LessonStatus,media: null == media ? _self.media : media // ignore: cast_nullable_to_non_nullable
 as LessonMedia,audioUrl: freezed == audioUrl ? _self.audioUrl : audioUrl // ignore: cast_nullable_to_non_nullable
-as String?,chapters: null == chapters ? _self._chapters : chapters // ignore: cast_nullable_to_non_nullable
+as String?,textKind: freezed == textKind ? _self.textKind : textKind // ignore: cast_nullable_to_non_nullable
+as LessonTextKind?,gainDb: freezed == gainDb ? _self.gainDb : gainDb // ignore: cast_nullable_to_non_nullable
+as double?,chapters: null == chapters ? _self._chapters : chapters // ignore: cast_nullable_to_non_nullable
 as List<CatalogChapter>,
   ));
 }

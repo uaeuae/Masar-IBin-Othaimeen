@@ -15,6 +15,8 @@ import '../../data/view_models.dart';
 import '../series/series_providers.dart';
 import '../settings/theme_mode_provider.dart';
 import 'audio_engine.dart';
+import 'lesson_text_providers.dart';
+import 'lesson_text_view.dart';
 import 'progress_tracker.dart';
 
 const _speeds = [1.0, 1.25, 1.5, 2.0];
@@ -51,6 +53,8 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
   double? _dragFraction;
   double _speed = 1.0;
   int? _sleepMinutes;
+  bool _showText = false;
+  bool _playingOffline = false;
 
   @override
   void initState() {
@@ -146,28 +150,44 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
         ? Duration(seconds: saved.watchedSeconds)
         : Duration.zero;
 
+    // An offline copy plays from disk — no network, no buffering, and it works
+    // in a tunnel or on a plane.
+    final localPath = await ref
+        .read(downloadRepositoryProvider)
+        .localPathFor(id);
+
     if (mounted) {
       setState(() {
         _currentId = id;
         _position = resumeFrom;
         _hasSavedOnce = false;
+        _playingOffline = localPath != null;
       });
     }
 
     await _engine.load(
       id: id,
-      url: audioUrl,
+      url: localPath ?? audioUrl,
       title: 'الدرس ${arabicDigits(lesson.position)} — ${lesson.titleAr}',
       album: _series?.series.titleAr ?? 'مسار',
       start: resumeFrom,
+      isLocalFile: localPath != null,
     );
     if (_speed != 1.0) await _engine.setSpeed(_speed);
+    await _applyGain(lesson);
 
     final reported = await _engine.currentDuration();
     if (reported != null && identical(_tracker, tracker)) {
       tracker.totalDuration = reported;
       if (mounted) setState(() {});
     }
+  }
+
+  /// Levels the lesson against the rest of the library, unless the reader has
+  /// turned that off in settings.
+  Future<void> _applyGain(LessonWithProgress lesson) async {
+    final normalize = ref.read(normalizeVolumeProvider);
+    await _engine.setGainDb(normalize ? (lesson.gainDb ?? 0) : 0);
   }
 
   void _onPosition(Duration position) {
@@ -258,6 +278,49 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     }
   }
 
+  /// The read-along panel, sized to take the artwork's place without pushing
+  /// the transport controls off small screens.
+  Widget _buildTextPanel(BuildContext context, LessonWithProgress lesson) {
+    final scheme = Theme.of(context).colorScheme;
+    final height = (MediaQuery.sizeOf(context).height * 0.4).clamp(
+      240.0,
+      400.0,
+    );
+    final textAsync = ref.watch(lessonTextProvider(lesson.videoId));
+
+    return SizedBox(
+      height: height,
+      child: textAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Text(
+            'تعذّر تحميل نص الدرس.',
+            style: TextStyle(color: scheme.onSurfaceVariant),
+          ),
+        ),
+        data: (text) {
+          if (text == null) {
+            return Center(
+              child: Text(
+                'لا يوجد نص لهذا الدرس.',
+                style: TextStyle(color: scheme.onSurfaceVariant),
+              ),
+            );
+          }
+          return LessonTextView(
+            text: text,
+            position: _position,
+            height: height,
+            onSeek: (target) {
+              setState(() => _position = target);
+              _engine.seekTo(target);
+            },
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Like the video player, the design specifies this screen dark, always.
@@ -335,12 +398,29 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const BackCircle(),
-                  Text(
-                    'تشغيل صوتي · يعمل في الخلفية',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_playingOffline) ...[
+                        Icon(
+                          Icons.download_done_rounded,
+                          size: 13,
+                          color: scheme.primary,
+                        ),
+                        const SizedBox(width: 4),
+                      ],
+                      Text(
+                        _playingOffline
+                            ? 'تشغيل من التنزيلات'
+                            : 'تشغيل صوتي · يعمل في الخلفية',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: _playingOffline
+                              ? scheme.primary
+                              : scheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
                   ),
                   _RoundIconButton(
                     icon: _sleepMinutes == null
@@ -353,58 +433,61 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
               ),
               const SizedBox(height: 24),
 
-              // ── Artwork card ─────────────────────────────────────────
-              Center(
-                child: Container(
-                  width: 240,
-                  height: 240,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
-                      colors: [masar.heroGreen, const Color(0xFF17492F)],
-                    ),
-                    borderRadius: BorderRadius.circular(28),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x73000000),
-                        blurRadius: 50,
-                        offset: Offset(0, 20),
+              // ── Artwork card, or the read-along text in its place ────
+              if (_showText && current?.textKind != null)
+                _buildTextPanel(context, current!)
+              else
+                Center(
+                  child: Container(
+                    width: 240,
+                    height: 240,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [masar.heroGreen, const Color(0xFF17492F)],
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 92,
-                        height: 92,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: masar.gold.withValues(alpha: 0.55),
-                            width: 1.5,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x73000000),
+                          blurRadius: 50,
+                          offset: Offset(0, 20),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 92,
+                          height: 92,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: masar.gold.withValues(alpha: 0.55),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Text(
+                            ScienceGlyph.initialOf(seriesTitle),
+                            style: serif(34, masar.onHero, height: 1),
                           ),
                         ),
-                        child: Text(
-                          ScienceGlyph.initialOf(seriesTitle),
-                          style: serif(34, masar.onHero, height: 1),
+                        const SizedBox(height: 10),
+                        Text(
+                          seriesTitle,
+                          style: serif(
+                            18,
+                            masar.onHero.withValues(alpha: 0.85),
+                            height: 1.3,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        seriesTitle,
-                        style: serif(
-                          18,
-                          masar.onHero.withValues(alpha: 0.85),
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
               const SizedBox(height: 24),
 
               // ── Title ────────────────────────────────────────────────
@@ -440,8 +523,8 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                     final shownPosition = !seekable
                         ? _position
                         : Duration(
-                            milliseconds:
-                                (total.inMilliseconds * shownFraction).round(),
+                            milliseconds: (total.inMilliseconds * shownFraction)
+                                .round(),
                           );
                     return Column(
                       children: [
@@ -574,11 +657,41 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                         ),
                       ],
                     ),
-                    Icon(
-                      Icons.graphic_eq_rounded,
-                      size: 19,
-                      color: scheme.onSurfaceVariant,
-                    ),
+                    // Where the decorative equalizer glyph used to sit.
+                    if (current?.textKind != null)
+                      GestureDetector(
+                        onTap: () => setState(() => _showText = !_showText),
+                        behavior: HitTestBehavior.opaque,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.subject_rounded,
+                              size: 18,
+                              color: _showText
+                                  ? scheme.primary
+                                  : scheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              'النص',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: _showText
+                                    ? scheme.primary
+                                    : scheme.onSurfaceVariant,
+                                fontWeight: _showText
+                                    ? FontWeight.w700
+                                    : FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Icon(
+                        Icons.graphic_eq_rounded,
+                        size: 19,
+                        color: scheme.onSurfaceVariant,
+                      ),
                   ],
                 ),
               ),
@@ -705,11 +818,7 @@ class _RoundIconButton extends StatelessWidget {
 }
 
 class _SkipButton extends StatelessWidget {
-  const _SkipButton({
-    required this.forward,
-    required this.enabled,
-    this.onTap,
-  });
+  const _SkipButton({required this.forward, required this.enabled, this.onTap});
 
   final bool forward;
   final bool enabled;
@@ -771,10 +880,7 @@ class _ChapterRow extends StatelessWidget {
             children: [
               if (chapter.startSeconds != null)
                 Padding(
-                  padding: const EdgeInsetsDirectional.only(
-                    end: 12,
-                    top: 2,
-                  ),
+                  padding: const EdgeInsetsDirectional.only(end: 12, top: 2),
                   child: Text(
                     clockLabelLtr(Duration(seconds: chapter.startSeconds!)),
                     textDirection: TextDirection.ltr,
@@ -791,9 +897,7 @@ class _ChapterRow extends StatelessWidget {
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontSize: 12.5,
                     height: 1.6,
-                    color: onTap == null
-                        ? masar.textMuted
-                        : scheme.onSurface,
+                    color: onTap == null ? masar.textMuted : scheme.onSurface,
                   ),
                 ),
               ),

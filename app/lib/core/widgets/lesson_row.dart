@@ -18,6 +18,7 @@ class LessonRow extends StatelessWidget {
     this.showDivider = true,
     this.monoClock = false,
     this.onTap,
+    this.trailing,
   });
 
   final String title;
@@ -32,6 +33,9 @@ class LessonRow extends StatelessWidget {
   /// series detail keeps Arabic-Indic digits (design 1g).
   final bool monoClock;
   final VoidCallback? onTap;
+
+  /// Slot after the duration — the download control on audio lessons.
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +149,10 @@ class LessonRow extends StatelessWidget {
                             : masar.textFaint,
                       ),
                     ),
+                  ],
+                  if (trailing != null) ...[
+                    const SizedBox(width: 4),
+                    trailing!,
                   ],
                 ],
               ),

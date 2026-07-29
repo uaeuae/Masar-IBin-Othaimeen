@@ -48,6 +48,43 @@ final autoplayProvider = NotifierProvider<AutoplayNotifier, bool>(
   AutoplayNotifier.new,
 );
 
+/// Whether downloads may run on mobile data. Off by default: a زاد المستقنع
+/// book is several GB, and a mis-tap shouldn't spend someone's bundle.
+class AllowMobileDataNotifier extends Notifier<bool> {
+  static const _key = 'downloads_allow_mobile_data';
+
+  @override
+  bool build() => ref.watch(sharedPreferencesProvider).getBool(_key) ?? false;
+
+  void set(bool value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setBool(_key, value);
+  }
+}
+
+final allowMobileDataProvider =
+    NotifierProvider<AllowMobileDataNotifier, bool>(
+      AllowMobileDataNotifier.new,
+    );
+
+/// Even out the library's loudness using each lesson's measured level.
+class NormalizeVolumeNotifier extends Notifier<bool> {
+  static const _key = 'normalize_volume';
+
+  @override
+  bool build() => ref.watch(sharedPreferencesProvider).getBool(_key) ?? true;
+
+  void set(bool value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setBool(_key, value);
+  }
+}
+
+final normalizeVolumeProvider =
+    NotifierProvider<NormalizeVolumeNotifier, bool>(
+      NormalizeVolumeNotifier.new,
+    );
+
 /// Daily-continuation reminder preference. Persisted now; the actual local
 /// notification ships in Phase 2 (the UI labels it "قريبًا").
 class DailyReminderNotifier extends Notifier<bool> {

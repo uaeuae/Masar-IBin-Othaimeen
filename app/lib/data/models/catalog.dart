@@ -92,6 +92,14 @@ abstract class CatalogLesson with _$CatalogLesson {
     @Default(LessonStatus.active) LessonStatus status,
     @Default(LessonMedia.video) LessonMedia media,
     String? audioUrl,
+
+    /// Null when the lesson has no read-along script bundled under
+    /// `assets/texts/` — 114 of the 500 audio lessons.
+    LessonTextKind? textKind,
+
+    /// Playback correction in dB toward a common loudness, from the measured
+    /// level of the source file. Null until the lesson has been measured.
+    double? gainDb,
     @Default([]) List<CatalogChapter> chapters,
   }) = _CatalogLesson;
 

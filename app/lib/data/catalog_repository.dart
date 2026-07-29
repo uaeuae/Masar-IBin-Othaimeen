@@ -98,6 +98,8 @@ class CatalogRepository {
                 status: Value(l.status.name),
                 mediaType: Value(l.media.name),
                 audioUrl: Value(l.audioUrl),
+                textKind: Value(l.textKind?.name),
+                gainDb: Value(l.gainDb),
                 chaptersJson: Value(
                   l.chapters.isEmpty
                       ? null
@@ -347,7 +349,7 @@ class CatalogRepository {
     final lessonsQuery = db.customSelect(
       '''
       SELECT l.video_id, l.position, l.title_ar, l.duration_seconds, l.status,
-        l.media_type, l.audio_url, l.chapters_json,
+        l.media_type, l.audio_url, l.chapters_json, l.text_kind, l.gain_db,
         COALESCE(p.watched_seconds, 0) AS watched_seconds,
         COALESCE(p.completed, 0) AS completed
       FROM lessons l
@@ -377,6 +379,10 @@ class CatalogRepository {
             completed: row.read<int>('completed') != 0,
             media: LessonMedia.fromJson(row.read<String>('media_type')),
             audioUrl: row.readNullable<String>('audio_url'),
+            textKind: LessonTextKind.fromJson(
+              row.readNullable<String>('text_kind'),
+            ),
+            gainDb: row.readNullable<double>('gain_db'),
             chapters: _chaptersFromJson(
               row.readNullable<String>('chapters_json'),
             ),

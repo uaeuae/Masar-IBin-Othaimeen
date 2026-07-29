@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:masar/app/app.dart';
 import 'package:masar/data/catalog_repository.dart';
@@ -42,6 +43,7 @@ void testApp(
   String description,
   Future<void> Function(WidgetTester tester, PumpedApp app) body, {
   bool importCatalog = true,
+  List<Override> overrides = const [],
 }) {
   testWidgets(description, (tester) async {
     SharedPreferences.setMockInitialValues({});
@@ -71,6 +73,7 @@ void testApp(
             // the bundled asset (real I/O — deadlocks under FakeAsync) and
             // overwrite the fixture with the production catalog.
             catalogReadyProvider.overrideWith((ref) async {}),
+            ...overrides,
           ],
           child: const MasarApp(),
         ),

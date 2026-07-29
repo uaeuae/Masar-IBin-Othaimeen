@@ -1,5 +1,6 @@
 import 'dart:async' show unawaited;
 import 'dart:io' show Platform;
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,16 +23,38 @@ abstract class AudioLessonEngine {
     required String title,
     required String album,
     Duration start = Duration.zero,
+    bool isLocalFile = false,
   });
 
   Future<void> togglePlay();
   Future<void> seekTo(Duration position);
   Future<void> setSpeed(double speed);
+
+  /// Applies a loudness correction in dB (0 = play the file untouched).
+  Future<void> setGainDb(double gainDb);
   void dispose();
 }
 
 class JustAudioLessonEngine implements AudioLessonEngine {
-  final AudioPlayer _player = AudioPlayer();
+  JustAudioLessonEngine()
+    : _enhancer = !kIsWeb && Platform.isAndroid
+          ? AndroidLoudnessEnhancer()
+          : null {
+    final enhancer = _enhancer;
+    _player = AudioPlayer(
+      audioPipeline: enhancer == null
+          ? null
+          : AudioPipeline(androidAudioEffects: [enhancer]),
+    );
+  }
+
+  /// Android is the only platform that can lift a quiet lesson *above* its
+  /// source level — iOS clamps AVPlayer's volume at 1.0× and just_audio ships
+  /// no Darwin effects. There, a positive gain simply isn't applied. One
+  /// enhancer per player: an effect can't be attached to two.
+  final AndroidLoudnessEnhancer? _enhancer;
+
+  late final AudioPlayer _player;
 
   @override
   Stream<Duration> get positions => _player.positionStream;
@@ -54,11 +77,12 @@ class JustAudioLessonEngine implements AudioLessonEngine {
     required String title,
     required String album,
     Duration start = Duration.zero,
+    bool isLocalFile = false,
   }) async {
     try {
       await _player.setAudioSource(
         AudioSource.uri(
-          Uri.parse(url),
+          isLocalFile ? Uri.file(url) : Uri.parse(url),
           tag: MediaItem(id: id, title: title, album: album),
         ),
         initialPosition: start,
@@ -98,6 +122,25 @@ class JustAudioLessonEngine implements AudioLessonEngine {
       await _player.setSpeed(speed);
     } on Exception catch (error) {
       debugPrint('audio setSpeed failed: $error');
+    }
+  }
+
+  @override
+  Future<void> setGainDb(double gainDb) async {
+    try {
+      // Attenuation is just volume, and works everywhere. Boost is not: the
+      // player's volume tops out at 1.0×, so a positive gain has to come from
+      // the platform effect — which only Android has.
+      final linear = math.pow(10, gainDb / 20).toDouble();
+      await _player.setVolume(linear.clamp(0.0, 1.0));
+
+      final enhancer = _enhancer;
+      if (enhancer == null) return;
+      final boost = gainDb > 0 ? gainDb : 0.0;
+      await enhancer.setTargetGain(boost);
+      await enhancer.setEnabled(boost > 0);
+    } on Exception catch (error) {
+      debugPrint('audio setGainDb failed: $error');
     }
   }
 

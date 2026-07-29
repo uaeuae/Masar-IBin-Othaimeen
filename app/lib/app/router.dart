@@ -12,6 +12,7 @@ import '../features/library/library_screen.dart';
 import '../features/library/science_series_screen.dart';
 import '../features/player/lesson_player_dispatcher.dart';
 import '../features/series/series_detail_screen.dart';
+import '../features/downloads/downloads_screen.dart';
 import '../features/settings/settings_screen.dart';
 import 'shell.dart';
 
@@ -81,6 +82,10 @@ GoRouter _createRouter() => GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/downloads',
+      builder: (context, state) => const DownloadsScreen(),
     ),
     GoRoute(
       path: '/search',

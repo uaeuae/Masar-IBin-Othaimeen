@@ -28,6 +28,7 @@ dependencies:
   url_launcher: ^6.3.2
   just_audio: ^0.10.6
   just_audio_background: ^0.0.1-beta.17
+  connectivity_plus: ^7.3.1
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +63,8 @@ flutter:
 
   assets:
     - assets/catalog/
+    # Read-along scripts, one gzipped file per lesson (npm run build:texts).
+    - assets/texts/
 
   fonts:
     - family: IBMPlexSansArabic

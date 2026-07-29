@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
@@ -19,6 +20,7 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final autoplay = ref.watch(autoplayProvider);
     final reminder = ref.watch(dailyReminderProvider);
+    final normalize = ref.watch(normalizeVolumeProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -66,6 +68,14 @@ class SettingsScreen extends ConsumerWidget {
                   onChanged: (v) => ref.read(autoplayProvider.notifier).set(v),
                 ),
                 _ToggleRow(
+                  title: 'توحيد مستوى الصوت',
+                  subtitle:
+                      'يعادل بين الدروس المرتفعة والمنخفضة حسب مستوى كل تسجيل',
+                  value: normalize,
+                  onChanged: (v) =>
+                      ref.read(normalizeVolumeProvider.notifier).set(v),
+                ),
+                _ToggleRow(
                   title: 'تذكير المتابعة اليومي',
                   subtitle: 'إشعار لطيف لمواصلة مسارك (قريبًا)',
                   value: reminder,
@@ -80,6 +90,10 @@ class SettingsScreen extends ConsumerWidget {
             // ── Links ────────────────────────────────────────────────
             _GroupCard(
               children: [
+                _LinkRow(
+                  title: 'التنزيلات',
+                  onTap: () => context.push('/downloads'),
+                ),
                 _LinkRow(
                   title: 'القناة الرسمية للشيخ',
                   onTap: () => launchUrl(

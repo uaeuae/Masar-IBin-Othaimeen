@@ -12,6 +12,10 @@ class FakeAudioLessonEngine implements AudioLessonEngine {
   final loads = <(String, String, Duration)>[];
   final seeks = <Duration>[];
   final speeds = <double>[];
+  final gains = <double>[];
+
+  /// Whether the last load() played a file from disk rather than the network.
+  bool lastLoadWasLocal = false;
 
   Duration? durationToReport;
   bool disposed = false;
@@ -36,8 +40,10 @@ class FakeAudioLessonEngine implements AudioLessonEngine {
     required String title,
     required String album,
     Duration start = Duration.zero,
+    bool isLocalFile = false,
   }) async {
     loads.add((id, url, start));
+    lastLoadWasLocal = isLocalFile;
   }
 
   @override
@@ -53,6 +59,11 @@ class FakeAudioLessonEngine implements AudioLessonEngine {
   @override
   Future<void> setSpeed(double speed) async {
     speeds.add(speed);
+  }
+
+  @override
+  Future<void> setGainDb(double gainDb) async {
+    gains.add(gainDb);
   }
 
   @override

@@ -125,6 +125,8 @@ class LessonWithProgress {
     required this.completed,
     this.media = LessonMedia.video,
     this.audioUrl,
+    this.textKind,
+    this.gainDb,
     this.chapters = const [],
   });
 
@@ -137,6 +139,12 @@ class LessonWithProgress {
   final bool completed;
   final LessonMedia media;
   final String? audioUrl;
+
+  /// Set when a read-along script is bundled for this lesson.
+  final LessonTextKind? textKind;
+
+  /// Loudness correction in dB, or null if the lesson was never measured.
+  final double? gainDb;
   final List<CatalogChapter> chapters;
 
   double get progress {

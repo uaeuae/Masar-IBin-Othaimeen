@@ -1494,6 +1494,26 @@ class $LessonsTable extends Lessons with TableInfo<$LessonsTable, Lesson> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _textKindMeta = const VerificationMeta(
+    'textKind',
+  );
+  @override
+  late final GeneratedColumn<String> textKind = GeneratedColumn<String>(
+    'text_kind',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _gainDbMeta = const VerificationMeta('gainDb');
+  @override
+  late final GeneratedColumn<double> gainDb = GeneratedColumn<double>(
+    'gain_db',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     videoId,
@@ -1505,6 +1525,8 @@ class $LessonsTable extends Lessons with TableInfo<$LessonsTable, Lesson> {
     mediaType,
     audioUrl,
     chaptersJson,
+    textKind,
+    gainDb,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1586,6 +1608,18 @@ class $LessonsTable extends Lessons with TableInfo<$LessonsTable, Lesson> {
         ),
       );
     }
+    if (data.containsKey('text_kind')) {
+      context.handle(
+        _textKindMeta,
+        textKind.isAcceptableOrUnknown(data['text_kind']!, _textKindMeta),
+      );
+    }
+    if (data.containsKey('gain_db')) {
+      context.handle(
+        _gainDbMeta,
+        gainDb.isAcceptableOrUnknown(data['gain_db']!, _gainDbMeta),
+      );
+    }
     return context;
   }
 
@@ -1631,6 +1665,14 @@ class $LessonsTable extends Lessons with TableInfo<$LessonsTable, Lesson> {
         DriftSqlType.string,
         data['${effectivePrefix}chapters_json'],
       ),
+      textKind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text_kind'],
+      ),
+      gainDb: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}gain_db'],
+      ),
     );
   }
 
@@ -1657,6 +1699,15 @@ class Lesson extends DataClass implements Insertable<Lesson> {
 
   /// JSON list of {start_seconds, title, body} chapter markers (audio only).
   final String? chaptersJson;
+
+  /// 'transcript' | 'matn' — which read-along script exists under
+  /// assets/texts/, or null when the lesson has none.
+  final String? textKind;
+
+  /// Playback correction in dB from the measured loudness (see
+  /// `analyze:loudness`). Negative pulls a loud lesson down; positive marks a
+  /// quiet one, which only Android can actually boost.
+  final double? gainDb;
   const Lesson({
     required this.videoId,
     required this.seriesSlug,
@@ -1667,6 +1718,8 @@ class Lesson extends DataClass implements Insertable<Lesson> {
     required this.mediaType,
     this.audioUrl,
     this.chaptersJson,
+    this.textKind,
+    this.gainDb,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1685,6 +1738,12 @@ class Lesson extends DataClass implements Insertable<Lesson> {
     }
     if (!nullToAbsent || chaptersJson != null) {
       map['chapters_json'] = Variable<String>(chaptersJson);
+    }
+    if (!nullToAbsent || textKind != null) {
+      map['text_kind'] = Variable<String>(textKind);
+    }
+    if (!nullToAbsent || gainDb != null) {
+      map['gain_db'] = Variable<double>(gainDb);
     }
     return map;
   }
@@ -1706,6 +1765,12 @@ class Lesson extends DataClass implements Insertable<Lesson> {
       chaptersJson: chaptersJson == null && nullToAbsent
           ? const Value.absent()
           : Value(chaptersJson),
+      textKind: textKind == null && nullToAbsent
+          ? const Value.absent()
+          : Value(textKind),
+      gainDb: gainDb == null && nullToAbsent
+          ? const Value.absent()
+          : Value(gainDb),
     );
   }
 
@@ -1724,6 +1789,8 @@ class Lesson extends DataClass implements Insertable<Lesson> {
       mediaType: serializer.fromJson<String>(json['mediaType']),
       audioUrl: serializer.fromJson<String?>(json['audioUrl']),
       chaptersJson: serializer.fromJson<String?>(json['chaptersJson']),
+      textKind: serializer.fromJson<String?>(json['textKind']),
+      gainDb: serializer.fromJson<double?>(json['gainDb']),
     );
   }
   @override
@@ -1739,6 +1806,8 @@ class Lesson extends DataClass implements Insertable<Lesson> {
       'mediaType': serializer.toJson<String>(mediaType),
       'audioUrl': serializer.toJson<String?>(audioUrl),
       'chaptersJson': serializer.toJson<String?>(chaptersJson),
+      'textKind': serializer.toJson<String?>(textKind),
+      'gainDb': serializer.toJson<double?>(gainDb),
     };
   }
 
@@ -1752,6 +1821,8 @@ class Lesson extends DataClass implements Insertable<Lesson> {
     String? mediaType,
     Value<String?> audioUrl = const Value.absent(),
     Value<String?> chaptersJson = const Value.absent(),
+    Value<String?> textKind = const Value.absent(),
+    Value<double?> gainDb = const Value.absent(),
   }) => Lesson(
     videoId: videoId ?? this.videoId,
     seriesSlug: seriesSlug ?? this.seriesSlug,
@@ -1764,6 +1835,8 @@ class Lesson extends DataClass implements Insertable<Lesson> {
     mediaType: mediaType ?? this.mediaType,
     audioUrl: audioUrl.present ? audioUrl.value : this.audioUrl,
     chaptersJson: chaptersJson.present ? chaptersJson.value : this.chaptersJson,
+    textKind: textKind.present ? textKind.value : this.textKind,
+    gainDb: gainDb.present ? gainDb.value : this.gainDb,
   );
   Lesson copyWithCompanion(LessonsCompanion data) {
     return Lesson(
@@ -1782,6 +1855,8 @@ class Lesson extends DataClass implements Insertable<Lesson> {
       chaptersJson: data.chaptersJson.present
           ? data.chaptersJson.value
           : this.chaptersJson,
+      textKind: data.textKind.present ? data.textKind.value : this.textKind,
+      gainDb: data.gainDb.present ? data.gainDb.value : this.gainDb,
     );
   }
 
@@ -1796,7 +1871,9 @@ class Lesson extends DataClass implements Insertable<Lesson> {
           ..write('status: $status, ')
           ..write('mediaType: $mediaType, ')
           ..write('audioUrl: $audioUrl, ')
-          ..write('chaptersJson: $chaptersJson')
+          ..write('chaptersJson: $chaptersJson, ')
+          ..write('textKind: $textKind, ')
+          ..write('gainDb: $gainDb')
           ..write(')'))
         .toString();
   }
@@ -1812,6 +1889,8 @@ class Lesson extends DataClass implements Insertable<Lesson> {
     mediaType,
     audioUrl,
     chaptersJson,
+    textKind,
+    gainDb,
   );
   @override
   bool operator ==(Object other) =>
@@ -1825,7 +1904,9 @@ class Lesson extends DataClass implements Insertable<Lesson> {
           other.status == this.status &&
           other.mediaType == this.mediaType &&
           other.audioUrl == this.audioUrl &&
-          other.chaptersJson == this.chaptersJson);
+          other.chaptersJson == this.chaptersJson &&
+          other.textKind == this.textKind &&
+          other.gainDb == this.gainDb);
 }
 
 class LessonsCompanion extends UpdateCompanion<Lesson> {
@@ -1838,6 +1919,8 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
   final Value<String> mediaType;
   final Value<String?> audioUrl;
   final Value<String?> chaptersJson;
+  final Value<String?> textKind;
+  final Value<double?> gainDb;
   final Value<int> rowid;
   const LessonsCompanion({
     this.videoId = const Value.absent(),
@@ -1849,6 +1932,8 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
     this.mediaType = const Value.absent(),
     this.audioUrl = const Value.absent(),
     this.chaptersJson = const Value.absent(),
+    this.textKind = const Value.absent(),
+    this.gainDb = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   LessonsCompanion.insert({
@@ -1861,6 +1946,8 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
     this.mediaType = const Value.absent(),
     this.audioUrl = const Value.absent(),
     this.chaptersJson = const Value.absent(),
+    this.textKind = const Value.absent(),
+    this.gainDb = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : videoId = Value(videoId),
        seriesSlug = Value(seriesSlug),
@@ -1876,6 +1963,8 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
     Expression<String>? mediaType,
     Expression<String>? audioUrl,
     Expression<String>? chaptersJson,
+    Expression<String>? textKind,
+    Expression<double>? gainDb,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1888,6 +1977,8 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
       if (mediaType != null) 'media_type': mediaType,
       if (audioUrl != null) 'audio_url': audioUrl,
       if (chaptersJson != null) 'chapters_json': chaptersJson,
+      if (textKind != null) 'text_kind': textKind,
+      if (gainDb != null) 'gain_db': gainDb,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1902,6 +1993,8 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
     Value<String>? mediaType,
     Value<String?>? audioUrl,
     Value<String?>? chaptersJson,
+    Value<String?>? textKind,
+    Value<double?>? gainDb,
     Value<int>? rowid,
   }) {
     return LessonsCompanion(
@@ -1914,6 +2007,8 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
       mediaType: mediaType ?? this.mediaType,
       audioUrl: audioUrl ?? this.audioUrl,
       chaptersJson: chaptersJson ?? this.chaptersJson,
+      textKind: textKind ?? this.textKind,
+      gainDb: gainDb ?? this.gainDb,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1948,6 +2043,12 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
     if (chaptersJson.present) {
       map['chapters_json'] = Variable<String>(chaptersJson.value);
     }
+    if (textKind.present) {
+      map['text_kind'] = Variable<String>(textKind.value);
+    }
+    if (gainDb.present) {
+      map['gain_db'] = Variable<double>(gainDb.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1966,6 +2067,8 @@ class LessonsCompanion extends UpdateCompanion<Lesson> {
           ..write('mediaType: $mediaType, ')
           ..write('audioUrl: $audioUrl, ')
           ..write('chaptersJson: $chaptersJson, ')
+          ..write('textKind: $textKind, ')
+          ..write('gainDb: $gainDb, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -4154,6 +4257,590 @@ class JourneyEnrollmentsCompanion extends UpdateCompanion<JourneyEnrollment> {
   }
 }
 
+class $DownloadsTable extends Downloads
+    with TableInfo<$DownloadsTable, Download> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DownloadsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _videoIdMeta = const VerificationMeta(
+    'videoId',
+  );
+  @override
+  late final GeneratedColumn<String> videoId = GeneratedColumn<String>(
+    'video_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _seriesSlugMeta = const VerificationMeta(
+    'seriesSlug',
+  );
+  @override
+  late final GeneratedColumn<String> seriesSlug = GeneratedColumn<String>(
+    'series_slug',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _stateMeta = const VerificationMeta('state');
+  @override
+  late final GeneratedColumn<String> state = GeneratedColumn<String>(
+    'state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('queued'),
+  );
+  static const VerificationMeta _fileNameMeta = const VerificationMeta(
+    'fileName',
+  );
+  @override
+  late final GeneratedColumn<String> fileName = GeneratedColumn<String>(
+    'file_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _receivedBytesMeta = const VerificationMeta(
+    'receivedBytes',
+  );
+  @override
+  late final GeneratedColumn<int> receivedBytes = GeneratedColumn<int>(
+    'received_bytes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _totalBytesMeta = const VerificationMeta(
+    'totalBytes',
+  );
+  @override
+  late final GeneratedColumn<int> totalBytes = GeneratedColumn<int>(
+    'total_bytes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _errorMeta = const VerificationMeta('error');
+  @override
+  late final GeneratedColumn<String> error = GeneratedColumn<String>(
+    'error',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _requestedAtMeta = const VerificationMeta(
+    'requestedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> requestedAt = GeneratedColumn<DateTime>(
+    'requested_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _completedAtMeta = const VerificationMeta(
+    'completedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> completedAt = GeneratedColumn<DateTime>(
+    'completed_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    videoId,
+    seriesSlug,
+    state,
+    fileName,
+    receivedBytes,
+    totalBytes,
+    error,
+    requestedAt,
+    completedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'downloads';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Download> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('video_id')) {
+      context.handle(
+        _videoIdMeta,
+        videoId.isAcceptableOrUnknown(data['video_id']!, _videoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_videoIdMeta);
+    }
+    if (data.containsKey('series_slug')) {
+      context.handle(
+        _seriesSlugMeta,
+        seriesSlug.isAcceptableOrUnknown(data['series_slug']!, _seriesSlugMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_seriesSlugMeta);
+    }
+    if (data.containsKey('state')) {
+      context.handle(
+        _stateMeta,
+        state.isAcceptableOrUnknown(data['state']!, _stateMeta),
+      );
+    }
+    if (data.containsKey('file_name')) {
+      context.handle(
+        _fileNameMeta,
+        fileName.isAcceptableOrUnknown(data['file_name']!, _fileNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fileNameMeta);
+    }
+    if (data.containsKey('received_bytes')) {
+      context.handle(
+        _receivedBytesMeta,
+        receivedBytes.isAcceptableOrUnknown(
+          data['received_bytes']!,
+          _receivedBytesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('total_bytes')) {
+      context.handle(
+        _totalBytesMeta,
+        totalBytes.isAcceptableOrUnknown(data['total_bytes']!, _totalBytesMeta),
+      );
+    }
+    if (data.containsKey('error')) {
+      context.handle(
+        _errorMeta,
+        error.isAcceptableOrUnknown(data['error']!, _errorMeta),
+      );
+    }
+    if (data.containsKey('requested_at')) {
+      context.handle(
+        _requestedAtMeta,
+        requestedAt.isAcceptableOrUnknown(
+          data['requested_at']!,
+          _requestedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_requestedAtMeta);
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+        _completedAtMeta,
+        completedAt.isAcceptableOrUnknown(
+          data['completed_at']!,
+          _completedAtMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {videoId};
+  @override
+  Download map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Download(
+      videoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}video_id'],
+      )!,
+      seriesSlug: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}series_slug'],
+      )!,
+      state: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}state'],
+      )!,
+      fileName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}file_name'],
+      )!,
+      receivedBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}received_bytes'],
+      )!,
+      totalBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total_bytes'],
+      ),
+      error: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}error'],
+      ),
+      requestedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}requested_at'],
+      )!,
+      completedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}completed_at'],
+      ),
+    );
+  }
+
+  @override
+  $DownloadsTable createAlias(String alias) {
+    return $DownloadsTable(attachedDatabase, alias);
+  }
+}
+
+class Download extends DataClass implements Insertable<Download> {
+  final String videoId;
+  final String seriesSlug;
+
+  /// 'queued' | 'downloading' | 'done' | 'failed'
+  final String state;
+
+  /// Basename under the downloads directory — never an absolute path, which
+  /// iOS invalidates whenever the app container is relocated.
+  final String fileName;
+  final int receivedBytes;
+  final int? totalBytes;
+  final String? error;
+  final DateTime requestedAt;
+  final DateTime? completedAt;
+  const Download({
+    required this.videoId,
+    required this.seriesSlug,
+    required this.state,
+    required this.fileName,
+    required this.receivedBytes,
+    this.totalBytes,
+    this.error,
+    required this.requestedAt,
+    this.completedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['video_id'] = Variable<String>(videoId);
+    map['series_slug'] = Variable<String>(seriesSlug);
+    map['state'] = Variable<String>(state);
+    map['file_name'] = Variable<String>(fileName);
+    map['received_bytes'] = Variable<int>(receivedBytes);
+    if (!nullToAbsent || totalBytes != null) {
+      map['total_bytes'] = Variable<int>(totalBytes);
+    }
+    if (!nullToAbsent || error != null) {
+      map['error'] = Variable<String>(error);
+    }
+    map['requested_at'] = Variable<DateTime>(requestedAt);
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<DateTime>(completedAt);
+    }
+    return map;
+  }
+
+  DownloadsCompanion toCompanion(bool nullToAbsent) {
+    return DownloadsCompanion(
+      videoId: Value(videoId),
+      seriesSlug: Value(seriesSlug),
+      state: Value(state),
+      fileName: Value(fileName),
+      receivedBytes: Value(receivedBytes),
+      totalBytes: totalBytes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totalBytes),
+      error: error == null && nullToAbsent
+          ? const Value.absent()
+          : Value(error),
+      requestedAt: Value(requestedAt),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
+    );
+  }
+
+  factory Download.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Download(
+      videoId: serializer.fromJson<String>(json['videoId']),
+      seriesSlug: serializer.fromJson<String>(json['seriesSlug']),
+      state: serializer.fromJson<String>(json['state']),
+      fileName: serializer.fromJson<String>(json['fileName']),
+      receivedBytes: serializer.fromJson<int>(json['receivedBytes']),
+      totalBytes: serializer.fromJson<int?>(json['totalBytes']),
+      error: serializer.fromJson<String?>(json['error']),
+      requestedAt: serializer.fromJson<DateTime>(json['requestedAt']),
+      completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'videoId': serializer.toJson<String>(videoId),
+      'seriesSlug': serializer.toJson<String>(seriesSlug),
+      'state': serializer.toJson<String>(state),
+      'fileName': serializer.toJson<String>(fileName),
+      'receivedBytes': serializer.toJson<int>(receivedBytes),
+      'totalBytes': serializer.toJson<int?>(totalBytes),
+      'error': serializer.toJson<String?>(error),
+      'requestedAt': serializer.toJson<DateTime>(requestedAt),
+      'completedAt': serializer.toJson<DateTime?>(completedAt),
+    };
+  }
+
+  Download copyWith({
+    String? videoId,
+    String? seriesSlug,
+    String? state,
+    String? fileName,
+    int? receivedBytes,
+    Value<int?> totalBytes = const Value.absent(),
+    Value<String?> error = const Value.absent(),
+    DateTime? requestedAt,
+    Value<DateTime?> completedAt = const Value.absent(),
+  }) => Download(
+    videoId: videoId ?? this.videoId,
+    seriesSlug: seriesSlug ?? this.seriesSlug,
+    state: state ?? this.state,
+    fileName: fileName ?? this.fileName,
+    receivedBytes: receivedBytes ?? this.receivedBytes,
+    totalBytes: totalBytes.present ? totalBytes.value : this.totalBytes,
+    error: error.present ? error.value : this.error,
+    requestedAt: requestedAt ?? this.requestedAt,
+    completedAt: completedAt.present ? completedAt.value : this.completedAt,
+  );
+  Download copyWithCompanion(DownloadsCompanion data) {
+    return Download(
+      videoId: data.videoId.present ? data.videoId.value : this.videoId,
+      seriesSlug: data.seriesSlug.present
+          ? data.seriesSlug.value
+          : this.seriesSlug,
+      state: data.state.present ? data.state.value : this.state,
+      fileName: data.fileName.present ? data.fileName.value : this.fileName,
+      receivedBytes: data.receivedBytes.present
+          ? data.receivedBytes.value
+          : this.receivedBytes,
+      totalBytes: data.totalBytes.present
+          ? data.totalBytes.value
+          : this.totalBytes,
+      error: data.error.present ? data.error.value : this.error,
+      requestedAt: data.requestedAt.present
+          ? data.requestedAt.value
+          : this.requestedAt,
+      completedAt: data.completedAt.present
+          ? data.completedAt.value
+          : this.completedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Download(')
+          ..write('videoId: $videoId, ')
+          ..write('seriesSlug: $seriesSlug, ')
+          ..write('state: $state, ')
+          ..write('fileName: $fileName, ')
+          ..write('receivedBytes: $receivedBytes, ')
+          ..write('totalBytes: $totalBytes, ')
+          ..write('error: $error, ')
+          ..write('requestedAt: $requestedAt, ')
+          ..write('completedAt: $completedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    videoId,
+    seriesSlug,
+    state,
+    fileName,
+    receivedBytes,
+    totalBytes,
+    error,
+    requestedAt,
+    completedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Download &&
+          other.videoId == this.videoId &&
+          other.seriesSlug == this.seriesSlug &&
+          other.state == this.state &&
+          other.fileName == this.fileName &&
+          other.receivedBytes == this.receivedBytes &&
+          other.totalBytes == this.totalBytes &&
+          other.error == this.error &&
+          other.requestedAt == this.requestedAt &&
+          other.completedAt == this.completedAt);
+}
+
+class DownloadsCompanion extends UpdateCompanion<Download> {
+  final Value<String> videoId;
+  final Value<String> seriesSlug;
+  final Value<String> state;
+  final Value<String> fileName;
+  final Value<int> receivedBytes;
+  final Value<int?> totalBytes;
+  final Value<String?> error;
+  final Value<DateTime> requestedAt;
+  final Value<DateTime?> completedAt;
+  final Value<int> rowid;
+  const DownloadsCompanion({
+    this.videoId = const Value.absent(),
+    this.seriesSlug = const Value.absent(),
+    this.state = const Value.absent(),
+    this.fileName = const Value.absent(),
+    this.receivedBytes = const Value.absent(),
+    this.totalBytes = const Value.absent(),
+    this.error = const Value.absent(),
+    this.requestedAt = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DownloadsCompanion.insert({
+    required String videoId,
+    required String seriesSlug,
+    this.state = const Value.absent(),
+    required String fileName,
+    this.receivedBytes = const Value.absent(),
+    this.totalBytes = const Value.absent(),
+    this.error = const Value.absent(),
+    required DateTime requestedAt,
+    this.completedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : videoId = Value(videoId),
+       seriesSlug = Value(seriesSlug),
+       fileName = Value(fileName),
+       requestedAt = Value(requestedAt);
+  static Insertable<Download> custom({
+    Expression<String>? videoId,
+    Expression<String>? seriesSlug,
+    Expression<String>? state,
+    Expression<String>? fileName,
+    Expression<int>? receivedBytes,
+    Expression<int>? totalBytes,
+    Expression<String>? error,
+    Expression<DateTime>? requestedAt,
+    Expression<DateTime>? completedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (videoId != null) 'video_id': videoId,
+      if (seriesSlug != null) 'series_slug': seriesSlug,
+      if (state != null) 'state': state,
+      if (fileName != null) 'file_name': fileName,
+      if (receivedBytes != null) 'received_bytes': receivedBytes,
+      if (totalBytes != null) 'total_bytes': totalBytes,
+      if (error != null) 'error': error,
+      if (requestedAt != null) 'requested_at': requestedAt,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DownloadsCompanion copyWith({
+    Value<String>? videoId,
+    Value<String>? seriesSlug,
+    Value<String>? state,
+    Value<String>? fileName,
+    Value<int>? receivedBytes,
+    Value<int?>? totalBytes,
+    Value<String?>? error,
+    Value<DateTime>? requestedAt,
+    Value<DateTime?>? completedAt,
+    Value<int>? rowid,
+  }) {
+    return DownloadsCompanion(
+      videoId: videoId ?? this.videoId,
+      seriesSlug: seriesSlug ?? this.seriesSlug,
+      state: state ?? this.state,
+      fileName: fileName ?? this.fileName,
+      receivedBytes: receivedBytes ?? this.receivedBytes,
+      totalBytes: totalBytes ?? this.totalBytes,
+      error: error ?? this.error,
+      requestedAt: requestedAt ?? this.requestedAt,
+      completedAt: completedAt ?? this.completedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (videoId.present) {
+      map['video_id'] = Variable<String>(videoId.value);
+    }
+    if (seriesSlug.present) {
+      map['series_slug'] = Variable<String>(seriesSlug.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(state.value);
+    }
+    if (fileName.present) {
+      map['file_name'] = Variable<String>(fileName.value);
+    }
+    if (receivedBytes.present) {
+      map['received_bytes'] = Variable<int>(receivedBytes.value);
+    }
+    if (totalBytes.present) {
+      map['total_bytes'] = Variable<int>(totalBytes.value);
+    }
+    if (error.present) {
+      map['error'] = Variable<String>(error.value);
+    }
+    if (requestedAt.present) {
+      map['requested_at'] = Variable<DateTime>(requestedAt.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<DateTime>(completedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DownloadsCompanion(')
+          ..write('videoId: $videoId, ')
+          ..write('seriesSlug: $seriesSlug, ')
+          ..write('state: $state, ')
+          ..write('fileName: $fileName, ')
+          ..write('receivedBytes: $receivedBytes, ')
+          ..write('totalBytes: $totalBytes, ')
+          ..write('error: $error, ')
+          ..write('requestedAt: $requestedAt, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4168,6 +4855,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $LessonProgressTable lessonProgress = $LessonProgressTable(this);
   late final $JourneyEnrollmentsTable journeyEnrollments =
       $JourneyEnrollmentsTable(this);
+  late final $DownloadsTable downloads = $DownloadsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4183,6 +4871,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     catalogInfo,
     lessonProgress,
     journeyEnrollments,
+    downloads,
   ];
 }
 
@@ -4896,6 +5585,8 @@ typedef $$LessonsTableCreateCompanionBuilder =
       Value<String> mediaType,
       Value<String?> audioUrl,
       Value<String?> chaptersJson,
+      Value<String?> textKind,
+      Value<double?> gainDb,
       Value<int> rowid,
     });
 typedef $$LessonsTableUpdateCompanionBuilder =
@@ -4909,6 +5600,8 @@ typedef $$LessonsTableUpdateCompanionBuilder =
       Value<String> mediaType,
       Value<String?> audioUrl,
       Value<String?> chaptersJson,
+      Value<String?> textKind,
+      Value<double?> gainDb,
       Value<int> rowid,
     });
 
@@ -4963,6 +5656,16 @@ class $$LessonsTableFilterComposer
 
   ColumnFilters<String> get chaptersJson => $composableBuilder(
     column: $table.chaptersJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textKind => $composableBuilder(
+    column: $table.textKind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get gainDb => $composableBuilder(
+    column: $table.gainDb,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -5020,6 +5723,16 @@ class $$LessonsTableOrderingComposer
     column: $table.chaptersJson,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get textKind => $composableBuilder(
+    column: $table.textKind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get gainDb => $composableBuilder(
+    column: $table.gainDb,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$LessonsTableAnnotationComposer
@@ -5063,6 +5776,12 @@ class $$LessonsTableAnnotationComposer
     column: $table.chaptersJson,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get textKind =>
+      $composableBuilder(column: $table.textKind, builder: (column) => column);
+
+  GeneratedColumn<double> get gainDb =>
+      $composableBuilder(column: $table.gainDb, builder: (column) => column);
 }
 
 class $$LessonsTableTableManager
@@ -5102,6 +5821,8 @@ class $$LessonsTableTableManager
                 Value<String> mediaType = const Value.absent(),
                 Value<String?> audioUrl = const Value.absent(),
                 Value<String?> chaptersJson = const Value.absent(),
+                Value<String?> textKind = const Value.absent(),
+                Value<double?> gainDb = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => LessonsCompanion(
                 videoId: videoId,
@@ -5113,6 +5834,8 @@ class $$LessonsTableTableManager
                 mediaType: mediaType,
                 audioUrl: audioUrl,
                 chaptersJson: chaptersJson,
+                textKind: textKind,
+                gainDb: gainDb,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -5126,6 +5849,8 @@ class $$LessonsTableTableManager
                 Value<String> mediaType = const Value.absent(),
                 Value<String?> audioUrl = const Value.absent(),
                 Value<String?> chaptersJson = const Value.absent(),
+                Value<String?> textKind = const Value.absent(),
+                Value<double?> gainDb = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => LessonsCompanion.insert(
                 videoId: videoId,
@@ -5137,6 +5862,8 @@ class $$LessonsTableTableManager
                 mediaType: mediaType,
                 audioUrl: audioUrl,
                 chaptersJson: chaptersJson,
+                textKind: textKind,
+                gainDb: gainDb,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
@@ -6358,6 +7085,286 @@ typedef $$JourneyEnrollmentsTableProcessedTableManager =
       JourneyEnrollment,
       PrefetchHooks Function()
     >;
+typedef $$DownloadsTableCreateCompanionBuilder =
+    DownloadsCompanion Function({
+      required String videoId,
+      required String seriesSlug,
+      Value<String> state,
+      required String fileName,
+      Value<int> receivedBytes,
+      Value<int?> totalBytes,
+      Value<String?> error,
+      required DateTime requestedAt,
+      Value<DateTime?> completedAt,
+      Value<int> rowid,
+    });
+typedef $$DownloadsTableUpdateCompanionBuilder =
+    DownloadsCompanion Function({
+      Value<String> videoId,
+      Value<String> seriesSlug,
+      Value<String> state,
+      Value<String> fileName,
+      Value<int> receivedBytes,
+      Value<int?> totalBytes,
+      Value<String?> error,
+      Value<DateTime> requestedAt,
+      Value<DateTime?> completedAt,
+      Value<int> rowid,
+    });
+
+class $$DownloadsTableFilterComposer
+    extends Composer<_$AppDatabase, $DownloadsTable> {
+  $$DownloadsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get videoId => $composableBuilder(
+    column: $table.videoId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get seriesSlug => $composableBuilder(
+    column: $table.seriesSlug,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get receivedBytes => $composableBuilder(
+    column: $table.receivedBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get totalBytes => $composableBuilder(
+    column: $table.totalBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get error => $composableBuilder(
+    column: $table.error,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get requestedAt => $composableBuilder(
+    column: $table.requestedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DownloadsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DownloadsTable> {
+  $$DownloadsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get videoId => $composableBuilder(
+    column: $table.videoId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get seriesSlug => $composableBuilder(
+    column: $table.seriesSlug,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get receivedBytes => $composableBuilder(
+    column: $table.receivedBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get totalBytes => $composableBuilder(
+    column: $table.totalBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get error => $composableBuilder(
+    column: $table.error,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get requestedAt => $composableBuilder(
+    column: $table.requestedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DownloadsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DownloadsTable> {
+  $$DownloadsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get videoId =>
+      $composableBuilder(column: $table.videoId, builder: (column) => column);
+
+  GeneratedColumn<String> get seriesSlug => $composableBuilder(
+    column: $table.seriesSlug,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumn<String> get fileName =>
+      $composableBuilder(column: $table.fileName, builder: (column) => column);
+
+  GeneratedColumn<int> get receivedBytes => $composableBuilder(
+    column: $table.receivedBytes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get totalBytes => $composableBuilder(
+    column: $table.totalBytes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get error =>
+      $composableBuilder(column: $table.error, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get requestedAt => $composableBuilder(
+    column: $table.requestedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get completedAt => $composableBuilder(
+    column: $table.completedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$DownloadsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DownloadsTable,
+          Download,
+          $$DownloadsTableFilterComposer,
+          $$DownloadsTableOrderingComposer,
+          $$DownloadsTableAnnotationComposer,
+          $$DownloadsTableCreateCompanionBuilder,
+          $$DownloadsTableUpdateCompanionBuilder,
+          (Download, BaseReferences<_$AppDatabase, $DownloadsTable, Download>),
+          Download,
+          PrefetchHooks Function()
+        > {
+  $$DownloadsTableTableManager(_$AppDatabase db, $DownloadsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DownloadsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DownloadsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DownloadsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> videoId = const Value.absent(),
+                Value<String> seriesSlug = const Value.absent(),
+                Value<String> state = const Value.absent(),
+                Value<String> fileName = const Value.absent(),
+                Value<int> receivedBytes = const Value.absent(),
+                Value<int?> totalBytes = const Value.absent(),
+                Value<String?> error = const Value.absent(),
+                Value<DateTime> requestedAt = const Value.absent(),
+                Value<DateTime?> completedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DownloadsCompanion(
+                videoId: videoId,
+                seriesSlug: seriesSlug,
+                state: state,
+                fileName: fileName,
+                receivedBytes: receivedBytes,
+                totalBytes: totalBytes,
+                error: error,
+                requestedAt: requestedAt,
+                completedAt: completedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String videoId,
+                required String seriesSlug,
+                Value<String> state = const Value.absent(),
+                required String fileName,
+                Value<int> receivedBytes = const Value.absent(),
+                Value<int?> totalBytes = const Value.absent(),
+                Value<String?> error = const Value.absent(),
+                required DateTime requestedAt,
+                Value<DateTime?> completedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DownloadsCompanion.insert(
+                videoId: videoId,
+                seriesSlug: seriesSlug,
+                state: state,
+                fileName: fileName,
+                receivedBytes: receivedBytes,
+                totalBytes: totalBytes,
+                error: error,
+                requestedAt: requestedAt,
+                completedAt: completedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DownloadsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DownloadsTable,
+      Download,
+      $$DownloadsTableFilterComposer,
+      $$DownloadsTableOrderingComposer,
+      $$DownloadsTableAnnotationComposer,
+      $$DownloadsTableCreateCompanionBuilder,
+      $$DownloadsTableUpdateCompanionBuilder,
+      (Download, BaseReferences<_$AppDatabase, $DownloadsTable, Download>),
+      Download,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6382,4 +7389,6 @@ class $AppDatabaseManager {
       $$LessonProgressTableTableManager(_db, _db.lessonProgress);
   $$JourneyEnrollmentsTableTableManager get journeyEnrollments =>
       $$JourneyEnrollmentsTableTableManager(_db, _db.journeyEnrollments);
+  $$DownloadsTableTableManager get downloads =>
+      $$DownloadsTableTableManager(_db, _db.downloads);
 }

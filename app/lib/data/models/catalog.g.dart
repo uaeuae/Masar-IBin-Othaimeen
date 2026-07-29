@@ -142,6 +142,8 @@ _CatalogLesson _$CatalogLessonFromJson(Map<String, dynamic> json) =>
           $enumDecodeNullable(_$LessonMediaEnumMap, json['media']) ??
           LessonMedia.video,
       audioUrl: json['audio_url'] as String?,
+      textKind: $enumDecodeNullable(_$LessonTextKindEnumMap, json['text_kind']),
+      gainDb: (json['gain_db'] as num?)?.toDouble(),
       chapters:
           (json['chapters'] as List<dynamic>?)
               ?.map((e) => CatalogChapter.fromJson(e as Map<String, dynamic>))
@@ -159,6 +161,8 @@ Map<String, dynamic> _$CatalogLessonToJson(_CatalogLesson instance) =>
       'status': _$LessonStatusEnumMap[instance.status]!,
       'media': _$LessonMediaEnumMap[instance.media]!,
       'audio_url': instance.audioUrl,
+      'text_kind': _$LessonTextKindEnumMap[instance.textKind],
+      'gain_db': instance.gainDb,
       'chapters': instance.chapters.map((e) => e.toJson()).toList(),
     };
 
@@ -166,6 +170,11 @@ const _$LessonStatusEnumMap = {
   LessonStatus.active: 'active',
   LessonStatus.hidden: 'hidden',
   LessonStatus.unavailable: 'unavailable',
+};
+
+const _$LessonTextKindEnumMap = {
+  LessonTextKind.transcript: 'transcript',
+  LessonTextKind.matn: 'matn',
 };
 
 _CatalogChapter _$CatalogChapterFromJson(Map<String, dynamic> json) =>

@@ -31,6 +31,21 @@ enum LessonMedia {
   };
 }
 
+/// Which read-along script a lesson has. `transcript` is the sheikh's speech,
+/// so its sentences carry estimated times; `matn` is the book text being
+/// explained, which is only ever synced at the marker level.
+enum LessonTextKind {
+  transcript,
+  matn;
+
+  static LessonTextKind? fromJson(String? value) => switch (value) {
+    'transcript' => LessonTextKind.transcript,
+    'matn' => LessonTextKind.matn,
+    null => null,
+    _ => throw ArgumentError('Unknown lesson text kind: $value'),
+  };
+}
+
 enum LessonStatus {
   active,
   hidden,

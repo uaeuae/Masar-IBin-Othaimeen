@@ -126,3 +126,15 @@ String percentLabel(double progress) {
   final pct = (progress.clamp(0.0, 1.0) * 100).round();
   return '٪${arabicDigits(pct)}';
 }
+
+/// Storage size for the downloads screen: "٤٢ ميغابايت", "١٫٣ غيغابايت".
+String byteLabel(int bytes) {
+  if (bytes < 1024 * 1024) {
+    final kb = (bytes / 1024).round();
+    return '${arabicDigits(kb)} كيلوبايت';
+  }
+  final mb = bytes / (1024 * 1024);
+  if (mb < 1024) return '${arabicDigits(mb.round())} ميغابايت';
+  final gb = mb / 1024;
+  return '${arabicDigits(gb.toStringAsFixed(1).replaceAll('.', '٫'))} غيغابايت';
+}
