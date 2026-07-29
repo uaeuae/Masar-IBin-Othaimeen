@@ -3,7 +3,12 @@
 # One-time setup: DONE 2026-07-27. Apple Developer enrolled, ASC API key
 # created (App Manager role), Codemagic integration named masar-asc-key,
 # bundle id app.masar.talib registered, App Store Connect app record created
-# (app id 6795260984). Nothing here needs redoing -- just start the workflow.
+# (app id 6795260984). Nothing here needs redoing.
+#
+# Builds are AUTOMATIC since 2026-07-29: every push to main that touches app/
+# builds and uploads to TestFlight (see `triggering` below). Put [skip ci] in
+# the commit message to suppress one, or start a build by hand from the
+# Codemagic UI as before.
 #
 # Monorepo note: this file MUST stay at the repository root (Codemagic only
 # looks for codemagic.yaml there); `working_directory: app` is what targets
@@ -19,6 +24,29 @@ workflows:
     name: iOS → TestFlight
     max_build_duration: 45
     instance_type: mac_mini_m2
+    # Every push to main ships a TestFlight build. Requires the webhook to
+    # exist on the Codemagic side -- apps connected via the GitHub App get one
+    # automatically; otherwise copy the URL from the app's settings into
+    # GitHub → Settings → Webhooks. The yaml alone will not trigger anything.
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+      # Pushing three commits in a row should produce one build, not three --
+      # the free tier is 500 macOS minutes/month and a build costs ~20.
+      cancel_previous_builds: true
+    # Skip the build entirely when a push touched nothing the app is made of.
+    # Editing DECISIONS.md must not cost a TestFlight build.
+    when:
+      changeset:
+        includes:
+          - 'app'
+          - 'codemagic.yaml'
+        excludes:
+          - '**/*.md'
     environment:
       flutter: 3.44.6
       xcode: latest
