@@ -18,6 +18,17 @@
 #
 # To add a tester: App Store Connect → TestFlight → Internal Testing. Internal
 # testers skip Beta App Review; external testers do not.
+#
+# Known flaky failure, seen 2026-07-29 -- the build uploads, then:
+#   GET /v1/builds/<id>/buildBetaDetail returned 404:
+#   There is no resource of type 'buildBetaDetails'
+# Apple creates the `builds` record before the `buildBetaDetails` relationship
+# exists, and the CLI treats that gap as fatal instead of retrying. It is
+# transient and NOT a signing or key problem -- the binary is already in App
+# Store Connect when it happens. Recovery: assign that build to the Masar group
+# by hand in TestFlight (no rebuild), or just re-run the workflow;
+# PROJECT_BUILD_NUMBER increments, so there is no version clash with the upload
+# that already landed.
 
 workflows:
   ios-testflight:
@@ -106,3 +117,49 @@ workflows:
         # ready for strangers, and fill in the test info at that point.
         beta_groups:
           - Masar
+      # Safety net for the buildBetaDetail 404 described at the top of this
+      # file: it aborts the step above AFTER the binary has uploaded, leaving
+      # the build sitting in App Store Connect assigned to no group -- which
+      # looks exactly like "nothing happened" on the phone. Post-publish
+      # scripts run even when publishing failed, so this re-attempts just the
+      # group assignment, which needs no buildBetaDetail at all.
+      #
+      # A no-op when publishing worked: add-build on a build already in the
+      # group changes nothing.
+      scripts:
+        - name: Ensure the build reached the Masar group
+          script: |
+            set -euo pipefail
+            APP_ID=6795260984
+
+            # Apple takes a while to make a fresh build queryable; the upload
+            # itself already succeeded by this point, so it is worth waiting.
+            BUILD_ID=""
+            for attempt in $(seq 1 20); do
+              BUILD_ID=$(app-store-connect builds list \
+                --app-id "$APP_ID" \
+                --build-version-number "$PROJECT_BUILD_NUMBER" \
+                --json 2>/dev/null \
+                | python3 -c 'import json,sys; b=json.load(sys.stdin); print(b[0]["id"] if b else "")' \
+                || true)
+              [ -n "$BUILD_ID" ] && break
+              echo "build $PROJECT_BUILD_NUMBER not queryable yet (attempt $attempt/20)"
+              sleep 30
+            done
+
+            if [ -z "$BUILD_ID" ]; then
+              echo "Could not find build $PROJECT_BUILD_NUMBER; assign it to Masar by hand."
+              exit 1
+            fi
+
+            for attempt in $(seq 1 10); do
+              if app-store-connect beta-groups add-build "$BUILD_ID" --beta-group Masar; then
+                echo "Build $PROJECT_BUILD_NUMBER is in the Masar group."
+                exit 0
+              fi
+              echo "add-build failed (attempt $attempt/10); retrying"
+              sleep 30
+            done
+
+            echo "Could not add build $BUILD_ID to Masar; assign it by hand in TestFlight."
+            exit 1
