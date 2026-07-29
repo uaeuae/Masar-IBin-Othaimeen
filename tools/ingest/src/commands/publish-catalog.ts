@@ -4,6 +4,8 @@ import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { loadSeeds } from '../seeds.js';
 import { readStoredLessons } from '../store.js';
+import { classifyLesson } from '../text-align.js';
+import { gainForLoudness } from '../loudness.js';
 
 export interface PublishOptions {
   seedDir: string;
@@ -11,6 +13,14 @@ export interface PublishOptions {
   outDir: string;
   /** When set, also writes the pretty catalog.json as the app's bundled asset. */
   appAssetPath?: string;
+  /**
+   * Ships the audio library only: video series are left out entirely, journey
+   * stages fall through to each video series' audio companion, and the
+   * companions are promoted to browsable (companion_of cleared, «(صوتي)»
+   * stripped from their titles). Seeds are untouched — re-enabling video is
+   * just a publish without this flag.
+   */
+  audioOnly?: boolean;
   dryRun: boolean;
   now?: () => Date;
   log?: (line: string) => void;
@@ -75,6 +85,13 @@ export function publishCatalog(options: PublishOptions): { version: number; less
     companionByVideoSlug.set(s.companion_of, s.slug);
   }
 
+  const audioOnly = options.audioOnly ?? false;
+  const exportedSeries = audioOnly ? activeSeries.filter((s) => s.media === 'audio') : activeSeries;
+  const exportedSlugs = new Set(exportedSeries.map((s) => s.slug));
+  /** Audio-only: a journey step on a video series plays its audio edition instead. */
+  const resolveSeriesSlug = (slug: string) =>
+    audioOnly ? companionByVideoSlug.get(slug) ?? slug : slug;
+
   const publishedJourneys = bundle.journeys.filter((j) => j.is_published);
   for (const journey of publishedJourneys) {
     for (const stage of journey.stages) {
@@ -83,6 +100,15 @@ export function publishCatalog(options: PublishOptions): { version: number; less
         if (!series || series.status !== 'active') {
           problems.push(
             `published journey "${journey.slug}" references non-active series "${item.series}"`,
+          );
+          continue;
+        }
+        // Fail loudly rather than silently emptying a stage: a video series
+        // with no audio companion has nothing to fall through to.
+        if (!exportedSlugs.has(resolveSeriesSlug(item.series))) {
+          problems.push(
+            `audio-only publish: journey "${journey.slug}" references video series ` +
+              `"${item.series}", which has no audio companion`,
           );
         }
       }
@@ -115,17 +141,23 @@ export function publishCatalog(options: PublishOptions): { version: number; less
       icon: s.icon ?? null,
       sort_order: s.sort_order,
     })),
-    series: activeSeries.map((s) => ({
+    series: exportedSeries.map((s) => ({
       slug: s.slug,
       science: s.science,
       scholar: s.scholar,
-      title_ar: s.title_ar,
+      // Audio-only: the companions are the only edition left, so the
+      // «(صوتي)» disambiguator is noise — the series header already reads
+      // «صوتيات المؤسسة».
+      title_ar: audioOnly ? s.title_ar.replace(/\s*\(صوتي\)\s*$/u, '') : s.title_ar,
       description_ar: s.description_ar ?? null,
       thumbnail_url: s.thumbnail_url ?? null,
       level: s.level ?? null,
       media: s.media,
-      companion_of: s.companion_of ?? null,
-      companion_slug: companionByVideoSlug.get(s.slug) ?? null,
+      // Audio-only: clearing both promotes the companions to browsable
+      // (the app hides `companion_of IS NOT NULL`) and hides the
+      // cross-edition banners, which have nowhere to link.
+      companion_of: audioOnly ? null : s.companion_of ?? null,
+      companion_slug: audioOnly ? null : companionByVideoSlug.get(s.slug) ?? null,
       lessons: (lessonsBySeries.get(s.slug) ?? [])
         .filter((l) => l.status !== 'hidden')
         .map((l) => ({
@@ -139,6 +171,13 @@ export function publishCatalog(options: PublishOptions): { version: number; less
             ? {
                 media: 'audio',
                 audio_url: l.audio_url ?? null,
+                // Which read-along script `build-texts` emitted, so the player
+                // knows whether to offer «النص» without probing for the asset.
+                // Same classifier both sides — they can't disagree.
+                text_kind: classifyLesson(l),
+                // Playback correction from `analyze:loudness`; null until the
+                // lesson has been measured.
+                gain_db: gainForLoudness(l.loudness_lufs),
                 // Chapter bodies (full matn passages) stay in the data files;
                 // the app only renders titles + timestamps, and bodies are
                 // ~10 MB across the library.
@@ -161,7 +200,10 @@ export function publishCatalog(options: PublishOptions): { version: number; less
       stages: j.stages.map((stage) => ({
         title_ar: stage.title_ar,
         description_ar: stage.description_ar ?? null,
-        items: stage.items.map((item) => ({ type: 'series', series: item.series })),
+        items: stage.items.map((item) => ({
+          type: 'series',
+          series: resolveSeriesSlug(item.series),
+        })),
       })),
     })),
   };
@@ -174,7 +216,8 @@ export function publishCatalog(options: PublishOptions): { version: number; less
   log(
     `catalog v${version}: ${catalog.sciences.length} sciences, ${catalog.series.length} series, ` +
       `${lessonCount} lessons, ${catalog.journeys.length} journeys ` +
-      `(${(gz.length / 1024).toFixed(1)} KiB gzipped)${options.dryRun ? ' [dry-run]' : ''}`,
+      `(${(gz.length / 1024).toFixed(1)} KiB gzipped)` +
+      `${audioOnly ? ' [audio-only]' : ''}${options.dryRun ? ' [dry-run]' : ''}`,
   );
 
   if (!options.dryRun) {

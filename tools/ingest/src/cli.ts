@@ -5,6 +5,8 @@ import { loadSeeds, SeedValidationError } from './seeds.js';
 import { syncYoutube } from './commands/sync-youtube.js';
 import { syncSiteAudio } from './commands/sync-site-audio.js';
 import { publishCatalog, PublishIntegrityError } from './commands/publish-catalog.js';
+import { buildLessonTexts } from './commands/build-lesson-texts.js';
+import { analyzeLoudness } from './commands/analyze-loudness.js';
 import { createYoutubeClient } from './youtube.js';
 import { createSiteClient } from './site.js';
 
@@ -27,6 +29,7 @@ const defaultSeedDir = resolve(repoRoot, 'seed');
 const defaultDataDir = resolve(repoRoot, 'tools', 'ingest', 'data');
 const defaultOutDir = resolve(repoRoot, 'tools', 'ingest', 'dist');
 const appAssetPath = resolve(repoRoot, 'app', 'assets', 'catalog', 'catalog.json');
+const appTextsDir = resolve(repoRoot, 'app', 'assets', 'texts');
 
 const [command, ...rest] = process.argv.slice(2);
 const dryRun = rest.includes('--dry-run');
@@ -89,10 +92,40 @@ async function main(): Promise<void> {
         dataDir,
         outDir,
         appAssetPath: rest.includes('--no-app-asset') ? undefined : appAssetPath,
+        audioOnly: rest.includes('--audio-only'),
         dryRun,
       });
       console.log(`Published catalog v${result.version} (${result.lessonCount} lessons).`);
       // TODO(M5b, needs Supabase project): upload dist/ to Supabase Storage.
+      break;
+    }
+    case 'analyze-loudness': {
+      const numberArg = (name: string, fallback: number) => {
+        const arg = rest.find((a) => a.startsWith(`--${name}=`));
+        const value = arg ? Number.parseInt(arg.slice(name.length + 3), 10) : Number.NaN;
+        return Number.isFinite(value) ? value : fallback;
+      };
+      const result = await analyzeLoudness({
+        seedDir,
+        dataDir,
+        force: rest.includes('--force'),
+        limit: rest.some((a) => a.startsWith('--limit='))
+          ? numberArg('limit', 0)
+          : undefined,
+        concurrency: numberArg('concurrency', 4),
+        dryRun,
+      });
+      console.log(`Measured ${result.measured} lesson(s).`);
+      break;
+    }
+    case 'build-texts': {
+      const result = buildLessonTexts({
+        seedDir,
+        dataDir,
+        outDir: pathArg('texts-dir', appTextsDir),
+        dryRun,
+      });
+      console.log(`Built ${result.files} lesson texts.`);
       break;
     }
     case 'discover-playlists': {
@@ -120,8 +153,8 @@ async function main(): Promise<void> {
       break;
     default:
       console.error(
-        'Usage: cli.ts <validate-seeds|sync-youtube|sync-site-audio|publish-catalog|discover-playlists [handle]|apply-seeds> ' +
-          '[--dry-run] [--seed-dir=PATH] [--data-dir=PATH] [--out-dir=PATH] [--no-app-asset]',
+        'Usage: cli.ts <validate-seeds|sync-youtube|sync-site-audio|publish-catalog|build-texts|discover-playlists [handle]|apply-seeds> ' +
+          '[--dry-run] [--seed-dir=PATH] [--data-dir=PATH] [--out-dir=PATH] [--texts-dir=PATH] [--no-app-asset] [--audio-only]',
       );
       process.exit(64);
   }

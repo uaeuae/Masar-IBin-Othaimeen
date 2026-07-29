@@ -6,7 +6,13 @@ import { describe, expect, it } from 'vitest';
 import { publishCatalog, PublishIntegrityError } from '../src/commands/publish-catalog.js';
 import type { StoredLesson } from '../src/store.js';
 
-function makeWorkspace(options: { publish?: boolean; seriesStatus?: string; withLessons?: boolean }) {
+function makeWorkspace(options: {
+  publish?: boolean;
+  seriesStatus?: string;
+  withLessons?: boolean;
+  /** Adds the full audio edition of sharh-zad, the way every video series has one. */
+  withCompanion?: boolean;
+}) {
   const root = mkdtempSync(join(tmpdir(), 'masar-publish-'));
   const seedDir = join(root, 'seed');
   const dataDir = join(root, 'data');
@@ -51,6 +57,28 @@ function makeWorkspace(options: { publish?: boolean; seriesStatus?: string; with
       },
     ];
     writeFileSync(join(dataDir, 'series', 'sharh-zad.json'), JSON.stringify(lessons));
+  }
+
+  if (options.withCompanion) {
+    writeFileSync(
+      join(seedDir, 'series', 'sharh-zad-audio.yaml'),
+      'slug: sharh-zad-audio\ntitle_ar: شرح زاد المستقنع (صوتي)\nscience: fiqh\nstatus: active\n' +
+        'media: audio\ncompanion_of: sharh-zad\nsite_audio_sections: [sec-1]\n',
+    );
+    const audioLessons: StoredLesson[] = [
+      {
+        youtube_video_id: 'a1',
+        position: 1,
+        title_ar: 'الدرس الصوتي الأول',
+        duration_seconds: 4800,
+        published_at: '2020-01-01T00:00:00Z',
+        thumbnail_url: null,
+        status: 'active',
+        media: 'audio',
+        audio_url: 'https://sounds.example/1.mp3',
+      },
+    ];
+    writeFileSync(join(dataDir, 'series', 'sharh-zad-audio.json'), JSON.stringify(audioLessons));
   }
 
   return { seedDir, dataDir, outDir };
@@ -108,5 +136,63 @@ describe('publishCatalog', () => {
     publishCatalog({ ...ws, dryRun: false, now: fixedNow });
     const catalog = JSON.parse(readFileSync(join(ws.outDir, 'catalog.json'), 'utf8'));
     expect(catalog.journeys).toHaveLength(0);
+  });
+
+  describe('audio-only', () => {
+    function publishAudioOnly(ws: ReturnType<typeof makeWorkspace>) {
+      publishCatalog({ ...ws, dryRun: false, audioOnly: true, now: fixedNow });
+      return JSON.parse(readFileSync(join(ws.outDir, 'catalog.json'), 'utf8'));
+    }
+
+    it('exports the audio editions only, promoted to browsable', () => {
+      const catalog = publishAudioOnly(makeWorkspace({ withCompanion: true }));
+
+      expect(catalog.series).toHaveLength(1);
+      expect(catalog.series[0]).toMatchObject({
+        slug: 'sharh-zad-audio',
+        media: 'audio',
+        // Browsable: the app hides series with a non-null companion_of.
+        companion_of: null,
+        companion_slug: null,
+        // «(صوتي)» stripped — it's the only edition now.
+        title_ar: 'شرح زاد المستقنع',
+      });
+      expect(catalog.series[0].lessons[0]).toMatchObject({
+        media: 'audio',
+        audio_url: 'https://sounds.example/1.mp3',
+      });
+    });
+
+    it('re-points journey stages at the audio companion', () => {
+      const catalog = publishAudioOnly(makeWorkspace({ withCompanion: true }));
+      expect(catalog.journeys[0].stages[0].items[0]).toEqual({
+        type: 'series',
+        series: 'sharh-zad-audio',
+      });
+    });
+
+    it('rejects a journey on a video series that has no audio companion', () => {
+      const ws = makeWorkspace({});
+      expect(() => publishCatalog({ ...ws, dryRun: true, audioOnly: true, now: fixedNow })).toThrow(
+        /no audio companion/,
+      );
+    });
+
+    it('leaves the default publish untouched', () => {
+      const ws = makeWorkspace({ withCompanion: true });
+      publishCatalog({ ...ws, dryRun: false, now: fixedNow });
+      const catalog = JSON.parse(readFileSync(join(ws.outDir, 'catalog.json'), 'utf8'));
+
+      const bySlug = new Map<string, Record<string, unknown>>(
+        catalog.series.map((s: { slug: string }) => [s.slug, s]),
+      );
+      expect([...bySlug.keys()].sort()).toEqual(['sharh-zad', 'sharh-zad-audio']);
+      expect(bySlug.get('sharh-zad')).toMatchObject({ companion_slug: 'sharh-zad-audio' });
+      expect(bySlug.get('sharh-zad-audio')).toMatchObject({
+        companion_of: 'sharh-zad',
+        title_ar: 'شرح زاد المستقنع (صوتي)',
+      });
+      expect(catalog.journeys[0].stages[0].items[0].series).toBe('sharh-zad');
+    });
   });
 });

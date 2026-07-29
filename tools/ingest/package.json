@@ -11,6 +11,8 @@
     "sync:youtube": "tsx src/cli.ts sync-youtube",
     "apply:seeds": "tsx src/cli.ts apply-seeds",
     "publish:catalog": "tsx src/cli.ts publish-catalog",
+    "build:texts": "tsx src/cli.ts build-texts",
+    "analyze:loudness": "tsx src/cli.ts analyze-loudness",
     "discover:playlists": "tsx src/cli.ts discover-playlists",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

@@ -24,6 +24,12 @@ export interface StoredLesson {
   /** Absent/'video' = YouTube lesson; 'audio' = foundation-hosted MP3. */
   media?: 'video' | 'audio';
   audio_url?: string | null;
+  /**
+   * Integrated loudness in LUFS (EBU R128), measured by `analyze:loudness`.
+   * The uploads' levels wander by 8+ dB within a single series, so the player
+   * needs this per lesson to even them out.
+   */
+  loudness_lufs?: number | null;
   chapters?: StoredChapter[];
 }
 

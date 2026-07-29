@@ -9,7 +9,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_01.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -16.1
   },
   {
     "youtube_video_id": "bf683665-6859-44a0-9191-a0572b5fc41e",
@@ -21,7 +22,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_02.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -18.8
   },
   {
     "youtube_video_id": "ee36d0f5-1f3c-4e6e-8295-bda7d72b287b",
@@ -33,7 +35,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_03.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -18.3
   },
   {
     "youtube_video_id": "fdb7ee36-5fe0-4767-befc-64e1a376d295",
@@ -45,7 +48,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_04.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -16.6
   },
   {
     "youtube_video_id": "9729b934-9327-4026-bf8c-2fcd57062723",
@@ -57,7 +61,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_05.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -19.2
   },
   {
     "youtube_video_id": "be7ecaf8-1aa4-4fa3-88d4-4f6d54c5bbd3",
@@ -69,7 +74,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_06.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -18.3
   },
   {
     "youtube_video_id": "7f55a340-0dc3-48f0-a8f9-e70ade52cc91",
@@ -81,7 +87,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_07.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -16.7
   },
   {
     "youtube_video_id": "cf82dfab-136d-4f04-bba2-3d0caaad9e14",
@@ -93,7 +100,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_08.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -17
   },
   {
     "youtube_video_id": "0b46c900-c9f4-4d66-8261-3e94e2d41ccc",
@@ -105,7 +113,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_09.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -19.9
   },
   {
     "youtube_video_id": "46268f59-b2a0-45a1-a3d9-e88464b14b04",
@@ -117,7 +126,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_10.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -16.9
   },
   {
     "youtube_video_id": "2678d7d5-2b65-4432-b2e2-b14d715fbbcf",
@@ -129,7 +139,8 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_11.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -16.8
   },
   {
     "youtube_video_id": "79ad52ee-1d4a-4d95-b736-c551178a3795",
@@ -141,6 +152,7 @@
     "status": "active",
     "media": "audio",
     "audio_url": "https://sounds.binothaimeen.net/storage/uploads/uploadbin//othaimeen_L/hilyat_talib_al3ilm/hilyat_talib_al3ilm_othaimeen_L_12.mp3",
-    "chapters": []
+    "chapters": [],
+    "loudness_lufs": -18.7
   }
 ]
