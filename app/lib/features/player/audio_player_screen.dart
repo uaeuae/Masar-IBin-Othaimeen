@@ -53,7 +53,6 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
   double? _dragFraction;
   double _speed = 1.0;
   int? _sleepMinutes;
-  bool _showText = false;
   bool _playingOffline = false;
 
   @override
@@ -335,6 +334,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     final scheme = theme.colorScheme;
     final masar = masarColorsOf(context);
 
+    final showText = ref.watch(showLessonTextProvider);
     final detailAsync = ref.watch(seriesDetailProvider(widget.seriesSlug));
     final detail = detailAsync.value;
     final current = _lessonById(_currentId);
@@ -434,7 +434,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
               const SizedBox(height: 24),
 
               // ── Artwork card, or the read-along text in its place ────
-              if (_showText && current?.textKind != null)
+              if (showText && current?.textKind != null)
                 _buildTextPanel(context, current!)
               else
                 Center(
@@ -660,14 +660,16 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                     // Where the decorative equalizer glyph used to sit.
                     if (current?.textKind != null)
                       GestureDetector(
-                        onTap: () => setState(() => _showText = !_showText),
+                        onTap: () => ref
+                            .read(showLessonTextProvider.notifier)
+                            .set(!showText),
                         behavior: HitTestBehavior.opaque,
                         child: Row(
                           children: [
                             Icon(
                               Icons.subject_rounded,
                               size: 18,
-                              color: _showText
+                              color: showText
                                   ? scheme.primary
                                   : scheme.onSurfaceVariant,
                             ),
@@ -675,10 +677,10 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                             Text(
                               'النص',
                               style: theme.textTheme.labelMedium?.copyWith(
-                                color: _showText
+                                color: showText
                                     ? scheme.primary
                                     : scheme.onSurfaceVariant,
-                                fontWeight: _showText
+                                fontWeight: showText
                                     ? FontWeight.w700
                                     : FontWeight.w400,
                               ),

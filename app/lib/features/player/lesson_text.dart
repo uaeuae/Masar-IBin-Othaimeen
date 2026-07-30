@@ -16,11 +16,20 @@ class LessonText {
     required this.lessonId,
     required this.kind,
     required this.sections,
+    this.measured = 0,
   }) : sentences = [for (final section in sections) ...section.sentences];
 
   final String lessonId;
   final LessonTextKind kind;
   final List<TextSection> sections;
+
+  /// How many sentence times were measured by forced alignment rather than
+  /// interpolated between markers.
+  final int measured;
+
+  /// True when the highlight is tracking measured times, so the UI can drop
+  /// the «تقريبية» hedge.
+  bool get isMeasured => measured > 0 && measured >= sentences.length ~/ 2;
 
   /// Every sentence in playback order — what the highlight indexes into.
   final List<TextSentence> sentences;
@@ -80,6 +89,7 @@ class LessonText {
       lessonId: json['lesson'] as String? ?? '',
       kind: kind ?? LessonTextKind.matn,
       sections: sections,
+      measured: (json['measured'] as num?)?.toInt() ?? 0,
     );
   }
 }

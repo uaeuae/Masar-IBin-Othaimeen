@@ -67,6 +67,24 @@ final allowMobileDataProvider =
       AllowMobileDataNotifier.new,
     );
 
+/// Whether the audio player opens on the lesson text rather than the artwork.
+/// On by default -- reading along is the point of having the text at all.
+class ShowLessonTextNotifier extends Notifier<bool> {
+  static const _key = 'show_lesson_text';
+
+  @override
+  bool build() => ref.watch(sharedPreferencesProvider).getBool(_key) ?? true;
+
+  void set(bool value) {
+    state = value;
+    ref.read(sharedPreferencesProvider).setBool(_key, value);
+  }
+}
+
+final showLessonTextProvider = NotifierProvider<ShowLessonTextNotifier, bool>(
+  ShowLessonTextNotifier.new,
+);
+
 /// Even out the library's loudness using each lesson's measured level.
 class NormalizeVolumeNotifier extends Notifier<bool> {
   static const _key = 'normalize_volume';

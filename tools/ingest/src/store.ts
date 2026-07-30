@@ -30,6 +30,13 @@ export interface StoredLesson {
    * needs this per lesson to even them out.
    */
   loudness_lufs?: number | null;
+  /**
+   * Measured sentence start times in seconds, keyed by the sentence's index in
+   * the lesson's read-along script — produced by `tools/align` forced
+   * alignment. Present only for lessons that have been aligned; the rest fall
+   * back to interpolation between markers, which drifts.
+   */
+  sentence_times?: Record<string, number> | null;
   chapters?: StoredChapter[];
 }
 

@@ -167,13 +167,21 @@ class _LessonTextViewState extends State<LessonTextView> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                isMatn ? Icons.menu_book_rounded : Icons.subject_rounded,
+                isMatn
+                    ? Icons.menu_book_rounded
+                    : widget.text.isMeasured
+                    ? Icons.graphic_eq_rounded
+                    : Icons.subject_rounded,
                 size: 13,
                 color: masar.textFaint,
               ),
               const SizedBox(width: 6),
               Text(
-                isMatn ? 'نص المتن' : 'مزامنة تقريبية · المس جملة للانتقال',
+                isMatn
+                    ? 'نص المتن'
+                    : widget.text.isMeasured
+                    ? 'المس جملة للانتقال'
+                    : 'مزامنة تقريبية · المس جملة للانتقال',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: masar.textFaint,
                 ),

@@ -31,6 +31,8 @@ export interface LessonText {
   lesson: string;
   kind: LessonTextKind;
   duration: number | null;
+  /** Sentences whose time was measured by forced alignment, not estimated. */
+  measured?: number;
   sections: TextSection[];
 }
 
@@ -41,7 +43,15 @@ const SUBSTANTIAL_BODY_CHARS = 200;
 const MAX_SENTENCE_CHARS = 220;
 /** Shorter marker titles match too loosely to trust as anchors. */
 const MIN_ANCHOR_CHARS = 12;
-const ANCHOR_KEY_CHARS = 40;
+/**
+ * Prefix lengths tried when locating a marker, longest first. The sheikh reads
+ * the matn back with interjections («قال المؤلف رحمه الله»), so demanding one
+ * exact 40-character run threw away 56% of the timestamps the site gives us —
+ * and every discarded marker widens the stretch that has to be interpolated.
+ * Shorter keys match more loosely; the forward-only search and the rate check
+ * below are what keep a loose match from being accepted.
+ */
+const ANCHOR_KEY_LENGTHS = [40, 28, 20, 14];
 /** Measured speech density is 7.6–9.0 chars/s; anything outside this is a
  * false match (the sheikh re-quotes the matn, so titles recur). */
 const MIN_RATE = 3;
@@ -151,10 +161,21 @@ export function anchorMarkers(
     const seconds = marker.start_seconds;
     if (seconds == null || seconds <= lastSeconds) continue;
 
-    const key = normalizeArabic(marker.title).slice(0, ANCHOR_KEY_CHARS);
-    if (key.length < MIN_ANCHOR_CHARS) continue;
+    const title = normalizeArabic(marker.title);
+    if (title.length < MIN_ANCHOR_CHARS) continue;
 
-    const found = norm.indexOf(key, searchFrom);
+    // Most specific prefix first, then progressively shorter ones.
+    let found = -1;
+    let matched = 0;
+    for (const length of ANCHOR_KEY_LENGTHS) {
+      const key = title.slice(0, Math.min(length, title.length));
+      if (key.length < MIN_ANCHOR_CHARS) break;
+      found = norm.indexOf(key, searchFrom);
+      if (found >= 0) {
+        matched = key.length;
+        break;
+      }
+    }
     if (found < 0) continue;
 
     const charOffset = map[found]!;
@@ -162,7 +183,7 @@ export function anchorMarkers(
     if (rate < MIN_RATE || rate > MAX_RATE) continue;
 
     anchors.push({ charOffset, seconds, title: marker.title });
-    searchFrom = found + key.length;
+    searchFrom = found + matched;
     lastOffset = charOffset;
     lastSeconds = seconds;
   }
@@ -258,5 +279,55 @@ export function buildLessonText(lesson: StoredLesson): LessonText | null {
   sections = sections.filter((s) => s.sentences.length > 0);
   if (sections.length === 0) return null;
 
-  return { lesson: lesson.youtube_video_id, kind, duration, sections };
+  const aligned = applyMeasuredTimes(sections, lesson.sentence_times);
+
+  return {
+    lesson: lesson.youtube_video_id,
+    kind,
+    duration,
+    // `measured` tells the app the highlight can be trusted, so it can stop
+    // calling the sync approximate.
+    ...(aligned > 0 ? { measured: aligned } : {}),
+    sections,
+  };
+}
+
+/**
+ * Overwrites interpolated sentence times with the ones forced alignment
+ * measured. Returns how many sentences were replaced.
+ *
+ * Applied per sentence rather than all-or-nothing: a window the aligner could
+ * not place keeps its estimate instead of losing its time entirely, and the
+ * section's own marker start still bounds it.
+ */
+function applyMeasuredTimes(
+  sections: TextSection[],
+  times: Record<string, number> | null | undefined,
+): number {
+  if (!times) return 0;
+  let index = 0;
+  let applied = 0;
+  let previous = -Infinity;
+  for (const section of sections) {
+    for (const sentence of section.sentences) {
+      const measured = times[String(index)];
+      index++;
+      // Monotonic or nothing: a stray out-of-order value would make the
+      // highlight jump backwards, which reads as a bug.
+      if (typeof measured === 'number' && Number.isFinite(measured) && measured >= previous) {
+        sentence.t = Math.round(measured * 10) / 10;
+        previous = measured;
+        applied++;
+      } else if (sentence.t != null) {
+        // A sentence the aligner skipped keeps its estimate — but that estimate
+        // was interpolated against the old timeline and can easily land before
+        // a measured neighbour, which would make the highlight jump backwards.
+        if (Number.isFinite(previous) && sentence.t < previous) {
+          sentence.t = Math.round(previous * 10) / 10;
+        }
+        previous = sentence.t;
+      }
+    }
+  }
+  return applied;
 }

@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:masar/features/player/lesson_text.dart';
 import 'package:masar/features/player/lesson_text_providers.dart';
 import 'package:masar/features/player/lesson_text_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../support/pump_app.dart';
 
@@ -97,17 +98,11 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  /// Opens the lesson, turns the text on, and scrolls the panel back into
-  /// view — ensuring the toggle visible pushes the panel off the top, since
-  /// the toggle sits below it in the player's outer list.
+  /// Opens the lesson with the text panel already showing — it is on by
+  /// default now — and makes sure the panel is in view before interacting.
   Future<void> openText(WidgetTester tester, String id) async {
     await openLesson(tester, id);
-    await tapVisible(tester, find.text('النص'));
-    await tester.scrollUntilVisible(
-      find.byType(LessonTextView),
-      -120,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await tester.ensureVisible(find.byType(LessonTextView));
     await tester.pumpAndSettle();
   }
 
@@ -134,16 +129,32 @@ void main() {
   });
 
   testApp(
-    'the text toggle reveals the lesson text',
+    'the lesson text is showing from the moment the player opens',
     overrides: _bundleOverride(),
     (tester, app) async {
       await openLesson(tester, 'fx-riyd-01');
-      expect(find.text('الجملة الأولى.'), findsNothing);
-
-      await tapVisible(tester, find.text('النص'));
 
       expect(find.text('الجملة الأولى.'), findsOneWidget);
       expect(find.text('مزامنة تقريبية · المس جملة للانتقال'), findsOneWidget);
+    },
+  );
+
+  testApp(
+    'the toggle hides the text, and the choice sticks',
+    overrides: _bundleOverride(),
+    (tester, app) async {
+      await openLesson(tester, 'fx-riyd-01');
+      expect(find.text('الجملة الأولى.'), findsOneWidget);
+
+      await tapVisible(tester, find.text('النص'));
+      expect(find.text('الجملة الأولى.'), findsNothing);
+
+      // Persisted, so reopening the player keeps it hidden.
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getBool('show_lesson_text'), isFalse);
+
+      await tapVisible(tester, find.text('النص'));
+      expect(find.text('الجملة الأولى.'), findsOneWidget);
     },
   );
 
