@@ -5,11 +5,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../support/pump_app.dart';
 
 void main() {
+  testApp('the home button that opens settings looks like settings', (
+    tester,
+    app,
+  ) async {
+    // It shipped as a clock, which promised something the tap does not do.
+    expect(find.byIcon(Icons.settings_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.access_time_rounded), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.settings_rounded));
+    await tester.pumpAndSettle();
+    expect(find.text('الإعدادات'), findsOneWidget);
+  });
+
   testApp('settings switches theme to dark and persists it', (
     tester,
     app,
   ) async {
-    await tester.tap(find.byIcon(Icons.access_time_rounded));
+    await tester.tap(find.byIcon(Icons.settings_rounded));
     await tester.pumpAndSettle();
     expect(find.text('الإعدادات'), findsOneWidget);
 
@@ -24,7 +37,7 @@ void main() {
   });
 
   testApp('autoplay toggle persists', (tester, app) async {
-    await tester.tap(find.byIcon(Icons.access_time_rounded));
+    await tester.tap(find.byIcon(Icons.settings_rounded));
     await tester.pumpAndSettle();
 
     // First switch is autoplay (on by default), second is the daily reminder.
@@ -36,7 +49,7 @@ void main() {
   });
 
   testApp('attribution and version footer are present', (tester, app) async {
-    await tester.tap(find.byIcon(Icons.access_time_rounded));
+    await tester.tap(find.byIcon(Icons.settings_rounded));
     await tester.pumpAndSettle();
 
     await tester.scrollUntilVisible(find.text('Masar v1.0.0'), 300);

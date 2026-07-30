@@ -99,7 +99,9 @@ class HomeScreen extends ConsumerWidget {
                       ),
                       alignment: Alignment.center,
                       child: Icon(
-                        Icons.access_time_rounded, // the design's clock roundel
+                        // The design put a clock roundel here, but the button
+                        // opens Settings — a clock promised something else.
+                        Icons.settings_rounded,
                         size: 20,
                         color: scheme.onPrimaryContainer,
                       ),

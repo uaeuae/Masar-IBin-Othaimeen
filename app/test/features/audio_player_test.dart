@@ -85,6 +85,29 @@ void main() {
     expect(find.text('١٫٢٥×'), findsOneWidget);
   });
 
+  testApp('transport runs left-to-right, matching the seek bar', (
+    tester,
+    app,
+  ) async {
+    await openFirstRiyadLesson(tester);
+    await tester.scrollUntilVisible(
+      find.byIcon(Icons.play_arrow_rounded),
+      150,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    double x(IconData icon) => tester.getCenter(find.byIcon(icon)).dx;
+
+    // Back on the left of play, forward on the right — in an RTL app, so this
+    // only holds because the row is pinned LTR like the timeline it drives.
+    expect(x(Icons.replay_10_rounded), lessThan(x(Icons.play_arrow_rounded)));
+    expect(x(Icons.forward_10_rounded), greaterThan(x(Icons.play_arrow_rounded)));
+    // Previous lesson sits outside the back nudge, next outside the forward one.
+    expect(x(Icons.skip_previous_rounded), lessThan(x(Icons.replay_10_rounded)));
+    expect(x(Icons.skip_next_rounded), greaterThan(x(Icons.forward_10_rounded)));
+  });
+
   testApp('the 10-second buttons nudge playback both ways', (tester, app) async {
     app.audioEngine.durationToReport = const Duration(seconds: 2580);
     await openFirstRiyadLesson(tester);

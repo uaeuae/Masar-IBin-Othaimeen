@@ -633,54 +633,62 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                     Flexible(
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: Row(
-                          children: [
-                            _SkipButton(
-                              forward: false,
-                              enabled: previous != null,
-                              onTap: previous == null
-                                  ? null
-                                  : () => _startLesson(previous.videoId),
-                            ),
-                            const SizedBox(width: 6),
-                            _SeekButton(
-                              forward: false,
-                              onTap: () => _skipBy(-10, total),
-                            ),
-                            const SizedBox(width: 8),
-                            GestureDetector(
-                              onTap: _engine.togglePlay,
-                              child: Container(
-                                width: 68,
-                                height: 68,
-                                decoration: BoxDecoration(
-                                  color: scheme.primary,
-                                  shape: BoxShape.circle,
-                                ),
-                                alignment: Alignment.center,
-                                child: Icon(
-                                  _isPlaying
-                                      ? Icons.pause_rounded
-                                      : Icons.play_arrow_rounded,
-                                  size: 32,
-                                  color: scheme.onPrimary,
+                        // Transport runs left-to-right even in Arabic, matching
+                        // the seek bar directly above it, which is already
+                        // pinned LTR: back on the left, forward on the right.
+                        // The timeline is the thing being controlled, and it
+                        // does not flip with the reading direction.
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Row(
+                            children: [
+                              _SkipButton(
+                                forward: false,
+                                enabled: previous != null,
+                                onTap: previous == null
+                                    ? null
+                                    : () => _startLesson(previous.videoId),
+                              ),
+                              const SizedBox(width: 6),
+                              _SeekButton(
+                                forward: false,
+                                onTap: () => _skipBy(-10, total),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: _engine.togglePlay,
+                                child: Container(
+                                  width: 68,
+                                  height: 68,
+                                  decoration: BoxDecoration(
+                                    color: scheme.primary,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Icon(
+                                    _isPlaying
+                                        ? Icons.pause_rounded
+                                        : Icons.play_arrow_rounded,
+                                    size: 32,
+                                    color: scheme.onPrimary,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            _SeekButton(
-                              forward: true,
-                              onTap: () => _skipBy(10, total),
-                            ),
-                            const SizedBox(width: 6),
-                            _SkipButton(
-                              forward: true,
-                              enabled: next != null,
-                              onTap: next == null
-                                  ? null
-                                  : () => _startLesson(next.videoId),
-                            ),
-                          ],
+                              const SizedBox(width: 8),
+                              _SeekButton(
+                                forward: true,
+                                onTap: () => _skipBy(10, total),
+                              ),
+                              const SizedBox(width: 6),
+                              _SkipButton(
+                                forward: true,
+                                enabled: next != null,
+                                onTap: next == null
+                                    ? null
+                                    : () => _startLesson(next.videoId),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -885,8 +893,9 @@ class _SkipButton extends StatelessWidget {
       child: IconButton(
         onPressed: onTap,
         icon: Icon(
-          // RTL: "next" advances the series, drawn as skip_previous shape.
-          forward ? Icons.skip_previous_rounded : Icons.skip_next_rounded,
+          // The transport row is pinned LTR, so these are the natural glyphs:
+          // no mirroring, and they point the way they move.
+          forward ? Icons.skip_next_rounded : Icons.skip_previous_rounded,
           size: 26,
           color: scheme.onSurface,
         ),
