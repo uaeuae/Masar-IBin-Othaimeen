@@ -9,15 +9,31 @@ The foundation's site timestamps «mat-parts» markers only, and the median
 transcript lesson has a **34 minute stretch between them**. Interpolating
 sentence times across that gap drifts by minutes — measured, not assumed:
 
+Accuracy is measured by **hold-out**: markers are hidden from the aligner, it
+runs without them, and its predictions at those hidden times are scored.
+`validate_holdout.py --drop-one` hides one marker at a time so its neighbours
+keep production-length segments.
+
 | | interpolated | aligned |
 |---|---|---|
-| median error | minutes | **1.18 s** |
-| p90 | — | **2.62 s** |
-| worst | 994 s | **5.8 s** |
-| within 3 s | — | **93%** |
+| median error | minutes | **1.26 s** |
+| p90 | — | **3.26 s** |
+| worst | 994 s | 21.3 s |
+| within 3 s | — | **88%** |
 
-(85 markers across 7 lessons, compared against the site's own timestamps, which
-the aligner never sees — so this is independent ground truth, not self-scoring.)
+(80 hidden markers over 5 تفسير جزء عمّ lessons.)
+
+**Do not score against markers the aligner used as segment boundaries.** A
+section's first sentence is constrained to start at its boundary, so errors
+there are small by construction rather than earned — that measure reports
+~1.2 s even when mid-segment alignment is minutes off.
+
+Blob-transcript series (زاد المستقنع) score worse on the same test — mean 6-24 s
+per lesson. Some of that is genuine, but some is *reference* error: their section
+boundaries were themselves derived by fuzzy text matching in `text-align.ts`, so
+the hidden marker's position in the text is uncertain by a sentence or two.
+Series the site pre-segments (تفسير, أصول التفسير, الحج) have authoritative
+boundaries and are the trustworthy measurement.
 
 ## Setup
 
