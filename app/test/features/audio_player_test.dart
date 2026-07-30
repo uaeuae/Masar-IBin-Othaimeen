@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:masar/data/progress_repository.dart';
@@ -11,6 +11,20 @@ void main() {
     GoRouter.of(
       context,
     ).push('/player/fx-riyd-01?series=sharh-riyad-alsalihin');
+    await tester.pumpAndSettle();
+  }
+
+  /// The transport row sits below the fold, and a lazy ListView does not build
+  /// off-screen children -- so the icon has to be scrolled into existence
+  /// before it can be found, let alone tapped.
+  Future<void> tapControl(WidgetTester tester, IconData icon) async {
+    await tester.scrollUntilVisible(
+      find.byIcon(icon),
+      150,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(icon));
     await tester.pumpAndSettle();
   }
 
@@ -69,6 +83,42 @@ void main() {
     await tapVisible(tester, find.text('١×'));
     expect(app.audioEngine.speeds, [1.25]);
     expect(find.text('١٫٢٥×'), findsOneWidget);
+  });
+
+  testApp('the 10-second buttons nudge playback both ways', (tester, app) async {
+    app.audioEngine.durationToReport = const Duration(seconds: 2580);
+    await openFirstRiyadLesson(tester);
+
+    app.audioEngine.positionsController.add(const Duration(seconds: 100));
+    await tester.pumpAndSettle();
+
+    await tapControl(tester, Icons.forward_10_rounded);
+    expect(app.audioEngine.seeks.last, const Duration(seconds: 110));
+
+    app.audioEngine.positionsController.add(const Duration(seconds: 110));
+    await tester.pumpAndSettle();
+    await tapControl(tester, Icons.replay_10_rounded);
+    expect(app.audioEngine.seeks.last, const Duration(seconds: 100));
+  });
+
+  testApp('a nudge near either end clamps instead of seeking past it', (
+    tester,
+    app,
+  ) async {
+    app.audioEngine.durationToReport = const Duration(seconds: 2580);
+    await openFirstRiyadLesson(tester);
+
+    // At 3s, back 10 must land on 0 rather than a negative position.
+    app.audioEngine.positionsController.add(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    await tapControl(tester, Icons.replay_10_rounded);
+    expect(app.audioEngine.seeks.last, Duration.zero);
+
+    // And 4s from the end, forward 10 stops at the end.
+    app.audioEngine.positionsController.add(const Duration(seconds: 2576));
+    await tester.pumpAndSettle();
+    await tapControl(tester, Icons.forward_10_rounded);
+    expect(app.audioEngine.seeks.last, const Duration(seconds: 2580));
   });
 
   testApp('ended audio lesson with autoplay rolls into the next one', (

@@ -205,6 +205,16 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     }
   }
 
+  /// Nudges playback by [seconds], clamped to the lesson so a tap near either
+  /// end can't seek past it.
+  Future<void> _skipBy(int seconds, Duration? total) async {
+    var target = _position + Duration(seconds: seconds);
+    if (target < Duration.zero) target = Duration.zero;
+    if (total != null && target > total) target = total;
+    setState(() => _position = target);
+    await _engine.seekTo(target);
+  }
+
   Future<void> _seekToFraction(double fraction, Duration total) async {
     final target = Duration(
       milliseconds: (total.inMilliseconds * fraction).round(),
@@ -618,44 +628,61 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                         ),
                       ),
                     ),
-                    Row(
-                      children: [
-                        _SkipButton(
-                          forward: false,
-                          enabled: previous != null,
-                          onTap: previous == null
-                              ? null
-                              : () => _startLesson(previous.videoId),
-                        ),
-                        const SizedBox(width: 22),
-                        GestureDetector(
-                          onTap: _engine.togglePlay,
-                          child: Container(
-                            width: 68,
-                            height: 68,
-                            decoration: BoxDecoration(
-                              color: scheme.primary,
-                              shape: BoxShape.circle,
+                    // Five controls plus the edge labels is a lot for a narrow
+                    // phone, so this scales down rather than overflowing.
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          children: [
+                            _SkipButton(
+                              forward: false,
+                              enabled: previous != null,
+                              onTap: previous == null
+                                  ? null
+                                  : () => _startLesson(previous.videoId),
                             ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              _isPlaying
-                                  ? Icons.pause_rounded
-                                  : Icons.play_arrow_rounded,
-                              size: 32,
-                              color: scheme.onPrimary,
+                            const SizedBox(width: 6),
+                            _SeekButton(
+                              forward: false,
+                              onTap: () => _skipBy(-10, total),
                             ),
-                          ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: _engine.togglePlay,
+                              child: Container(
+                                width: 68,
+                                height: 68,
+                                decoration: BoxDecoration(
+                                  color: scheme.primary,
+                                  shape: BoxShape.circle,
+                                ),
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  _isPlaying
+                                      ? Icons.pause_rounded
+                                      : Icons.play_arrow_rounded,
+                                  size: 32,
+                                  color: scheme.onPrimary,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            _SeekButton(
+                              forward: true,
+                              onTap: () => _skipBy(10, total),
+                            ),
+                            const SizedBox(width: 6),
+                            _SkipButton(
+                              forward: true,
+                              enabled: next != null,
+                              onTap: next == null
+                                  ? null
+                                  : () => _startLesson(next.videoId),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 22),
-                        _SkipButton(
-                          forward: true,
-                          enabled: next != null,
-                          onTap: next == null
-                              ? null
-                              : () => _startLesson(next.videoId),
-                        ),
-                      ],
+                      ),
                     ),
                     // Where the decorative equalizer glyph used to sit.
                     if (current?.textKind != null)
@@ -814,6 +841,30 @@ class _RoundIconButton extends StatelessWidget {
           size: 16,
           color: highlighted ? scheme.primary : scheme.onSurfaceVariant,
         ),
+      ),
+    );
+  }
+}
+
+/// ±10 s nudge. The glyphs carry the numeral, so unlike the lesson-skip buttons
+/// these must NOT be mirrored in RTL — time direction isn't reading direction,
+/// and a flipped "10" reads as nonsense.
+class _SeekButton extends StatelessWidget {
+  const _SeekButton({required this.forward, required this.onTap});
+
+  final bool forward;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return IconButton(
+      onPressed: onTap,
+      tooltip: forward ? 'تقديم ١٠ ثوانٍ' : 'إرجاع ١٠ ثوانٍ',
+      icon: Icon(
+        forward ? Icons.forward_10_rounded : Icons.replay_10_rounded,
+        size: 28,
+        color: scheme.onSurface,
       ),
     );
   }
