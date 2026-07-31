@@ -162,18 +162,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const SizedBox(height: 20),
 
             // ── Level chips (onboarding replacement) ─────────────────
-            Row(
-              key: _levelKey,
-              children: [
-                for (final l in JourneyLevel.values) ...[
-                  MasarChip(
-                    label: l.labelAr,
-                    selected: level == l,
-                    onTap: () => ref.read(levelFilterProvider.notifier).set(l),
-                  ),
-                  const SizedBox(width: 8),
+            // Scrolls: three chips fit a phone at the default text size with
+            // almost nothing to spare, and overflow as soon as the reader turns
+            // text up. A chip row that clips is worse than one that scrolls.
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                key: _levelKey,
+                children: [
+                  for (final l in JourneyLevel.values) ...[
+                    MasarChip(
+                      label: l.labelAr,
+                      selected: level == l,
+                      onTap: () => ref.read(levelFilterProvider.notifier).set(l),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
                 ],
-              ],
+              ),
             ),
             const SizedBox(height: 20),
 

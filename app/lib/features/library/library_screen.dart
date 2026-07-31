@@ -10,6 +10,7 @@ import '../../core/widgets/science_glyph.dart';
 import '../../core/widgets/skeleton.dart';
 import '../../data/view_models.dart';
 import 'library_providers.dart';
+import 'scholar_filter.dart';
 
 /// المكتبة — the "browse everything" escape hatch, per the design:
 /// sciences grid with Amiri glyphs + counts, offline note banner.
@@ -21,7 +22,7 @@ class LibraryScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final masar = masarColorsOf(context);
-    final sciencesAsync = ref.watch(sciencesProvider);
+    final sciencesAsync = ref.watch(filteredSciencesProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -80,16 +81,25 @@ class LibraryScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 18),
+              const ScholarFilterChips(),
               const _ScholarsRow(),
               Text('العلوم', style: theme.textTheme.titleLarge),
               const SizedBox(height: 10),
-              GridView.count(
+              GridView(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.35,
+                // A fixed aspect ratio sized the tile from its *width*, so on a
+                // 402pt phone it gave the contents 93.6pt to hold ~112pt and
+                // overflowed by 19. Height is what the contents actually need,
+                // so it is set directly — and it scales with the reader's text
+                // size, which an aspect ratio cannot do.
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  mainAxisExtent:
+                      150 * MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.6),
+                ),
                 children: [
                   for (final science in sciences)
                     Card(
@@ -113,6 +123,14 @@ class LibraryScreen extends ConsumerWidget {
                               const Spacer(),
                               Text(
                                 science.nameAr,
+                                // One line, like the count below it. Science
+                                // names are short, but at a large text size
+                                // «أصول الفقه» wraps and adds a whole line the
+                                // tile has no room for — and a tile height
+                                // scaled from the text size cannot predict a
+                                // wrap.
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.titleLarge,
                               ),
                               const SizedBox(height: 2),
@@ -265,7 +283,16 @@ class _ScholarsRow extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final scholars = ref.watch(scholarsProvider).value ?? const <ScholarInfo>[];
+    final filter = ref.watch(activeScholarFilterProvider);
+    final all = ref.watch(scholarsProvider).value ?? const <ScholarInfo>[];
+    // Filtered, the row narrows to the one card — it stays because it is still
+    // the way through to his profile, and a lone card reads as a header.
+    final scholars = filter == null
+        ? all
+        : [
+            for (final s in all)
+              if (s.slug == filter) s,
+          ];
     if (scholars.isEmpty) return const SizedBox.shrink();
 
     return Column(

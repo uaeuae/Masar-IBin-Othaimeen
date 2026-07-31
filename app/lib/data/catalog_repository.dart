@@ -481,41 +481,44 @@ class CatalogRepository {
 
   /// Case-blind substring search over series and lesson titles. Companion
   /// audio editions are searchable even though they're hidden from browse.
-  Future<CatalogSearchResults> search(String query, {int limit = 30}) async {
+  ///
+  /// [scholarSlug] narrows to one scholar (design 4e). It has to bite in SQL,
+  /// not on the result list: both queries are capped, so filtering afterwards
+  /// would search the whole catalog and then throw most of a short page away.
+  Future<CatalogSearchResults> search(
+    String query, {
+    int limit = 30,
+    String? scholarSlug,
+  }) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) return const CatalogSearchResults();
     final like =
         '%${trimmed.replaceAll('!', '!!').replaceAll('%', '!%').replaceAll('_', '!_')}%';
+    final byScholar = scholarSlug == null ? '' : 'AND s.scholar_slug = ?';
+    List<Variable> args() => [
+      Variable.withString(like),
+      if (scholarSlug != null) Variable.withString(scholarSlug),
+    ];
 
-    final seriesRows = await db
-        .customSelect(
-          '''
-          SELECT s.slug, s.title_ar, s.media_type,
+    final seriesRows = await db.customSelect('''
+          SELECT s.slug, s.title_ar, s.media_type, s.scholar_slug,
             (SELECT COUNT(*) FROM lessons l
               WHERE l.series_slug = s.slug AND l.status = 'active') AS lesson_count
           FROM series s
-          WHERE s.title_ar LIKE ? ESCAPE '!'
+          WHERE s.title_ar LIKE ? ESCAPE '!' $byScholar
           ORDER BY s.title_ar
           LIMIT 10
-          ''',
-          variables: [Variable.withString(like)],
-        )
-        .get();
+          ''', variables: args()).get();
 
-    final lessonRows = await db
-        .customSelect(
-          '''
+    final lessonRows = await db.customSelect('''
           SELECT l.video_id, l.title_ar, l.position, l.duration_seconds,
-            l.series_slug, s.title_ar AS series_title
+            l.series_slug, s.title_ar AS series_title, s.scholar_slug
           FROM lessons l
           JOIN series s ON s.slug = l.series_slug
-          WHERE l.status = 'active' AND l.title_ar LIKE ? ESCAPE '!'
+          WHERE l.status = 'active' AND l.title_ar LIKE ? ESCAPE '!' $byScholar
           ORDER BY s.title_ar, l.position
           LIMIT $limit
-          ''',
-          variables: [Variable.withString(like)],
-        )
-        .get();
+          ''', variables: args()).get();
 
     return CatalogSearchResults(
       series: [
@@ -524,6 +527,7 @@ class CatalogRepository {
             slug: row.read<String>('slug'),
             titleAr: row.read<String>('title_ar'),
             lessonCount: row.read<int>('lesson_count'),
+            scholarSlug: row.read<String>('scholar_slug'),
             media: LessonMedia.fromJson(row.read<String>('media_type')),
           ),
       ],
@@ -535,6 +539,7 @@ class CatalogRepository {
             seriesTitleAr: row.read<String>('series_title'),
             position: row.read<int>('position'),
             titleAr: row.read<String>('title_ar'),
+            scholarSlug: row.read<String>('scholar_slug'),
             durationSeconds: row.readNullable<int>('duration_seconds'),
           ),
       ],
@@ -610,22 +615,33 @@ class CatalogRepository {
 
   // ── Library queries ───────────────────────────────────────────────────
 
-  Stream<List<ScienceSummary>> watchSciences() {
+  /// [scholarSlug] narrows the grid to one scholar (design 3a). Every count
+  /// narrows with it, deliberately: a tile that still read «٢٢ سلسلة» under a
+  /// one-scholar filter would be counting series the filter has just hidden.
+  Stream<List<ScienceSummary>> watchSciences({String? scholarSlug}) {
+    final byScholar = scholarSlug == null ? '' : 'AND s.scholar_slug = ?';
     return db
         .customSelect(
           '''
           SELECT sc.slug, sc.name_ar, sc.description_ar, sc.icon, sc.sort_order,
             (SELECT COUNT(*) FROM series s
-              WHERE s.science_slug = sc.slug AND s.companion_of IS NULL) AS series_count,
+              WHERE s.science_slug = sc.slug AND s.companion_of IS NULL
+                $byScholar) AS series_count,
             (SELECT COUNT(*) FROM lessons l
                JOIN series s ON s.slug = l.series_slug
               WHERE s.science_slug = sc.slug AND s.companion_of IS NULL
-                AND l.status = 'active') AS lesson_count,
+                AND l.status = 'active' $byScholar) AS lesson_count,
             (SELECT COUNT(DISTINCT s.scholar_slug) FROM series s
-              WHERE s.science_slug = sc.slug AND s.companion_of IS NULL) AS scholar_count
+              WHERE s.science_slug = sc.slug AND s.companion_of IS NULL
+                $byScholar) AS scholar_count
           FROM sciences sc
           ORDER BY sc.sort_order
           ''',
+          variables: [
+            // One per subquery, in the order SQLite binds them.
+            if (scholarSlug != null)
+              for (var i = 0; i < 3; i++) Variable.withString(scholarSlug),
+          ],
           readsFrom: {db.sciences, db.seriesEntries, db.lessons},
         )
         .watch()

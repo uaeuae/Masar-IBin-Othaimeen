@@ -7,8 +7,12 @@ import 'package:go_router/go_router.dart';
 import '../../app/theme.dart';
 import '../../core/formatters.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/scholar_avatar.dart';
 import '../../data/providers.dart';
 import '../../data/view_models.dart';
+import '../library/library_providers.dart';
+import '../library/scholar_filter.dart';
+import '../scholars/scholar_providers.dart';
 
 /// Unified search per design 1m: one query over the catalog, grouped results
 /// with highlighted matches. Lessons and series search for real; the فتاوى
@@ -161,6 +165,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
               const SizedBox(height: 8),
 
+              // ── Scholar filter, design 4e ────────────────────────────
+              const ScholarFilterBar(),
+
               Expanded(child: _buildResults(context)),
             ],
           ),
@@ -188,20 +195,27 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         message: 'اكتب اسم كتاب أو بابًا أو كلمة من عنوان درس.',
       );
     }
+    final scholarFilter = ref.watch(activeScholarFilterProvider);
+    final scholars = ref.watch(scholarsBySlugProvider);
     return FutureBuilder<CatalogSearchResults>(
-      // Keyed so a new query triggers a fresh future.
-      key: ValueKey(_query),
-      future: ref.read(catalogRepositoryProvider).search(_query),
+      // Keyed on the filter too, so clearing the scholar re-runs the query
+      // rather than leaving his results on screen.
+      key: ValueKey('$_query|$scholarFilter'),
+      future: ref
+          .read(catalogRepositoryProvider)
+          .search(_query, scholarSlug: scholarFilter),
       builder: (context, snapshot) {
         final results = snapshot.data;
         if (results == null) {
           return const Center(child: CircularProgressIndicator());
         }
         if (results.isEmpty) {
-          return const EmptyState(
+          return EmptyState(
             icon: Icons.search_off_rounded,
             title: 'لا نتائج',
-            message: 'جرّب كلمة أخرى أو أقصر.',
+            message: scholarFilter == null
+                ? 'جرّب كلمة أخرى أو أقصر.'
+                : 'جرّب كلمة أخرى، أو أزل تصفية الشيخ.',
           );
         }
         final showSeries = _scope == _Scope.all && results.series.isNotEmpty;
@@ -214,6 +228,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 _ResultCard(
                   onTap: () => context.push('/series/${hit.slug}'),
                   title: _highlight(context, hit.titleAr, serif: true),
+                  scholar: scholars[hit.scholarSlug],
                   subtitle: lessonCountLabel(hit.lessonCount),
                 ),
               const SizedBox(height: 10),
@@ -226,6 +241,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     '/player/${hit.videoId}?series=${hit.seriesSlug}',
                   ),
                   title: _highlight(context, hit.titleAr),
+                  scholar: scholars[hit.scholarSlug],
                   subtitle: [
                     hit.seriesTitleAr,
                     'الدرس ${arabicDigits(hit.position)}',
@@ -308,11 +324,19 @@ class _ResultCard extends StatelessWidget {
     required this.onTap,
     required this.title,
     required this.subtitle,
+    this.scholar,
   });
 
   final VoidCallback onTap;
   final Widget title;
   final String subtitle;
+
+  /// Search is the one screen that shows every scholar's material side by
+  /// side, so a result that named no one would be the most misleading card in
+  /// the app (design 4e). It gets its own line rather than the design's single
+  /// meta row: `name_ar` is the full name, and inlined it would ellipsize away
+  /// the الدرس number and duration next to it.
+  final ScholarInfo? scholar;
 
   @override
   Widget build(BuildContext context) {
@@ -336,6 +360,10 @@ class _ResultCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               title,
+              if (scholar != null) ...[
+                const SizedBox(height: 6),
+                ScholarLine(scholar: scholar!, avatarSize: 18),
+              ],
               const SizedBox(height: 4),
               Text(
                 subtitle,

@@ -16,8 +16,12 @@ more text than it contains and the result silently compresses (measured 2.7x
 fast); hand it less and the text is free to stretch, and the over-advance
 compounds into the next window. So windows are not guessed — each section is
 aligned inside the audio its own markers bound, which is ground truth, and error
-cannot escape the section it happened in. Only sections too long for one trellis
-are sub-divided, using that section's own measured text density.
+cannot escape the section it happened in.
+
+A section too long for one trellis, or a source that publishes no markers at all
+(binbaz.org.sa), has no such bounds to work with. Those are re-bounded against
+the audio first — see find_anchors — and only walked blind where the recording
+decodes too poorly to anchor.
 
 Usage:
   python align_lessons.py --data-dir ../ingest/data --texts-dir ../../app/assets/texts
@@ -29,6 +33,7 @@ resumable and `npm run build:texts` picks them up.
 from __future__ import annotations
 
 import argparse
+import difflib
 import gzip
 import json
 import re
@@ -58,6 +63,45 @@ MAX_SEGMENT_SECONDS = 300.0
 # Within a sub-divided section: how much of each sub-window to trust before
 # resuming from the last sentence it placed.
 WINDOW_TRUST = 0.6
+
+# --- Anchors read off the audio, for sources that publish no markers ---
+#
+# A section with real marker bounds cannot drift far, because error is trapped
+# between two known times. A source with no markers at all (binbaz.org.sa) hands
+# the whole lesson over as one segment, and the sub-window walk above then has
+# nothing to re-anchor against — each window's over- or under-advance is carried
+# into the next for an hour.
+#
+# So anchors are recovered from the audio instead: greedy-decode the segment,
+# match the recognised words against the transcript's, and every long run of
+# agreement is a place where we know what is being said and when. Those become
+# segment bounds, which puts a marker-less source back into the case the aligner
+# was built for.
+#
+# A run this long is required before a match is trusted. Arabic religious prose
+# repeats short formulas constantly — «صلى الله عليه وسلم» is four words on its
+# own — so shorter runs match the wrong instance; raising it costs anchors and
+# lengthens the unbounded stretches between them. Measured on binbaz, paired
+# over 96 sentences (validate_decode gap): 3 -> +0.068, 4 -> +0.109,
+# 5 -> +0.113. Three is worse than doing nothing at all (+0.069).
+ANCHOR_WORDS = 5
+# The anchor rarely lands on a sentence's first word. When it lands a few words
+# in, the sentence's start is estimated by stepping back that many words in the
+# recognised text. That extrapolation assumes the two word streams run 1:1 over
+# the step, which only holds for a short one — allowing 16 buys more anchors and
+# measures worse for it (+0.099 against +0.113).
+ANCHOR_BACKOFF_WORDS = 8
+# Boundaries are pulled this much earlier than measured. Forced alignment cannot
+# place a token before the window starts, so a boundary that is slightly late
+# clips the sentence it opens, while one that is slightly early costs nothing.
+ANCHOR_MARGIN_SECONDS = 0.25
+# An anchor implying a speech rate outside this band of the segment's own average
+# is a mis-match, not a fast passage. Both failures the windowing can produce
+# show up here: far too much text between two anchors, or far too little.
+ANCHOR_RATE_BAND = (0.3, 3.0)
+# Anchors closer together than this are not worth a separate segment; the first
+# one already bounds the error well enough.
+ANCHOR_MIN_SPACING_SECONDS = 1.0
 
 
 def normalise(text: str) -> str:
@@ -123,6 +167,42 @@ class Aligner:
             )
             pieces.append(probs[head:tail])
         return torch.cat(pieces, dim=0) if pieces else torch.zeros(0, 1)
+
+    @torch.inference_mode()
+    def decode_words(self, emission: torch.Tensor) -> list[tuple[str, int]]:
+        """Greedy CTC over a window: each recognised word and the frame it starts.
+
+        This is recognition, not alignment — what the model actually heard, with
+        no transcript to constrain it. Note the model's vocabulary includes
+        tashkeel, so it decodes fully diacritised text («قَوْمٌ» for «قوم»); both
+        sides go through normalise() before anything is compared, or nothing
+        matches at all.
+        """
+        if not hasattr(self, "_inverse"):
+            self._inverse = {v: k for k, v in self.vocab.items()}
+        words: list[tuple[str, int]] = []
+        current, start = "", 0
+        previous = None
+        for frame, token in enumerate(emission.argmax(dim=-1).tolist()):
+            if token != previous and token != self.blank:
+                char = self._inverse.get(token, "")
+                if char == "|":
+                    if current:
+                        words.append((current, start))
+                    current = ""
+                elif char:
+                    if not current:
+                        start = frame
+                    current += char
+            previous = token
+        if current:
+            words.append((current, start))
+        out: list[tuple[str, int]] = []
+        for word, frame in words:
+            clean = "".join(c for c in normalise(word) if c.isalpha())
+            if clean:
+                out.append((clean, frame))
+        return out
 
     def align_window(
         self, emission: torch.Tensor, tokens: list[int]
@@ -191,6 +271,94 @@ def read_script(lesson: dict, texts_dir: Path, aligner: Aligner) -> dict | None:
     return {"sections": sections, "count": count} if count else None
 
 
+def find_anchors(
+    aligner: Aligner,
+    emission: torch.Tensor,
+    sentences: list[Sentence],
+    start_seconds: float,
+    end_seconds: float,
+) -> list[tuple[int, float]]:
+    """Segment bounds recovered from the audio, for a section no markers bound.
+
+    Greedy-decodes the window and matches the recognised words against the
+    transcript's. difflib's matching blocks are a longest-common-subsequence, so
+    they are monotonic by construction — a run of agreement cannot be matched to
+    an earlier moment than the run before it, which is exactly the property a
+    segment bound needs.
+
+    Returns (position in `sentences`, seconds) pairs, increasing in both.
+    """
+    first = int(start_seconds * FRAMES_PER_SECOND)
+    last = min(int(end_seconds * FRAMES_PER_SECOND), emission.shape[0])
+    if last - first < 2:
+        return []
+    heard = aligner.decode_words(emission[first:last])
+    if len(heard) < ANCHOR_WORDS:
+        return []
+
+    # Transcript words, each tagged with the sentence it belongs to and how far
+    # into that sentence it sits, so a match can be turned back into a sentence
+    # start rather than just a word start.
+    written: list[str] = []
+    origin: list[tuple[int, int]] = []
+    for position, sentence in enumerate(sentences):
+        offset = 0
+        for raw in normalise(sentence.text).split():
+            word = "".join(c for c in raw if c.isalpha())
+            if word:
+                written.append(word)
+                origin.append((position, offset))
+                offset += 1
+    if len(written) < ANCHOR_WORDS:
+        return []
+
+    matcher = difflib.SequenceMatcher(
+        None, written, [w for w, _ in heard], autojunk=False
+    )
+    # Each sentence keeps its best candidate — the one whose match landed
+    # closest to the sentence's own first word, since that needs the least
+    # extrapolation back.
+    best: dict[int, tuple[int, float]] = {}
+    for block in matcher.get_matching_blocks():
+        if block.size < ANCHOR_WORDS:
+            continue
+        for step in range(block.size):
+            position, offset = origin[block.a + step]
+            if offset > ANCHOR_BACKOFF_WORDS:
+                continue
+            source = block.b + step - offset
+            if source < 0:
+                continue
+            seconds = (first + heard[source][1]) / FRAMES_PER_SECOND
+            if offset:
+                seconds -= ANCHOR_MARGIN_SECONDS
+            previous = best.get(position)
+            if previous is None or offset < previous[0]:
+                best[position] = (offset, seconds)
+
+    # Keep only a chain that advances through both the text and the audio at a
+    # rate this section could actually have been spoken at.
+    span = max(end_seconds - start_seconds, 1.0)
+    rate = max(sum(len(s.tokens) for s in sentences) / span, 1.0)
+    low, high = ANCHOR_RATE_BAND
+
+    anchors: list[tuple[int, float]] = []
+    mark, clock = 0, start_seconds
+    for position in sorted(best):
+        if position <= mark:
+            continue
+        seconds = best[position][1]
+        if seconds <= clock + ANCHOR_MIN_SPACING_SECONDS or seconds >= end_seconds:
+            continue
+        tokens = sum(len(s.tokens) for s in sentences[mark:position])
+        implied = tokens / (seconds - clock)
+        if not low * rate <= implied <= high * rate:
+            continue
+        anchors.append((position, seconds))
+        mark, clock = position, seconds
+    return anchors
+
+
 def align_segment(
     aligner: Aligner,
     emission: torch.Tensor,
@@ -198,6 +366,7 @@ def align_segment(
     start_seconds: float,
     end_seconds: float,
     times: dict[int, float],
+    anchored: bool = False,
 ) -> None:
     """Places one section's sentences inside the audio its markers bound."""
     if not sentences:
@@ -225,9 +394,39 @@ def align_segment(
                 times[sentence.index] = (first + frames[offset]) / FRAMES_PER_SECOND
             return
 
-    # Long section: walk it, trusting the front of each sub-window and resuming
-    # from the last sentence placed. The text slice is sized from this section's
-    # own measured density, so it neither compresses nor stretches.
+    # Too long for one trellis, and (for a marker-less source) with no real
+    # bounds to trap the error. Recover bounds from the audio and recurse, which
+    # puts each piece back into the short, bounded case above. `anchored` stops
+    # a piece that is still too long from being decoded a second time — there
+    # are no further anchors to find inside one, by construction.
+    if not anchored:
+        anchors = find_anchors(
+            aligner, emission, sentences, start_seconds, end_seconds
+        )
+        if anchors:
+            mark, clock = 0, start_seconds
+            for position, seconds in [*anchors, (len(sentences), end_seconds)]:
+                align_segment(
+                    aligner,
+                    emission,
+                    sentences[mark:position],
+                    clock,
+                    seconds,
+                    times,
+                    anchored=True,
+                )
+                mark, clock = position, seconds
+            return
+
+    # Long section with no anchors to be had: walk it, trusting the front of
+    # each sub-window and resuming from the last sentence placed. The text slice
+    # is sized from this section's own measured density, so it neither
+    # compresses nor stretches.
+    #
+    # Sizing each window from the greedy decode's local character count instead
+    # — a real speech-rate signal rather than a section-wide average — was tried
+    # and measured no better (gap +0.114 against +0.113 over 96 sentences), so
+    # the simpler rule stays.
     span = max(end_seconds - start_seconds, 1.0)
     tokens_per_second = max(sum(len(s.tokens) for s in sentences) / span, 1.0)
     sub_frames = int(MAX_SEGMENT_SECONDS * FRAMES_PER_SECOND)

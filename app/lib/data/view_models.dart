@@ -223,12 +223,14 @@ class SeriesSearchHit {
     required this.slug,
     required this.titleAr,
     required this.lessonCount,
+    required this.scholarSlug,
     this.media = LessonMedia.video,
   });
 
   final String slug;
   final String titleAr;
   final int lessonCount;
+  final String scholarSlug;
   final LessonMedia media;
 }
 
@@ -239,6 +241,7 @@ class LessonSearchHit {
     required this.seriesTitleAr,
     required this.position,
     required this.titleAr,
+    required this.scholarSlug,
     this.durationSeconds,
   });
 
@@ -247,6 +250,11 @@ class LessonSearchHit {
   final String seriesTitleAr;
   final int position;
   final String titleAr;
+
+  /// Search crosses every scholar at once, so a hit that does not say whose
+  /// lesson it is leaves the reader to assume — design 4e puts a roundel on
+  /// every row for exactly that reason.
+  final String scholarSlug;
   final int? durationSeconds;
 }
 

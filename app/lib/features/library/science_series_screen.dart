@@ -10,6 +10,7 @@ import '../../core/widgets/series_card.dart';
 import '../../core/widgets/skeleton.dart';
 import '../scholars/scholar_providers.dart';
 import 'library_providers.dart';
+import 'scholar_filter.dart';
 
 enum _SeriesSort { newest, shortest, alphabetical }
 
@@ -34,6 +35,7 @@ class ScienceSeriesScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final seriesAsync = ref.watch(seriesByScienceProvider(scienceSlug));
+    final scholarFilter = ref.watch(activeScholarFilterProvider);
     final scholars = ref.watch(scholarsBySlugProvider);
     final sciences = ref.watch(sciencesProvider).value ?? const [];
     final science = sciences.where((s) => s.slug == scienceSlug).firstOrNull;
@@ -51,7 +53,16 @@ class ScienceSeriesScreen extends ConsumerWidget {
             icon: Icons.error_outline_rounded,
             title: 'تعذر تحميل السلاسل',
           ),
-          data: (series) {
+          data: (all) {
+            // The library tile that leads here counts only the filtered
+            // scholar's series; arriving at the unfiltered list would make
+            // that count look wrong.
+            final series = scholarFilter == null
+                ? all
+                : [
+                    for (final s in all)
+                      if (s.scholarSlug == scholarFilter) s,
+                  ];
             final sorted = [...series];
             switch (sort) {
               case _SeriesSort.newest:
@@ -83,65 +94,94 @@ class ScienceSeriesScreen extends ConsumerWidget {
                         size: 40,
                       ),
                       const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            science.nameAr,
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontSize: 22,
+                      // Flexible, or the counts line runs past the edge once
+                      // the reader turns text up — «٣ سلاسل · ٢٤ درسًا» is
+                      // wider than what is left beside the glyph.
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              science.nameAr,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontSize: 22,
+                              ),
                             ),
-                          ),
-                          Text(
-                            '${seriesCountLabel(series.length)} · ${lessonCountLabel(totalLessons)}',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: scheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w400,
+                            Text(
+                              '${seriesCountLabel(series.length)} · ${lessonCountLabel(totalLessons)}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: scheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ],
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    MasarChip(
-                      label: 'الأحدث',
-                      dense: true,
-                      selected: sort == _SeriesSort.newest,
-                      onTap: () => ref
-                          .read(_sortProvider.notifier)
-                          .set(_SeriesSort.newest),
-                    ),
-                    const SizedBox(width: 8),
-                    MasarChip(
-                      label: 'الأقصر أولًا',
-                      dense: true,
-                      selected: sort == _SeriesSort.shortest,
-                      onTap: () => ref
-                          .read(_sortProvider.notifier)
-                          .set(_SeriesSort.shortest),
-                    ),
-                    const SizedBox(width: 8),
-                    MasarChip(
-                      label: 'أبجديًا',
-                      dense: true,
-                      selected: sort == _SeriesSort.alphabetical,
-                      onTap: () => ref
-                          .read(_sortProvider.notifier)
-                          .set(_SeriesSort.alphabetical),
-                    ),
-                  ],
+                if (scholarFilter != null) ...[
+                  const Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: ActiveScholarFilterChip(),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                // Scrolls rather than wraps: the three labels need ~392pt and a
+                // 402pt phone leaves 362, so as a plain Row this overflowed by
+                // 30 — and it gets worse at larger text sizes. Same treatment
+                // as the science and scholar filter rows.
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      MasarChip(
+                        label: 'الأحدث',
+                        dense: true,
+                        selected: sort == _SeriesSort.newest,
+                        onTap: () => ref
+                            .read(_sortProvider.notifier)
+                            .set(_SeriesSort.newest),
+                      ),
+                      const SizedBox(width: 8),
+                      MasarChip(
+                        label: 'الأقصر أولًا',
+                        dense: true,
+                        selected: sort == _SeriesSort.shortest,
+                        onTap: () => ref
+                            .read(_sortProvider.notifier)
+                            .set(_SeriesSort.shortest),
+                      ),
+                      const SizedBox(width: 8),
+                      MasarChip(
+                        label: 'أبجديًا',
+                        dense: true,
+                        selected: sort == _SeriesSort.alphabetical,
+                        onTap: () => ref
+                            .read(_sortProvider.notifier)
+                            .set(_SeriesSort.alphabetical),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
                 if (sorted.isEmpty)
-                  const EmptyState(
-                    icon: Icons.auto_stories_rounded,
-                    title: 'لا سلاسل في هذا العلم بعد',
-                    message: 'سيضاف المحتوى تباعًا بإذن الله.',
-                  )
+                  scholarFilter == null
+                      ? const EmptyState(
+                          icon: Icons.auto_stories_rounded,
+                          title: 'لا سلاسل في هذا العلم بعد',
+                          message: 'سيضاف المحتوى تباعًا بإذن الله.',
+                        )
+                      : const EmptyState(
+                          icon: Icons.filter_alt_off_rounded,
+                          title: 'لا سلاسل تطابق التصفية',
+                          message: 'أزل تصفية الشيخ لعرض سلاسل هذا العلم.',
+                        )
                 else
                   for (final s in sorted) ...[
                     SeriesCard(series: s, scholar: scholars[s.scholarSlug]),

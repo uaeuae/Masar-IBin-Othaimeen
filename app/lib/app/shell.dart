@@ -27,7 +27,18 @@ class AppShell extends ConsumerWidget {
           title: 'تعذر تجهيز المحتوى',
           message: 'حدث خطأ أثناء تحميل قاعدة الدروس.',
           actionLabel: 'إعادة المحاولة',
-          onAction: () => ref.invalidate(catalogReadyProvider),
+          // The database has to be rebuilt, not merely re-queried. When drift
+          // fails to open a connection — a bad migration, a corrupt file — it
+          // caches that error and every later query on the same connection
+          // rethrows the identical exception without retrying. Invalidating
+          // only `catalogReadyProvider` therefore re-asks the same wedged
+          // connection and cannot ever succeed: a button that does nothing.
+          // Disposing `databaseProvider` closes it and builds a fresh one, so
+          // a transient failure gets a real second attempt.
+          onAction: () {
+            ref.invalidate(databaseProvider);
+            ref.invalidate(catalogReadyProvider);
+          },
         ),
       ),
       data: (_) => Scaffold(

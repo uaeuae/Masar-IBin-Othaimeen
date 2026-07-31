@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:flutter/foundation.dart'
+    show ErrorDescription, FlutterError, FlutterErrorDetails, debugPrint;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -82,6 +84,25 @@ final downloadsProvider = StreamProvider<Map<String, DownloadStatus>>(
 
 /// Resolves once the bundled catalog has been imported (first run) or a
 /// catalog is already present. Screens gate on this before querying.
-final catalogReadyProvider = FutureProvider<void>(
-  (ref) => ref.watch(catalogRepositoryProvider).ensureLoaded(),
-);
+///
+/// Failures are logged on the way past. Riverpod turns them into an
+/// `AsyncError` that the shell renders as an error screen, which means they
+/// never reach `runZonedGuarded` in main.dart — so without this, the one
+/// failure that can make the app unusable is also the one failure that leaves
+/// no trace in `crash.log` for a tester to send back.
+final catalogReadyProvider = FutureProvider<void>((ref) async {
+  try {
+    await ref.watch(catalogRepositoryProvider).ensureLoaded();
+  } catch (error, stack) {
+    debugPrint('catalog could not be prepared: $error');
+    FlutterError.reportError(
+      FlutterErrorDetails(
+        exception: error,
+        stack: stack,
+        library: 'masar',
+        context: ErrorDescription('preparing the catalog on startup'),
+      ),
+    );
+    rethrow;
+  }
+});

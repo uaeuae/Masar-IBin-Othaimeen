@@ -21,3 +21,7 @@ Desktop.ini
 
 # Forced-alignment toolchain (torch + CUDA, ~3 GB; recreate per tools/align/README.md)
 tools/align/.venv/
+
+# Python bytecode from tools/align
+__pycache__/
+*.pyc

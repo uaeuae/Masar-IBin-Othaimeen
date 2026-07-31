@@ -237,14 +237,25 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(seriesEntries, seriesEntries.companionOf);
         await m.addColumn(seriesEntries, seriesEntries.companionSlug);
       }
-      if (from < 5) {
+      // `createTable` is NOT version-aware: it emits DDL from the table's
+      // definition as it stands today, so a table created here already has
+      // every column that later versions added. Any `addColumn` on such a
+      // table must therefore be skipped for installs that reached this branch,
+      // or SQLite rejects the duplicate and the whole migration aborts —
+      // leaving the app unable to open its database at all. See
+      // test/data/migration_test.dart.
+      final createdScholars = from < 5;
+      if (createdScholars) {
         await m.createTable(scholars);
         await m.addColumn(seriesEntries, seriesEntries.scholarSlug);
       }
       if (from < 6) {
         await m.addColumn(lessons, lessons.textKind);
       }
-      if (from < 7) {
+      // Same rule as `createdScholars` above: anything added to `downloads`
+      // after v7 must be guarded with `&& !createdDownloads`.
+      final createdDownloads = from < 7;
+      if (createdDownloads) {
         await m.addColumn(lessons, lessons.gainDb);
         await m.createTable(downloads);
       }
@@ -254,7 +265,7 @@ class AppDatabase extends _$AppDatabase {
       if (from < 9) {
         await m.addColumn(seriesEntries, seriesEntries.bookAuthorAr);
       }
-      if (from < 10) {
+      if (from < 10 && !createdScholars) {
         await m.addColumn(scholars, scholars.initialAr);
         await m.addColumn(scholars, scholars.accent);
         await m.addColumn(scholars, scholars.honorificAr);
