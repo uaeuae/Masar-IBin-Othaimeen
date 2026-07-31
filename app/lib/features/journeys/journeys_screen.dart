@@ -7,6 +7,7 @@ import '../../core/widgets/journey_card.dart';
 import '../../core/widgets/masar_chip.dart';
 import '../../core/widgets/skeleton.dart';
 import '../library/library_providers.dart';
+import '../scholars/scholar_providers.dart';
 import 'journeys_providers.dart';
 
 class JourneysScreen extends ConsumerWidget {
@@ -17,6 +18,7 @@ class JourneysScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final journeysAsync = ref.watch(journeySummariesProvider);
     final sciences = ref.watch(sciencesProvider).value ?? const [];
+    final scholars = ref.watch(scholarsBySlugProvider);
     final scienceFilter = ref.watch(scienceFilterProvider);
 
     String scienceName(String? slug) =>
@@ -120,6 +122,10 @@ class JourneysScreen extends ConsumerWidget {
                         scienceName: scienceName(journey.scienceSlug),
                         scienceSortOrder: scienceOrder(journey.scienceSlug),
                         seriesPreview: journey.seriesPreview,
+                        scholars: [
+                          for (final slug in journey.scholarSlugs)
+                            if (scholars[slug] != null) scholars[slug]!,
+                        ],
                         enrolled: journey.enrolled,
                         progress: journey.enrolled ? journey.progress : null,
                         onTap: () => context.push('/journey/${journey.slug}'),

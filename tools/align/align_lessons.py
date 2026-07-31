@@ -353,7 +353,11 @@ def main() -> int:
                 continue
             if lesson.get("sentence_times") and not args.force:
                 continue
-            if not lesson.get("chapters"):
+            # Chapters used to be the gate, because the foundation's text only
+            # exists inside them. A source that publishes a flat transcript
+            # (binbaz.org.sa) has none, and needs alignment more, not less —
+            # with no markers there is nothing to interpolate from either.
+            if not lesson.get("chapters") and not lesson.get("transcript_text"):
                 continue
 
             log(f"{path.stem} #{lesson['position']}")

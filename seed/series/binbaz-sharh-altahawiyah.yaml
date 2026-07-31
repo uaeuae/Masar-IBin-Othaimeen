@@ -1,0 +1,22 @@
+# شرح العقيدة الطحاوية بصوت سماحة الشيخ ابن باز رحمه الله — من المكتبة الصوتية
+# في موقعه الرسمي binbaz.org.sa (سلسلة رقم ٥١، ٣٢ درسًا).
+slug: binbaz-sharh-altahawiyah
+title_ar: شرح العقيدة الطحاوية
+description_ar: شرح سماحة الشيخ عبد العزيز بن باز رحمه الله للعقيدة الطحاوية في بيان معتقد أهل السنة والجماعة
+science: aqeedah
+scholar: ibn-baz
+level: intermediate
+status: active
+media: audio
+book_author_ar: أبو جعفر الطحاوي
+# التفريغ منشور في الموقع لكنه بلا أي توقيت، فمحاذاته تتم بلا مراسٍ
+# تُثبّتها. القياس (validate_decode.py): الفارق بين التوقيت المحاذى وتوقيت
+# خاطئ متعمَّد +0.069 فقط، مقابل +0.197 في مصدر موثوق — أي أن التوقيت لا
+# يكاد يحمل معلومة. فيُشغَّل الصوت بلا نص، والتفريغ محفوظ لمحاولة قادمة.
+read_along: false
+audio_source: binbaz
+site_audio_sections:
+  - '51' # شرح العقيدة الطحاوية (٣٢ درسًا)
+overrides:
+  exclude_videos: []
+  title_cleanup: '^\s*\d+\s*[-|/]?\s*'

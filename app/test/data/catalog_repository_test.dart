@@ -9,6 +9,7 @@ import 'package:masar/data/db/database.dart';
 import 'package:masar/data/models/catalog.dart';
 import 'package:masar/data/models/enums.dart';
 import 'package:masar/data/progress_repository.dart';
+import 'package:masar/data/view_models.dart';
 
 import '../support/test_db.dart';
 
@@ -51,14 +52,14 @@ void main() {
     final data = loadFixture();
     expect(data.version, 1);
     expect(data.sciences, hasLength(6));
-    expect(data.series, hasLength(4));
-    expect(data.journeys, hasLength(3));
+    expect(data.series, hasLength(5));
+    expect(data.journeys, hasLength(5));
 
     await catalog.importCatalog(data);
     expect(await catalog.currentVersion(), 1);
 
     final summaries = await catalog.watchJourneySummaries().first;
-    expect(summaries, hasLength(3));
+    expect(summaries, hasLength(5));
 
     final aqeedah = summaries.firstWhere((j) => j.slug == 'masar-alaqeedah');
     expect(aqeedah.level, JourneyLevel.beginner);
@@ -85,12 +86,37 @@ void main() {
     // announced-but-not-yet-ingested one.
     expect(video.series.scholarSlug, 'ibn-uthaymeen');
     final scholars = await catalog.watchScholars().first;
-    expect(scholars.map((s) => s.slug), ['ibn-uthaymeen', 'ibn-baz']);
+    expect(scholars.map((s) => s.slug), [
+      'ibn-uthaymeen',
+      'ibn-baz',
+      'al-fawzan',
+    ]);
     expect(scholars.first.initialAr, 'ع');
     expect(scholars.first.seriesCount, greaterThan(0));
-    expect(scholars.last.status, ScholarStatus.comingSoon);
-    // Announced means announced: no series stand behind him.
-    expect(scholars.last.seriesCount, 0);
+
+    // A scholar's status has to agree with whether he has series behind him —
+    // publishing rejects either mismatch, so the app can rely on it.
+    for (final scholar in scholars) {
+      expect(
+        scholar.seriesCount > 0,
+        scholar.status == ScholarStatus.active,
+        reason: scholar.slug,
+      );
+    }
+
+    // A journey's scholars are derived from its stages' series rather than
+    // seeded, so they can never drift out of step with what it actually
+    // teaches. Two journeys share the title «مسار العقيدة»; this is what tells
+    // them apart.
+    final journeys = await catalog.watchJourneySummaries().first;
+    JourneySummary journey(String slug) =>
+        journeys.firstWhere((j) => j.slug == slug);
+    expect(journey('masar-alaqeedah').scholarSlugs, ['ibn-uthaymeen']);
+    expect(journey('masar-alaqeedah-binbaz').scholarSlugs, ['ibn-baz']);
+    expect(
+      journey('masar-mushtarak').scholarSlugs..sort(),
+      ['ibn-baz', 'ibn-uthaymeen'],
+    );
 
     // Companions are reached from their video series, not the library —
     // they must not appear in browse nor inflate the science counters.
@@ -262,7 +288,7 @@ void main() {
     final sciences = await catalog.watchSciences().first;
     expect(sciences, hasLength(6));
     expect(sciences.first.slug, 'aqeedah'); // sort_order 1
-    expect(sciences.firstWhere((s) => s.slug == 'aqeedah').seriesCount, 2);
+    expect(sciences.firstWhere((s) => s.slug == 'aqeedah').seriesCount, 3);
     expect(sciences.firstWhere((s) => s.slug == 'tafsir').seriesCount, 0);
 
     final fiqhSeries = await catalog.watchSeriesByScience('fiqh').first;

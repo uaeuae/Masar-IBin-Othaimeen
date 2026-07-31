@@ -13,12 +13,18 @@ export interface AudioProbe {
 export interface SyncSiteAudioOptions {
   seedDir: string;
   dataDir: string;
-  client: SiteClient;
+  /**
+   * One client per audio source. A series' `audio_source` selects which is
+   * used, so a scholar's lessons are always fetched from his own foundation.
+   */
+  clients: Record<AudioSource, SiteClient>;
   dryRun: boolean;
   /** Injectable for tests; default probes the MP3's first bytes over HTTP. */
   probeAudio?: (audioUrl: string) => Promise<AudioProbe>;
   log?: (line: string) => void;
 }
+
+export type AudioSource = 'binothaimeen' | 'binbaz';
 
 /**
  * Range-fetches the start of an MP3 and estimates its duration. When the
@@ -90,10 +96,18 @@ export async function syncSiteAudio(
       continue;
     }
 
+    const client = options.clients[seed.audio_source];
+    if (!client) {
+      log(`- ${seed.slug}: no client for audio_source "${seed.audio_source}", skipping`);
+      continue;
+    }
+
     const lessons: SiteAudioLesson[] = [];
     for (const sectionId of seed.site_audio_sections) {
       // Per section (not across): multi-section series restart numbering.
-      lessons.push(...sortByEpisodeNumber(await options.client.fetchSectionLessons(sectionId)));
+      // `sortByEpisodeNumber` is a no-op for sources whose titles lead with
+      // the number rather than trailing it; those clients sort their own.
+      lessons.push(...sortByEpisodeNumber(await client.fetchSectionLessons(sectionId)));
     }
 
     const previous = readStoredLessons(options.dataDir, seed.slug);

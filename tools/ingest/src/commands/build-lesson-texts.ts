@@ -35,6 +35,9 @@ export function buildLessonTexts(options: BuildTextsOptions): {
   let matn = 0;
 
   for (const series of activeSeries) {
+    // Mirrors the gate in publish-catalog, so a lesson never claims a
+    // text_kind the assets don't back.
+    if (!series.read_along) continue;
     for (const lesson of readStoredLessons(options.dataDir, series.slug)) {
       // Same rule as publish-catalog, so every lesson the catalog flags with a
       // text_kind has an asset behind it — including `unavailable` ones, whose

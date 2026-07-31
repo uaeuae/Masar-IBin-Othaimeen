@@ -9,6 +9,7 @@ import { buildLessonTexts } from './commands/build-lesson-texts.js';
 import { analyzeLoudness } from './commands/analyze-loudness.js';
 import { createYoutubeClient } from './youtube.js';
 import { createSiteClient } from './site.js';
+import { createBinbazClient } from './binbaz.js';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
@@ -72,12 +73,15 @@ async function main(): Promise<void> {
       break;
     }
     case 'sync-site-audio': {
-      // The site API is public — no key required.
+      // Both sources are public — no key required.
       const { changedSeries } = await syncSiteAudio({
         seedDir,
         dataDir,
         dryRun,
-        client: createSiteClient(),
+        clients: {
+          binothaimeen: createSiteClient(),
+          binbaz: createBinbazClient(),
+        },
       });
       console.log(
         changedSeries.length === 0

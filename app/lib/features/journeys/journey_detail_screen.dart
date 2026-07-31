@@ -7,10 +7,12 @@ import '../../core/formatters.dart';
 import '../../core/widgets/back_circle.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/level_badge.dart';
+import '../../core/widgets/scholar_avatar.dart';
 import '../../core/widgets/skeleton.dart';
 import '../../core/widgets/stage_timeline.dart';
 import '../../data/providers.dart';
 import '../../data/view_models.dart';
+import '../scholars/scholar_providers.dart';
 import 'journeys_providers.dart';
 
 class JourneyDetailScreen extends ConsumerWidget {
@@ -58,6 +60,11 @@ class _JourneyDetailBody extends ConsumerWidget {
     final masar = masarColorsOf(context);
     final summary = detail.summary;
     final topInset = MediaQuery.paddingOf(context).top;
+    final bySlug = ref.watch(scholarsBySlugProvider);
+    final journeyScholars = [
+      for (final slug in summary.scholarSlugs)
+        if (bySlug[slug] != null) bySlug[slug]!,
+    ];
 
     return ListView(
       padding: EdgeInsets.zero,
@@ -87,6 +94,24 @@ class _JourneyDetailBody extends ConsumerWidget {
                 summary.titleAr,
                 style: serif(30, masar.onHero, height: 1.2),
               ),
+              // Whose شرح — the title alone does not identify the مسار, since
+              // «مسار العقيدة» exists for more than one scholar (design 4c).
+              if (journeyScholars.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 14,
+                  runSpacing: 6,
+                  children: [
+                    for (final scholar in journeyScholars)
+                      ScholarLine(
+                        scholar: scholar,
+                        avatarSize: 22,
+                        onHero: true,
+                        withHonorific: journeyScholars.length == 1,
+                      ),
+                  ],
+                ),
+              ],
               if (summary.descriptionAr != null) ...[
                 const SizedBox(height: 8),
                 Text(

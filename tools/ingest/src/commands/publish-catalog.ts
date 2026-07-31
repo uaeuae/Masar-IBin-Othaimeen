@@ -194,8 +194,9 @@ export function publishCatalog(options: PublishOptions): { version: number; less
                 audio_url: l.audio_url ?? null,
                 // Which read-along script `build-texts` emitted, so the player
                 // knows whether to offer «النص» without probing for the asset.
-                // Same classifier both sides — they can't disagree.
-                text_kind: classifyLesson(l),
+                // Same classifier and the same `read_along` gate on both sides
+                // — they can't disagree.
+                text_kind: s.read_along ? classifyLesson(l) : null,
                 // Playback correction from `analyze:loudness`; null until the
                 // lesson has been measured.
                 gain_db: gainForLoudness(l.loudness_lufs),

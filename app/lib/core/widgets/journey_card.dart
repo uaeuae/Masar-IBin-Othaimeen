@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
 import '../../data/models/enums.dart';
+import '../../data/view_models.dart';
 import '../formatters.dart';
 import 'level_badge.dart';
+import 'scholar_avatar.dart';
 import 'science_glyph.dart';
 
 /// Journey card per the design's المسارات list: glyph + title row with an
@@ -19,6 +21,7 @@ class JourneyCard extends StatelessWidget {
     required this.scienceName,
     this.scienceSortOrder = 1,
     this.seriesPreview = '',
+    this.scholars = const [],
     this.enrolled = false,
     this.progress,
     this.onTap,
@@ -34,6 +37,11 @@ class JourneyCard extends StatelessWidget {
   final String scienceName;
   final int scienceSortOrder;
   final String seriesPreview;
+
+  /// Whose شرح the journey is built from. Load-bearing rather than decorative:
+  /// «مسار العقيدة» exists for more than one scholar, so without this the list
+  /// shows two identical cards.
+  final List<ScholarInfo> scholars;
   final bool enrolled;
   final double? progress;
   final VoidCallback? onTap;
@@ -99,6 +107,34 @@ class JourneyCard extends StatelessWidget {
                   ],
                 ],
               ),
+              if (scholars.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: scholars.length == 1
+                      ? ScholarLine(scholar: scholars.single, avatarSize: 20)
+                      // Mixed مسار: overlapping roundels then «بشرح فلان وفلان»,
+                      // as the design draws it (4c).
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _StackedAvatars(scholars: scholars),
+                            const SizedBox(width: 7),
+                            Flexible(
+                              child: Text(
+                                'بشرح ${scholars.map((s) => s.nameAr).join(' و')}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: scheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ],
               if (seriesPreview.isNotEmpty) ...[
                 const SizedBox(height: 10),
                 Text(
@@ -149,6 +185,42 @@ class JourneyCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Overlapping roundels for a مسار whose stages come from different scholars
+/// (design 4c). Overlapped rather than spaced so the group reads as one fact
+/// about the journey rather than a list.
+class _StackedAvatars extends StatelessWidget {
+  const _StackedAvatars({required this.scholars});
+
+  final List<ScholarInfo> scholars;
+
+  static const double _size = 20;
+  static const double _overlap = 6;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return SizedBox(
+      width: _size + (scholars.length - 1) * (_size - _overlap),
+      height: _size,
+      child: Stack(
+        children: [
+          for (final (index, scholar) in scholars.indexed)
+            PositionedDirectional(
+              start: index * (_size - _overlap),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: scheme.surface, width: 1.5),
+                ),
+                child: ScholarAvatar.of(scholar, size: _size),
+              ),
+            ),
+        ],
       ),
     );
   }

@@ -27,8 +27,31 @@ and add sync tooling for his official sources (own YouTube channel id / site
 adapter — the current ones are Ibn-Uthaymeen specific). Seed him as
 `coming_soon` first; flip to `active` in the same commit as his first series.
 
-As of 2026-07-31 there are two: `ibn-uthaymeen` (active) and `ibn-baz`
-(coming_soon, no series yet).
+As of 2026-07-31 there are two, both active: `ibn-uthaymeen` (17 series) and
+`ibn-baz` (2 series — مسار العقيدة).
+
+### Sources
+
+A series' `audio_source` says which site `site_audio_sections` refers to, since
+each scholar's material lives on his own foundation's site:
+
+| source | ids are | notes |
+| --- | --- | --- |
+| `binothaimeen` (default) | audio-library section uuids on `shekhapi.binothaimeen.net` | JSON API, chaptered text with marker timestamps |
+| `binbaz` | `/audios/series/{id}` ids on `binbaz.org.sa` | scraped HTML, flat transcript, **no timestamps anywhere** |
+
+Both go through one `npm run sync:site-audio`.
+
+**binbaz gotcha, already handled but worth knowing:** the router resolves a
+series by id, so `/audios/series/83/anything` renders page 1 — but the paginator
+is built from the canonical URL, so `?page=2` under a placeholder slug silently
+re-serves page 1. The client reads `<link rel="canonical">` from page 1 before
+paging. If a binbaz series ever syncs as exactly 15 lessons, that is the reason.
+
+Because binbaz timestamps nothing, its lessons have no markers to interpolate
+between and no markers to validate against — read-along times come only from
+`tools/align`, and accuracy is checked with `validate_decode.py` against a
+control series rather than `validate_holdout.py`. See tools/align/README.md.
 
 Content went live 2026-07-15: 16 active series (1,719 lessons) across the
 4 launch journeys, all synced from @ibnothaimeentv. Since 2026-07-29 the app

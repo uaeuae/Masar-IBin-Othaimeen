@@ -59,15 +59,15 @@ void main() {
     tester,
     app,
   ) async {
-    await push(tester, '/scholar/ibn-baz');
+    await push(tester, '/scholar/al-fawzan');
 
-    expect(find.text('الشيخ عبد العزيز بن عبد الله بن باز'), findsWidgets);
+    expect(find.text('الشيخ صالح الفوزان'), findsWidgets);
     expect(find.text('قريبًا إن شاء الله'), findsOneWidget);
     expect(find.textContaining('لم تُضف بعد'), findsOneWidget);
     // His own foundation, not the app's — this is why the credit cannot be
     // a single line in app chrome.
     expect(
-      find.textContaining('مؤسسة الشيخ عبد العزيز بن باز الخيرية'),
+      find.textContaining('موقع الشيخ صالح الفوزان'),
       findsOneWidget,
     );
   });
@@ -127,6 +127,37 @@ void main() {
     );
     expect(find.text('مؤسسة الشيخ عبد العزيز بن باز الخيرية'), findsOneWidget);
     expect(find.textContaining('binothaimeen.net'), findsOneWidget);
+  });
+
+  testApp('journey cards say whose شرح they are', (tester, app) async {
+    await tester.tap(find.text('المسارات'));
+    await tester.pumpAndSettle();
+
+    // The fixture carries «مسار العقيدة» twice, once per scholar — which is
+    // exactly why a card has to name whose شرح it is. Without attribution the
+    // list shows two identical cards.
+    expect(find.text('مسار العقيدة'), findsWidgets);
+    expect(find.byType(ScholarAvatar), findsWidgets);
+    expect(find.text('الشيخ محمد بن صالح العثيمين رحمه الله'), findsWidgets);
+  });
+
+  testApp('a journey mixing scholars names them all', (tester, app) async {
+    await push(tester, '/journey/masar-mushtarak');
+
+    // Derived from the stages' own series, so it cannot disagree with them.
+    expect(find.textContaining('الشيخ محمد بن صالح العثيمين'), findsWidgets);
+    expect(find.textContaining('الشيخ عبد العزيز'), findsWidgets);
+  });
+
+  testApp('a flat-transcript series offers no «نص الكتاب» dead end', (
+    tester,
+    app,
+  ) async {
+    // «نص الكتاب» is built from timed passage markers. A source that publishes
+    // a flat transcript has none, so the button would open an empty screen.
+    await push(tester, '/series/baz-sharh-kitab-altawhid');
+    expect(find.text('عن الكتاب'), findsOneWidget);
+    expect(find.text('عرض نص الكتاب'), findsNothing);
   });
 
   testApp('no screen credits a single unnamed «المؤسسة»', (tester, app) async {

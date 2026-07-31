@@ -182,7 +182,13 @@ class CatalogRepository {
       (SELECT COALESCE(SUM(l.duration_seconds), 0) FROM lessons l
          JOIN journey_items i ON l.series_slug = i.series_slug
         WHERE i.journey_slug = j.slug AND l.status = 'active') AS total_duration,
-      EXISTS(SELECT 1 FROM journey_enrollments e WHERE e.journey_slug = j.slug) AS enrolled
+      EXISTS(SELECT 1 FROM journey_enrollments e WHERE e.journey_slug = j.slug) AS enrolled,
+      -- Derived, never seeded: two journeys can share a title («مسار العقيدة»
+      -- exists for two scholars), so the reader needs to see whose it is. Taking
+      -- it from the stages' own series means it cannot disagree with them.
+      (SELECT GROUP_CONCAT(DISTINCT s.scholar_slug) FROM journey_items i
+         JOIN series s ON s.slug = i.series_slug
+        WHERE i.journey_slug = j.slug) AS scholar_slugs
     FROM journeys j
   ''';
 
@@ -200,7 +206,13 @@ class CatalogRepository {
         totalDurationSeconds: row.read<int>('total_duration'),
         enrolled: row.read<int>('enrolled') != 0,
         seriesPreview: seriesPreview,
+        scholarSlugs: _splitSlugs(row.readNullable<String>('scholar_slugs')),
       );
+
+  /// `GROUP_CONCAT` gives a comma-joined list, or null for a journey whose
+  /// series are all missing.
+  static List<String> _splitSlugs(String? value) =>
+      (value == null || value.isEmpty) ? const [] : value.split(',');
 
   /// journey slug → "ثلاثة الأصول ← القواعد الأربع ← ..." (stage order).
   Future<Map<String, String>> _seriesPreviews() async {

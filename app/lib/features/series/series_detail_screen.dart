@@ -115,7 +115,11 @@ class _SeriesDetailBody extends ConsumerWidget {
           scholar: scholar,
           bookAuthorAr: series.bookAuthorAr,
           hasReadAlongText: detail.lessons.any((l) => l.textKind != null),
-          onOpenBookText: detail.lessons.any((l) => l.textKind != null)
+          // «نص الكتاب» is assembled from the timed passage markers, so it needs
+          // chapters and not merely text. A source that publishes a flat
+          // transcript has none — the reader's text is the lesson itself, and
+          // offering a button to an empty screen would just be a dead end.
+          onOpenBookText: detail.lessons.any((l) => l.chapters.isNotEmpty)
               ? () => context.push('/series/${series.slug}/book')
               : null,
         ),

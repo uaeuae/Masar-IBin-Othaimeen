@@ -38,6 +38,13 @@ export interface StoredLesson {
    */
   sentence_times?: Record<string, number> | null;
   chapters?: StoredChapter[];
+  /**
+   * Flat lesson transcript, for sources that publish the text without markers
+   * (binbaz.org.sa). Chaptered sources leave this unset and carry their text in
+   * `chapters`. Never exported to the catalog — like chapter bodies, it is
+   * megabytes of prose that only `build:texts` reads.
+   */
+  transcript_text?: string | null;
 }
 
 export function readStoredLessons(dataDir: string, seriesSlug: string): StoredLesson[] {

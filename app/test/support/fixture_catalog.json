@@ -19,11 +19,23 @@
       "initial_ar": "ب",
       "accent": "blue",
       "honorific_ar": "رحمه الله",
-      "status": "coming_soon",
+      "status": "active",
       "foundation_ar": "مؤسسة الشيخ عبد العزيز بن باز الخيرية",
       "website": "https://binbaz.org.sa",
       "youtube_url": null,
       "sort_order": 2
+    },
+    {
+      "slug": "al-fawzan",
+      "name_ar": "الشيخ صالح الفوزان",
+      "initial_ar": "ف",
+      "accent": "gold",
+      "honorific_ar": "حفظه الله",
+      "status": "coming_soon",
+      "foundation_ar": "موقع الشيخ صالح الفوزان",
+      "website": "https://alfawzan.af.org.sa",
+      "youtube_url": null,
+      "sort_order": 3
     }
   ],
   "generated_at": "2026-07-13T00:00:00Z",
@@ -420,6 +432,39 @@
       ],
       "level": "beginner",
       "media": "audio"
+    },
+    {
+      "slug": "baz-sharh-kitab-altawhid",
+      "science": "aqeedah",
+      "title_ar": "شرح كتاب التوحيد",
+      "description_ar": "شرح رسالة ثلاثة الأصول وأدلتها لشيخ الإسلام محمد بن عبدالوهاب رحمه الله",
+      "lessons": [
+        {
+          "youtube_video_id": "baz-tawhid-01",
+          "position": 1,
+          "title_ar": "مقدمة الشرح والتعريف بالرسالة ومنهجها",
+          "duration_seconds": 2700,
+          "text_kind": null
+        },
+        {
+          "youtube_video_id": "baz-tawhid-02",
+          "position": 2,
+          "title_ar": "المسائل الأربع التي تجب معرفتها",
+          "duration_seconds": 3120,
+          "text_kind": null
+        },
+        {
+          "youtube_video_id": "baz-tawhid-03",
+          "position": 3,
+          "title_ar": "الأصل الأول: معرفة العبد ربه",
+          "duration_seconds": 2880,
+          "text_kind": null
+        }
+      ],
+      "level": "beginner",
+      "scholar": "ibn-baz",
+      "companion_of": null,
+      "companion_slug": null
     }
   ],
   "journeys": [
@@ -483,6 +528,58 @@
           "items": [
             {
               "series": "sharh-riyad-alsalihin"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "masar-alaqeedah-binbaz",
+      "title_ar": "مسار العقيدة",
+      "description_ar": "بشرح ابن باز",
+      "level": "beginner",
+      "science": "aqeedah",
+      "cover_url": null,
+      "sort_order": 5,
+      "stages": [
+        {
+          "title_ar": "المرحلة الأولى",
+          "description_ar": null,
+          "items": [
+            {
+              "type": "series",
+              "series": "baz-sharh-kitab-altawhid"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "masar-mushtarak",
+      "title_ar": "مسار مشترك",
+      "description_ar": null,
+      "level": "intermediate",
+      "science": "aqeedah",
+      "cover_url": null,
+      "sort_order": 6,
+      "stages": [
+        {
+          "title_ar": "المرحلة الأولى",
+          "description_ar": null,
+          "items": [
+            {
+              "type": "series",
+              "series": "sharh-thalathat-alusul"
+            }
+          ]
+        },
+        {
+          "title_ar": "المرحلة الثانية",
+          "description_ar": null,
+          "items": [
+            {
+              "type": "series",
+              "series": "baz-sharh-kitab-altawhid"
             }
           ]
         }

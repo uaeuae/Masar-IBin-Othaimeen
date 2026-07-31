@@ -18,6 +18,7 @@ class JourneySummary {
     required this.totalDurationSeconds,
     required this.enrolled,
     this.seriesPreview = '',
+    this.scholarSlugs = const [],
   });
 
   final String slug;
@@ -34,6 +35,10 @@ class JourneySummary {
 
   /// Stage sequence teaser: "ثلاثة الأصول ← القواعد الأربع ← الواسطية".
   final String seriesPreview;
+
+  /// Whose شرح this journey is built from, derived from its stages' series.
+  /// More than one when a مسار mixes scholars; the card shows a roundel each.
+  final List<String> scholarSlugs;
 
   double get progress => lessonCount == 0 ? 0 : completedCount / lessonCount;
 }

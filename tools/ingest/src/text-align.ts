@@ -111,6 +111,11 @@ export function splitSentences(text: string, maxChars = MAX_SENTENCE_CHARS): str
 
 /** null = no usable text at all (114 of the 500 audio lessons). */
 export function classifyLesson(lesson: StoredLesson): LessonTextKind | null {
+  // A flat transcript is by definition the speech, so it is never matn. Sources
+  // that publish one (binbaz.org.sa) timestamp nothing, so every sentence time
+  // has to come from forced alignment — there is nothing to interpolate from.
+  if ((lesson.transcript_text ?? '').trim().length > 0) return 'transcript';
+
   const chapters = lesson.chapters ?? [];
   const chars = chapters.reduce((sum, c) => sum + (c.body ?? '').length, 0);
   if (chars === 0) return null;
@@ -246,6 +251,26 @@ export function buildLessonText(lesson: StoredLesson): LessonText | null {
 
   const chapters = (lesson.chapters ?? []).filter((c) => (c.title ?? '') || (c.body ?? ''));
   const duration = lesson.duration_seconds ?? null;
+
+  const flat = (lesson.transcript_text ?? '').trim();
+  if (flat.length > 0) {
+    // A marker-less source: one section spanning the lesson, and NO times.
+    // Interpolating across a whole lesson drifts by minutes (DECISIONS.md 8),
+    // so these sentences stay untimed until forced alignment fills them in —
+    // an untimed script still reads, it just does not highlight.
+    const flatSections: TextSection[] = [
+      { start: 0, title: '', sentences: splitSentences(flat).map((s) => ({ s })) },
+    ].filter((s) => s.sentences.length > 0);
+    if (flatSections.length === 0) return null;
+    const flatAligned = applyMeasuredTimes(flatSections, lesson.sentence_times);
+    return {
+      lesson: lesson.youtube_video_id,
+      kind: 'transcript',
+      duration,
+      ...(flatAligned > 0 ? { measured: flatAligned } : {}),
+      sections: flatSections,
+    };
+  }
 
   let sections: TextSection[];
   if (kind === 'matn') {

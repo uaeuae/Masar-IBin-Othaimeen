@@ -27,9 +27,15 @@
 - [ ] Privacy policy URL — host `docs/privacy-policy.md` (e.g. GitHub Pages) and link it
 
 ## Etiquette / goodwill (recommended before launch)
+The app now streams from **two** foundations' own hosts, so both deserve the
+note — same message, and each is credited by name in الإعدادات → المصادر والإسناد
+and on its scholar's page.
 - [ ] Email مؤسسة الشيخ محمد بن صالح العثيمين الخيرية: non-profit intent,
       official-embed-only playback, prominent attribution, offer to comply
       with any request (contact via binothaimeen.net)
+- [ ] Email مؤسسة الشيخ عبد العزيز بن باز الخيرية: same, noting the app streams
+      their audio from files.zadapps.info rather than re-hosting it
+      (contact via binbaz.org.sa)
 
 ## Final verification on a clean device
 - [ ] `flutter build appbundle --release`, install via internal testing track

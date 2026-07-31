@@ -167,6 +167,12 @@ export function mergeAudioLessons(
         title: c.title,
         body: c.body,
       })),
+      // Sources that publish a flat transcript instead of chaptered text; kept
+      // from the previous sync when a re-fetch comes back empty, so a site
+      // hiccup cannot quietly delete a lesson's text.
+      ...(audio.transcriptText ?? old?.transcript_text
+        ? { transcript_text: audio.transcriptText ?? old?.transcript_text ?? null }
+        : {}),
     };
     next.push(lesson);
 
@@ -179,7 +185,8 @@ export function mergeAudioLessons(
       old.audio_url !== lesson.audio_url ||
       old.status !== lesson.status ||
       old.position !== lesson.position ||
-      JSON.stringify(old.chapters ?? []) !== JSON.stringify(lesson.chapters)
+      JSON.stringify(old.chapters ?? []) !== JSON.stringify(lesson.chapters) ||
+      (old.transcript_text ?? null) !== (lesson.transcript_text ?? null)
     ) {
       updated.push(audio.siteId);
       if (old.status !== 'unavailable' && lesson.status === 'unavailable') {

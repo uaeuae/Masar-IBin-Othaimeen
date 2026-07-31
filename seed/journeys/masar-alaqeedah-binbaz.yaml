@@ -1,0 +1,19 @@
+# مسار العقيدة بشرح سماحة الشيخ ابن باز رحمه الله.
+# يحمل عنوان «مسار العقيدة» نفسه الذي يحمله مسار الشيخ ابن عثيمين — التمييز
+# بينهما بالشارح لا بالعنوان، وبطاقة المسار تعرض شارة الشيخ.
+slug: masar-alaqeedah-binbaz
+title_ar: مسار العقيدة
+description_ar: رحلة متدرجة في العقيدة بشرح سماحة الشيخ عبد العزيز بن باز رحمه الله، تبدأ بكتاب التوحيد ثم العقيدة الطحاوية
+level: beginner
+science: aqeedah
+sort_order: 5
+is_published: true
+stages:
+  - title_ar: "المرحلة الأولى: كتاب التوحيد"
+    description_ar: تحقيق التوحيد وبيان ما ينافيه أو ينافي كماله
+    items:
+      - series: binbaz-sharh-kitab-altawhid
+  - title_ar: "المرحلة الثانية: العقيدة الطحاوية"
+    description_ar: معتقد أهل السنة والجماعة كما قرره الإمام الطحاوي
+    items:
+      - series: binbaz-sharh-altahawiyah

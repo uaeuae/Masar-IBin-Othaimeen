@@ -97,7 +97,25 @@ export const seriesSeedSchema = z.object({
   companion_of: slugSchema.optional(),
   /** Ordered: when a long series spans multiple playlists, order here is playback order. */
   youtube_playlists: z.array(z.string().min(1)).default([]),
-  /** Audio-library section ids on shekhapi.binothaimeen.net, in playback order. */
+  /**
+   * Which site `site_audio_sections` refers to. Each scholar's material lives
+   * on his own foundation's site, so the ids are only meaningful together with
+   * the source.
+   */
+  audio_source: z.enum(['binothaimeen', 'binbaz']).default('binothaimeen'),
+  /**
+   * Whether the lesson text ships as a read-along. Set false when a transcript
+   * exists but its timing cannot be trusted: the app then plays the audio and
+   * says «لا يوجد نص لهذا الدرس», which is honest, where a drifting highlight
+   * is actively misleading. The transcript and any measured times stay in the
+   * data files, so flipping this back is a rebuild, not a re-ingest.
+   */
+  read_along: z.boolean().default(true),
+  /**
+   * Audio-library section ids in playback order — sections on
+   * shekhapi.binothaimeen.net, or `/audios/series/{id}` ids on binbaz.org.sa,
+   * per `audio_source`.
+   */
   site_audio_sections: z.array(z.string().min(1)).default([]),
   site_series_ids: z.array(z.string().min(1)).default([]),
   overrides: seriesOverridesSchema,

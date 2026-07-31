@@ -187,6 +187,39 @@ describe('publishCatalog', () => {
     });
   });
 
+  it('read_along: false publishes the audio without claiming a text', () => {
+    // A transcript whose timing cannot be trusted is worse than no text: the
+    // highlight drifts and misleads. The lesson still plays; it just reports
+    // no text_kind, which is what makes the player say «لا يوجد نص».
+    const ws = makeWorkspace({ withCompanion: true });
+    writeFileSync(
+      join(ws.seedDir, 'series', 'sharh-zad-audio.yaml'),
+      'slug: sharh-zad-audio\ntitle_ar: شرح زاد (صوتي)\nscience: fiqh\nstatus: active\n' +
+        'media: audio\nread_along: false\nsite_audio_sections: [sec-9]\n',
+    );
+    const lessons: StoredLesson[] = [
+      {
+        youtube_video_id: 'x1',
+        position: 1,
+        title_ar: 'درس',
+        duration_seconds: 600,
+        published_at: null,
+        thumbnail_url: null,
+        status: 'active',
+        media: 'audio',
+        audio_url: 'https://example.test/x1.mp3',
+        transcript_text: 'جملة أولى. جملة ثانية.',
+      },
+    ];
+    writeFileSync(join(ws.dataDir, 'series', 'sharh-zad-audio.json'), JSON.stringify(lessons));
+
+    publishCatalog({ ...ws, dryRun: false, now: fixedNow });
+    const catalog = JSON.parse(readFileSync(join(ws.outDir, 'catalog.json'), 'utf8'));
+    const series = catalog.series.find((s: { slug: string }) => s.slug === 'sharh-zad-audio');
+    expect(series.lessons[0].audio_url).toBe('https://example.test/x1.mp3');
+    expect(series.lessons[0].text_kind).toBeNull();
+  });
+
   it('unpublished journeys are simply omitted', () => {
     const ws = makeWorkspace({ publish: false });
     publishCatalog({ ...ws, dryRun: false, now: fixedNow });

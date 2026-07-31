@@ -29,6 +29,12 @@ export interface SiteAudioLesson {
   audioUrl: string;
   chapters: SiteAudioChapter[];
   publishedAt: string | null;
+  /**
+   * Flat transcript, for sources that publish the lesson's text without any
+   * markers (binbaz.org.sa). Sources with chaptered text leave this null and
+   * carry their text in `chapters` instead.
+   */
+  transcriptText?: string | null;
 }
 
 type FetchLike = (url: string) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>;
@@ -76,7 +82,7 @@ export function toAudioUrl(certificateUrl: string): string {
   return encodeURI(`${SOUND_HOST}${raw.startsWith('/') ? '' : '/'}${raw}`);
 }
 
-function stripHtml(html: string): string {
+export function stripHtml(html: string): string {
   return html
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
