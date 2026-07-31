@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:masar/core/widgets/level_badge.dart';
 import 'package:masar/core/widgets/masar_nav_bar.dart';
 import 'package:masar/core/widgets/segmented_control.dart';
 import 'package:masar/data/models/enums.dart';
@@ -45,25 +46,22 @@ void main() {
     expect(find.textContaining('الفهرس كامل متاح دون اتصال'), findsOneWidget);
   });
 
-  testApp('level segmented control filters the journeys list', (
+  testApp('journeys are all listed, each tagged with its level and hours', (
     tester,
     app,
   ) async {
     await tester.tap(navItem('المسارات'));
     await tester.pumpAndSettle();
 
-    // Default مبتدئ → beginner journeys only.
+    // No level filter any more: hiding three of four journeys behind a
+    // segmented control cost more than it saved.
+    expect(inJourneys(find.byType(SegmentedControl<JourneyLevel>)), findsNothing);
     expect(inJourneys(find.text('مسار العقيدة')), findsOneWidget);
-    expect(inJourneys(find.text('مسار الفقه')), findsNothing);
-
-    await tester.tap(segmentedOption('متوسط'));
-    await tester.pumpAndSettle();
     expect(inJourneys(find.text('مسار الفقه')), findsOneWidget);
-    expect(inJourneys(find.text('مسار العقيدة')), findsNothing);
 
-    await tester.tap(segmentedOption('متقدم'));
-    await tester.pumpAndSettle();
-    expect(inJourneys(find.text('لا مسارات تطابق التصفية')), findsOneWidget);
+    // The level is a tag on the card instead, and each says how long it is.
+    expect(inJourneys(find.byType(LevelBadge)), findsWidgets);
+    expect(inJourneys(find.textContaining('ساعة')), findsWidgets);
   });
 
   testApp('journey detail CTA enrolls and opens the player', (
@@ -97,6 +95,13 @@ void main() {
       find.textContaining('ابدأ — الدرس'),
       findsOneWidget,
     ); // resume banner
+    // The lesson list sits below «عن الكتاب»; a lazy ListView has not built it
+    // until it is scrolled to.
+    await tester.scrollUntilVisible(
+      find.textContaining('المسائل الأربع'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.textContaining('المسائل الأربع'), findsOneWidget);
 
     await tapVisible(tester, find.textContaining('ابدأ — الدرس'));

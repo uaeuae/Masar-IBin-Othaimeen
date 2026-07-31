@@ -13,3 +13,9 @@ final seriesByScienceProvider = StreamProvider.autoDispose
           .watch(catalogRepositoryProvider)
           .watchSeriesByScience(scienceSlug),
     );
+
+/// Scholar registry — attribution for the «عن الكتاب» card and the home
+/// resume card.
+final scholarsProvider = StreamProvider.autoDispose<List<ScholarInfo>>(
+  (ref) => ref.watch(catalogRepositoryProvider).watchScholars(),
+);

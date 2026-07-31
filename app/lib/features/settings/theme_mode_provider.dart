@@ -67,6 +67,31 @@ final allowMobileDataProvider =
       AllowMobileDataNotifier.new,
     );
 
+/// Which coach-mark sequences the reader has already seen. Stored as a set of
+/// keys rather than one boolean, so a sequence added later can run on its own
+/// without replaying the ones already shown.
+class SeenCoachMarksNotifier extends Notifier<Set<String>> {
+  static const _key = 'seen_coach_marks';
+
+  @override
+  Set<String> build() =>
+      (ref.watch(sharedPreferencesProvider).getStringList(_key) ?? const [])
+          .toSet();
+
+  bool has(String sequence) => state.contains(sequence);
+
+  void markSeen(String sequence) {
+    if (state.contains(sequence)) return;
+    state = {...state, sequence};
+    ref.read(sharedPreferencesProvider).setStringList(_key, state.toList());
+  }
+}
+
+final seenCoachMarksProvider =
+    NotifierProvider<SeenCoachMarksNotifier, Set<String>>(
+      SeenCoachMarksNotifier.new,
+    );
+
 /// Whether the audio player opens on the lesson text rather than the artwork.
 /// On by default -- reading along is the point of having the text at all.
 class ShowLessonTextNotifier extends Notifier<bool> {

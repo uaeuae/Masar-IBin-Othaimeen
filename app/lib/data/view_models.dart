@@ -182,6 +182,7 @@ class ContinueWatchingItem {
     required this.position,
     required this.seriesSlug,
     required this.seriesTitleAr,
+    this.scholarNameAr,
     required this.watchedSeconds,
     this.durationSeconds,
     required this.lastWatchedAt,
@@ -192,6 +193,10 @@ class ContinueWatchingItem {
   final int position;
   final String seriesSlug;
   final String seriesTitleAr;
+
+  /// Who taught it — attribution belongs next to the lesson, not only in
+  /// Settings.
+  final String? scholarNameAr;
   final int watchedSeconds;
   final int? durationSeconds;
   final DateTime lastWatchedAt;
@@ -262,4 +267,18 @@ class ScienceSummary {
   final int sortOrder;
   final int seriesCount;
   final int lessonCount;
+}
+
+class ScholarInfo {
+  const ScholarInfo({
+    required this.slug,
+    required this.nameAr,
+    required this.foundationAr,
+    this.website,
+  });
+
+  final String slug;
+  final String nameAr;
+  final String foundationAr;
+  final String? website;
 }

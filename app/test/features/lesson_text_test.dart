@@ -262,9 +262,20 @@ void main() {
     },
   );
 
-  testApp('lessons with no text never offer the toggle', (tester, app) async {
-    // fx-riyd-03 carries no text_kind in the fixture catalog.
+  testApp('a lesson with no text says so instead of hiding the control', (
+    tester,
+    app,
+  ) async {
+    // fx-riyd-03 carries no text_kind in the fixture catalog. The control used
+    // to vanish, which read as a broken player rather than as an absent
+    // transcript.
     await openLesson(tester, 'fx-riyd-03');
-    expect(find.text('النص'), findsNothing);
+
+    expect(find.text('النص'), findsOneWidget);
+    expect(find.text('لا يوجد نص لهذا الدرس'), findsOneWidget);
+    expect(
+      find.text('المؤسسة لم تنشر تفريغًا نصيًا له. الصوت يعمل كالمعتاد.'),
+      findsOneWidget,
+    );
   });
 }

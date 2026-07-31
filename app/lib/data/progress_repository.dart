@@ -31,7 +31,10 @@ class ProgressRepository {
         watched_seconds = excluded.watched_seconds,
         duration_seconds = COALESCE(excluded.duration_seconds, lesson_progress.duration_seconds),
         last_watched_at = excluded.last_watched_at,
-        updated_at = excluded.updated_at
+        updated_at = excluded.updated_at,
+        -- Listening again undoes a dismissal; otherwise a lesson swiped away
+        -- once could never return to the list.
+        dismissed = 0
       ''',
       [
         videoId,
@@ -56,6 +59,19 @@ class ProgressRepository {
             completed: const Value(true),
             lastWatchedAt: Value(now),
             updatedAt: Value(now),
+          ),
+        );
+  }
+
+  /// Takes a lesson off «متابعة الاستماع» without losing the saved position —
+  /// reopening it still resumes where the listener stopped.
+  Future<void> dismissFromContinue(String videoId) async {
+    await (db.update(db.lessonProgress)
+          ..where((p) => p.videoId.equals(videoId)))
+        .write(
+          LessonProgressCompanion(
+            dismissed: const Value(true),
+            updatedAt: Value(_now()),
           ),
         );
   }

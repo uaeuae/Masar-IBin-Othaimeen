@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/theme.dart';
 import '../../data/models/enums.dart';
 import '../formatters.dart';
+import 'level_badge.dart';
 import 'science_glyph.dart';
 
 /// Journey card per the design's المسارات list: glyph + title row with an
@@ -14,6 +15,7 @@ class JourneyCard extends StatelessWidget {
     required this.title,
     required this.level,
     required this.stageCount,
+    this.totalDurationSeconds = 0,
     required this.scienceName,
     this.scienceSortOrder = 1,
     this.seriesPreview = '',
@@ -25,6 +27,10 @@ class JourneyCard extends StatelessWidget {
   final String title;
   final JourneyLevel level;
   final int stageCount;
+
+  /// Total listening time across the journey — the same figure the library
+  /// shows on a series, which is what people actually plan around.
+  final int totalDurationSeconds;
   final String scienceName;
   final int scienceSortOrder;
   final String seriesPreview;
@@ -37,7 +43,13 @@ class JourneyCard extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
-    final meta = '${stageCountLabel(stageCount)} · ${level.labelAr}';
+    // The level moved out of this line and onto a badge; what belongs here is
+    // the commitment: how many stages, and how many hours.
+    final meta = [
+      stageCountLabel(stageCount),
+      if (totalDurationSeconds > 0)
+        durationLabel(Duration(seconds: totalDurationSeconds)),
+    ].join(' · ');
 
     return Card(
       child: InkWell(
@@ -99,6 +111,13 @@ class JourneyCard extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 10),
+              // The level is a tag now, not a filter — every journey is listed
+              // and says which level it suits.
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: LevelBadge(level: level, compact: true),
+              ),
+              const SizedBox(height: 8),
               if (enrolled && progress != null)
                 Row(
                   children: [

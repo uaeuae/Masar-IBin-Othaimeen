@@ -11,6 +11,7 @@ class ResumeHeroCard extends StatelessWidget {
     required this.seriesTitle,
     required this.lessonLabel,
     required this.progress,
+    this.scholarName,
     this.stoppedAt,
     this.remaining,
     this.onTap,
@@ -21,6 +22,9 @@ class ResumeHeroCard extends StatelessWidget {
   /// e.g. "الدرس ١٢ — كتاب الطهارة · باب المياه"
   final String lessonLabel;
   final double progress;
+
+  /// Who taught it, shown under the title.
+  final String? scholarName;
   final Duration? stoppedAt;
   final Duration? remaining;
   final VoidCallback? onTap;
@@ -55,6 +59,17 @@ class ResumeHeroCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(seriesTitle, style: serif(21, masar.onHero)),
+                      if (scholarName != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          scholarName!,
+                          style: TextStyle(
+                            fontFamily: kUiFont,
+                            fontSize: 11.5,
+                            color: masar.onHeroFaint,
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 4),
                       Text(
                         lessonLabel,

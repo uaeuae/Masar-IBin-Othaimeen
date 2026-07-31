@@ -13,6 +13,7 @@ import '../../data/view_models.dart';
 import '../downloads/download_button.dart';
 import '../downloads/series_download_bar.dart';
 import '../library/library_providers.dart';
+import 'book_about_card.dart';
 import 'series_providers.dart';
 
 class SeriesDetailScreen extends ConsumerWidget {
@@ -64,6 +65,9 @@ class _SeriesDetailBody extends ConsumerWidget {
     final series = detail.series;
     final resume = detail.resumeTarget;
     final sciences = ref.watch(sciencesProvider).value ?? const [];
+    final scholar = (ref.watch(scholarsProvider).value ?? const [])
+        .where((s) => s.slug == series.scholarSlug)
+        .firstOrNull;
     final scienceName =
         sciences
             .where((s) => s.slug == series.scienceSlug)
@@ -91,17 +95,24 @@ class _SeriesDetailBody extends ConsumerWidget {
         Text(series.titleAr, style: serif(30, scheme.onSurface, height: 1.25)),
         const SizedBox(height: 6),
         Text(
-          [
-            lessonCountLabel(series.lessonCount),
-            if (series.totalDurationSeconds > 0)
-              durationLabel(Duration(seconds: series.totalDurationSeconds)),
-            series.media == LessonMedia.audio
-                ? 'صوتيات المؤسسة'
-                : 'قناة الشيخ الرسمية',
-          ].join(' · '),
+          // Counts and hours live in «عن الكتاب» directly below; repeating them
+          // here just said the same thing twice.
+          series.media == LessonMedia.audio
+              ? 'صوتيات المؤسسة'
+              : 'قناة الشيخ الرسمية',
           style: theme.textTheme.bodySmall?.copyWith(
             color: scheme.onSurfaceVariant,
           ),
+        ),
+        const SizedBox(height: 16),
+
+        // ── عن الكتاب ─────────────────────────────────────────────────
+        BookAboutCard(
+          series: series,
+          scienceName: scienceName,
+          scholarNameAr: scholar?.nameAr,
+          foundationAr: scholar?.foundationAr,
+          hasReadAlongText: detail.lessons.any((l) => l.textKind != null),
         ),
         const SizedBox(height: 16),
 
@@ -310,10 +321,7 @@ class _CompanionBanner extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: scheme.onSurfaceVariant,
-            ),
+            Icon(Icons.chevron_right_rounded, color: scheme.onSurfaceVariant),
           ],
         ),
       ),

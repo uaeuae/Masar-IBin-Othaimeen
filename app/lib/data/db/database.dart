@@ -140,6 +140,10 @@ class LessonProgress extends Table {
   IntColumn get watchedSeconds => integer().withDefault(const Constant(0))();
   IntColumn get durationSeconds => integer().nullable()();
   BoolColumn get completed => boolean().withDefault(const Constant(false))();
+
+  /// Swiped off «متابعة الاستماع». A flag rather than a delete, so removing a
+  /// lesson from that list never throws away where you stopped in it.
+  BoolColumn get dismissed => boolean().withDefault(const Constant(false))();
   DateTimeColumn get lastWatchedAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   DateTimeColumn get syncedAt => dateTime().nullable()();
@@ -198,7 +202,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -226,6 +230,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 7) {
         await m.addColumn(lessons, lessons.gainDb);
         await m.createTable(downloads);
+      }
+      if (from < 8) {
+        await m.addColumn(lessonProgress, lessonProgress.dismissed);
       }
     },
   );

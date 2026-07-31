@@ -5,9 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/journey_card.dart';
 import '../../core/widgets/masar_chip.dart';
-import '../../core/widgets/segmented_control.dart';
 import '../../core/widgets/skeleton.dart';
-import '../../data/models/enums.dart';
 import '../library/library_providers.dart';
 import 'journeys_providers.dart';
 
@@ -19,7 +17,6 @@ class JourneysScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final journeysAsync = ref.watch(journeySummariesProvider);
     final sciences = ref.watch(sciencesProvider).value ?? const [];
-    final level = ref.watch(levelFilterProvider);
     final scienceFilter = ref.watch(scienceFilterProvider);
 
     String scienceName(String? slug) =>
@@ -72,15 +69,6 @@ class JourneysScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  SegmentedControl<JourneyLevel>(
-                    segments: {
-                      for (final l in JourneyLevel.values) l: l.labelAr,
-                    },
-                    selected: level,
-                    onChanged: (l) =>
-                        ref.read(levelFilterProvider.notifier).set(l),
-                  ),
                 ],
               ),
             ),
@@ -100,8 +88,10 @@ class JourneysScreen extends ConsumerWidget {
                   title: 'تعذر تحميل المسارات',
                 ),
                 data: (journeys) {
+                  // No level filter: with four journeys, hiding three of them
+                  // behind a segmented control cost more than it saved. The
+                  // level is a tag on each card instead.
                   final filtered = journeys
-                      .where((j) => j.level == level)
                       .where(
                         (j) =>
                             scienceFilter == null ||
@@ -112,7 +102,7 @@ class JourneysScreen extends ConsumerWidget {
                     return const EmptyState(
                       icon: Icons.filter_alt_off_rounded,
                       title: 'لا مسارات تطابق التصفية',
-                      message: 'جرّب تغيير المستوى أو العلم.',
+                      message: 'جرّب اختيار علم آخر.',
                     );
                   }
                   return ListView.separated(
@@ -126,6 +116,7 @@ class JourneysScreen extends ConsumerWidget {
                         title: journey.titleAr,
                         level: journey.level,
                         stageCount: journey.stageCount,
+                        totalDurationSeconds: journey.totalDurationSeconds,
                         scienceName: scienceName(journey.scienceSlug),
                         scienceSortOrder: scienceOrder(journey.scienceSlug),
                         seriesPreview: journey.seriesPreview,

@@ -25,7 +25,21 @@ typedef PumpedApp = ({
 });
 
 /// Scrolls the target into view if needed, then taps it and settles.
+///
+/// A lazy ListView never builds its off-screen children, so `ensureVisible`
+/// alone fails with "No element" on anything below the fold — the widget does
+/// not exist yet to be made visible. Scroll first when nothing matches.
 Future<void> tapVisible(WidgetTester tester, Finder finder) async {
+  if (finder.evaluate().isEmpty) {
+    final scrollables = find.byType(Scrollable);
+    if (scrollables.evaluate().isNotEmpty) {
+      await tester.scrollUntilVisible(
+        finder,
+        200,
+        scrollable: scrollables.first,
+      );
+    }
+  }
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);
@@ -44,9 +58,23 @@ void testApp(
   Future<void> Function(WidgetTester tester, PumpedApp app) body, {
   bool importCatalog = true,
   List<Override> overrides = const [],
+  /// Coach marks are marked already-seen by default: they cover the screen on
+  /// first launch, and every other test would be fighting an overlay. A test
+  /// about onboarding sets this true.
+  bool showCoachMarks = false,
+  /// Runs after the catalog import but before the app is pumped, for state the
+  /// very first build must already see — coach marks, for instance, decide
+  /// what to point at on that build and never reconsider.
+  Future<void> Function(AppDatabase db)? seed,
 }) {
   testWidgets(description, (tester) async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues(
+      showCoachMarks
+          ? {}
+          : {
+              'seen_coach_marks': ['home', 'player'],
+            },
+    );
     final prefs = await SharedPreferences.getInstance();
     final db = openTestDatabase();
     final engine = FakeLessonPlayerEngine();
@@ -60,6 +88,8 @@ void testApp(
         CatalogData.fromJson(jsonDecode(raw) as Map<String, dynamic>),
       );
     }
+
+    if (seed != null) await seed(db);
 
     try {
       await tester.pumpWidget(

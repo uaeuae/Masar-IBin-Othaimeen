@@ -9,21 +9,63 @@ import '../../core/widgets/progress_ring.dart';
 import '../../core/widgets/resume_hero_card.dart';
 import '../../core/widgets/science_glyph.dart';
 import '../../data/models/enums.dart';
+import '../../data/providers.dart';
 import '../../data/view_models.dart';
 import '../journeys/journeys_providers.dart';
+import '../onboarding/coach_marks.dart';
+import '../settings/theme_mode_provider.dart';
 import '../library/library_providers.dart';
 import 'home_providers.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  static const _sequence = 'home';
+  final _resumeKey = GlobalKey();
+  final _levelKey = GlobalKey();
+  bool _coachScheduled = false;
+
+  /// Runs once the first time Home has something to point at. Deferred to a
+  /// post-frame callback because the marks measure real widgets, which do not
+  /// have a size until they are laid out.
+  void _maybeShowCoachMarks({required bool hasResume}) {
+    if (_coachScheduled) return;
+    if (ref.read(seenCoachMarksProvider).contains(_sequence)) return;
+    _coachScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await showCoachMarks(context, [
+        CoachMark(
+          key: _levelKey,
+          title: 'اختر مستواك',
+          body: 'نقترح عليك المسارات المناسبة لمستواك. يمكنك تغييره متى شئت.',
+        ),
+        if (hasResume)
+          CoachMark(
+            key: _resumeKey,
+            title: 'تابع من حيث توقفت',
+            body:
+                'آخر درس استمعت إليه يظهر هنا. اسحب البطاقة يمينًا أو يسارًا لإزالته من القائمة — ويبقى موضع توقفك محفوظًا.',
+          ),
+      ]);
+      if (mounted) {
+        ref.read(seenCoachMarksProvider.notifier).markSeen(_sequence);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final masar = masarColorsOf(context);
-    final continueWatching =
-        ref.watch(continueWatchingProvider).value ?? const [];
+    final continueAsync = ref.watch(continueWatchingProvider);
+    final continueWatching = continueAsync.value ?? const [];
     final enrolled = ref.watch(enrolledJourneysProvider).value ?? const [];
     final journeys = ref.watch(journeySummariesProvider).value ?? const [];
     final sciences = ref.watch(sciencesProvider).value ?? const [];
@@ -41,6 +83,12 @@ class HomeScreen extends ConsumerWidget {
         .toList();
     final shown = suggestions.isEmpty ? fallbackSuggestions : suggestions;
     final resume = continueWatching.isEmpty ? null : continueWatching.first;
+    // Only once the stream has actually answered: on the first build it has no
+    // value yet, and deciding then would drop the resume mark for every reader
+    // who has one.
+    if (continueAsync.hasValue) {
+      _maybeShowCoachMarks(hasResume: resume != null);
+    }
 
     String scienceName(String? slug) =>
         sciences
@@ -114,6 +162,7 @@ class HomeScreen extends ConsumerWidget {
 
             // ── Level chips (onboarding replacement) ─────────────────
             Row(
+              key: _levelKey,
               children: [
                 for (final l in JourneyLevel.values) ...[
                   MasarChip(
@@ -131,21 +180,35 @@ class HomeScreen extends ConsumerWidget {
             if (resume != null) ...[
               Text('متابعة المشاهدة', style: theme.textTheme.titleLarge),
               const SizedBox(height: 12),
-              ResumeHeroCard(
-                seriesTitle: resume.seriesTitleAr,
-                lessonLabel:
-                    'الدرس ${arabicDigits(resume.position)} — ${resume.titleAr}',
-                progress: resume.progress,
-                stoppedAt: Duration(seconds: resume.watchedSeconds),
-                remaining: resume.durationSeconds == null
-                    ? null
-                    : Duration(
-                        seconds:
-                            (resume.durationSeconds! - resume.watchedSeconds)
-                                .clamp(0, 1 << 31),
-                      ),
-                onTap: () => context.push(
-                  '/player/${resume.videoId}?series=${resume.seriesSlug}',
+              Dismissible(
+                key: ValueKey('resume-${resume.videoId}'),
+                // Either way: a one-way swipe would feel backwards to half the
+                // gestures in an RTL layout.
+                direction: DismissDirection.horizontal,
+                background: const _RemoveSwipeBackground(),
+                secondaryBackground: const _RemoveSwipeBackground(),
+                confirmDismiss: (_) => _confirmRemove(context),
+                onDismissed: (_) => ref
+                    .read(progressRepositoryProvider)
+                    .dismissFromContinue(resume.videoId),
+                child: ResumeHeroCard(
+                  key: _resumeKey,
+                  seriesTitle: resume.seriesTitleAr,
+                  scholarName: resume.scholarNameAr,
+                  lessonLabel:
+                      'الدرس ${arabicDigits(resume.position)} — ${resume.titleAr}',
+                  progress: resume.progress,
+                  stoppedAt: Duration(seconds: resume.watchedSeconds),
+                  remaining: resume.durationSeconds == null
+                      ? null
+                      : Duration(
+                          seconds:
+                              (resume.durationSeconds! - resume.watchedSeconds)
+                                  .clamp(0, 1 << 31),
+                        ),
+                  onTap: () => context.push(
+                    '/player/${resume.videoId}?series=${resume.seriesSlug}',
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -348,4 +411,61 @@ class _SuggestionCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Shown behind the resume card while it is being swiped away.
+class _RemoveSwipeBackground extends StatelessWidget {
+  const _RemoveSwipeBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.errorContainer,
+        borderRadius: BorderRadius.circular(AppRadius.hero),
+      ),
+      padding: const EdgeInsetsDirectional.symmetric(horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Icon(Icons.delete_outline_rounded, color: scheme.onErrorContainer),
+          Text(
+            'إزالة من المتابعة',
+            style: TextStyle(
+              fontFamily: kUiFont,
+              fontWeight: FontWeight.w600,
+              color: scheme.onErrorContainer,
+            ),
+          ),
+          Icon(Icons.delete_outline_rounded, color: scheme.onErrorContainer),
+        ],
+      ),
+    );
+  }
+}
+
+/// Confirms before the card goes — a swipe is easy to do by accident while
+/// scrolling Home.
+Future<bool> _confirmRemove(BuildContext context) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: const Text('إزالة من المتابعة؟'),
+      content: const Text(
+        'سيختفي الدرس من قائمة المتابعة، ويبقى موضع التوقف محفوظًا إذا عدت إليه.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: const Text('إلغاء'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: const Text('إزالة'),
+        ),
+      ],
+    ),
+  );
+  return confirmed ?? false;
 }

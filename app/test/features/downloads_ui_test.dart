@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:masar/data/db/database.dart';
 import 'package:masar/data/download_repository.dart';
 import 'package:masar/data/providers.dart';
+import 'package:masar/features/downloads/series_download_bar.dart';
 
 import '../support/pump_app.dart';
 
@@ -37,6 +38,14 @@ void main() {
   Future<void> openSeries(WidgetTester tester) async {
     final context = tester.element(find.text('أهلًا بك يا طالب العلم'));
     GoRouter.of(context).push('/series/sharh-riyad-alsalihin');
+    await tester.pumpAndSettle();
+    // «عن الكتاب» sits above the download bar, and a lazy ListView does not
+    // build what is below the fold — scroll it into existence.
+    await tester.scrollUntilVisible(
+      find.byType(SeriesDownloadBar),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
   }
 

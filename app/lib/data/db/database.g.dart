@@ -3536,6 +3536,21 @@ class $LessonProgressTable extends LessonProgress
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _dismissedMeta = const VerificationMeta(
+    'dismissed',
+  );
+  @override
+  late final GeneratedColumn<bool> dismissed = GeneratedColumn<bool>(
+    'dismissed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("dismissed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _lastWatchedAtMeta = const VerificationMeta(
     'lastWatchedAt',
   );
@@ -3576,6 +3591,7 @@ class $LessonProgressTable extends LessonProgress
     watchedSeconds,
     durationSeconds,
     completed,
+    dismissed,
     lastWatchedAt,
     updatedAt,
     syncedAt,
@@ -3622,6 +3638,12 @@ class $LessonProgressTable extends LessonProgress
       context.handle(
         _completedMeta,
         completed.isAcceptableOrUnknown(data['completed']!, _completedMeta),
+      );
+    }
+    if (data.containsKey('dismissed')) {
+      context.handle(
+        _dismissedMeta,
+        dismissed.isAcceptableOrUnknown(data['dismissed']!, _dismissedMeta),
       );
     }
     if (data.containsKey('last_watched_at')) {
@@ -3674,6 +3696,10 @@ class $LessonProgressTable extends LessonProgress
         DriftSqlType.bool,
         data['${effectivePrefix}completed'],
       )!,
+      dismissed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}dismissed'],
+      )!,
       lastWatchedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}last_watched_at'],
@@ -3701,6 +3727,10 @@ class LessonProgressData extends DataClass
   final int watchedSeconds;
   final int? durationSeconds;
   final bool completed;
+
+  /// Swiped off «متابعة الاستماع». A flag rather than a delete, so removing a
+  /// lesson from that list never throws away where you stopped in it.
+  final bool dismissed;
   final DateTime lastWatchedAt;
   final DateTime updatedAt;
   final DateTime? syncedAt;
@@ -3709,6 +3739,7 @@ class LessonProgressData extends DataClass
     required this.watchedSeconds,
     this.durationSeconds,
     required this.completed,
+    required this.dismissed,
     required this.lastWatchedAt,
     required this.updatedAt,
     this.syncedAt,
@@ -3722,6 +3753,7 @@ class LessonProgressData extends DataClass
       map['duration_seconds'] = Variable<int>(durationSeconds);
     }
     map['completed'] = Variable<bool>(completed);
+    map['dismissed'] = Variable<bool>(dismissed);
     map['last_watched_at'] = Variable<DateTime>(lastWatchedAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     if (!nullToAbsent || syncedAt != null) {
@@ -3738,6 +3770,7 @@ class LessonProgressData extends DataClass
           ? const Value.absent()
           : Value(durationSeconds),
       completed: Value(completed),
+      dismissed: Value(dismissed),
       lastWatchedAt: Value(lastWatchedAt),
       updatedAt: Value(updatedAt),
       syncedAt: syncedAt == null && nullToAbsent
@@ -3756,6 +3789,7 @@ class LessonProgressData extends DataClass
       watchedSeconds: serializer.fromJson<int>(json['watchedSeconds']),
       durationSeconds: serializer.fromJson<int?>(json['durationSeconds']),
       completed: serializer.fromJson<bool>(json['completed']),
+      dismissed: serializer.fromJson<bool>(json['dismissed']),
       lastWatchedAt: serializer.fromJson<DateTime>(json['lastWatchedAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       syncedAt: serializer.fromJson<DateTime?>(json['syncedAt']),
@@ -3769,6 +3803,7 @@ class LessonProgressData extends DataClass
       'watchedSeconds': serializer.toJson<int>(watchedSeconds),
       'durationSeconds': serializer.toJson<int?>(durationSeconds),
       'completed': serializer.toJson<bool>(completed),
+      'dismissed': serializer.toJson<bool>(dismissed),
       'lastWatchedAt': serializer.toJson<DateTime>(lastWatchedAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'syncedAt': serializer.toJson<DateTime?>(syncedAt),
@@ -3780,6 +3815,7 @@ class LessonProgressData extends DataClass
     int? watchedSeconds,
     Value<int?> durationSeconds = const Value.absent(),
     bool? completed,
+    bool? dismissed,
     DateTime? lastWatchedAt,
     DateTime? updatedAt,
     Value<DateTime?> syncedAt = const Value.absent(),
@@ -3790,6 +3826,7 @@ class LessonProgressData extends DataClass
         ? durationSeconds.value
         : this.durationSeconds,
     completed: completed ?? this.completed,
+    dismissed: dismissed ?? this.dismissed,
     lastWatchedAt: lastWatchedAt ?? this.lastWatchedAt,
     updatedAt: updatedAt ?? this.updatedAt,
     syncedAt: syncedAt.present ? syncedAt.value : this.syncedAt,
@@ -3804,6 +3841,7 @@ class LessonProgressData extends DataClass
           ? data.durationSeconds.value
           : this.durationSeconds,
       completed: data.completed.present ? data.completed.value : this.completed,
+      dismissed: data.dismissed.present ? data.dismissed.value : this.dismissed,
       lastWatchedAt: data.lastWatchedAt.present
           ? data.lastWatchedAt.value
           : this.lastWatchedAt,
@@ -3819,6 +3857,7 @@ class LessonProgressData extends DataClass
           ..write('watchedSeconds: $watchedSeconds, ')
           ..write('durationSeconds: $durationSeconds, ')
           ..write('completed: $completed, ')
+          ..write('dismissed: $dismissed, ')
           ..write('lastWatchedAt: $lastWatchedAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('syncedAt: $syncedAt')
@@ -3832,6 +3871,7 @@ class LessonProgressData extends DataClass
     watchedSeconds,
     durationSeconds,
     completed,
+    dismissed,
     lastWatchedAt,
     updatedAt,
     syncedAt,
@@ -3844,6 +3884,7 @@ class LessonProgressData extends DataClass
           other.watchedSeconds == this.watchedSeconds &&
           other.durationSeconds == this.durationSeconds &&
           other.completed == this.completed &&
+          other.dismissed == this.dismissed &&
           other.lastWatchedAt == this.lastWatchedAt &&
           other.updatedAt == this.updatedAt &&
           other.syncedAt == this.syncedAt);
@@ -3854,6 +3895,7 @@ class LessonProgressCompanion extends UpdateCompanion<LessonProgressData> {
   final Value<int> watchedSeconds;
   final Value<int?> durationSeconds;
   final Value<bool> completed;
+  final Value<bool> dismissed;
   final Value<DateTime> lastWatchedAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> syncedAt;
@@ -3863,6 +3905,7 @@ class LessonProgressCompanion extends UpdateCompanion<LessonProgressData> {
     this.watchedSeconds = const Value.absent(),
     this.durationSeconds = const Value.absent(),
     this.completed = const Value.absent(),
+    this.dismissed = const Value.absent(),
     this.lastWatchedAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.syncedAt = const Value.absent(),
@@ -3873,6 +3916,7 @@ class LessonProgressCompanion extends UpdateCompanion<LessonProgressData> {
     this.watchedSeconds = const Value.absent(),
     this.durationSeconds = const Value.absent(),
     this.completed = const Value.absent(),
+    this.dismissed = const Value.absent(),
     required DateTime lastWatchedAt,
     required DateTime updatedAt,
     this.syncedAt = const Value.absent(),
@@ -3885,6 +3929,7 @@ class LessonProgressCompanion extends UpdateCompanion<LessonProgressData> {
     Expression<int>? watchedSeconds,
     Expression<int>? durationSeconds,
     Expression<bool>? completed,
+    Expression<bool>? dismissed,
     Expression<DateTime>? lastWatchedAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? syncedAt,
@@ -3895,6 +3940,7 @@ class LessonProgressCompanion extends UpdateCompanion<LessonProgressData> {
       if (watchedSeconds != null) 'watched_seconds': watchedSeconds,
       if (durationSeconds != null) 'duration_seconds': durationSeconds,
       if (completed != null) 'completed': completed,
+      if (dismissed != null) 'dismissed': dismissed,
       if (lastWatchedAt != null) 'last_watched_at': lastWatchedAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (syncedAt != null) 'synced_at': syncedAt,
@@ -3907,6 +3953,7 @@ class LessonProgressCompanion extends UpdateCompanion<LessonProgressData> {
     Value<int>? watchedSeconds,
     Value<int?>? durationSeconds,
     Value<bool>? completed,
+    Value<bool>? dismissed,
     Value<DateTime>? lastWatchedAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? syncedAt,
@@ -3917,6 +3964,7 @@ class LessonProgressCompanion extends UpdateCompanion<LessonProgressData> {
       watchedSeconds: watchedSeconds ?? this.watchedSeconds,
       durationSeconds: durationSeconds ?? this.durationSeconds,
       completed: completed ?? this.completed,
+      dismissed: dismissed ?? this.dismissed,
       lastWatchedAt: lastWatchedAt ?? this.lastWatchedAt,
       updatedAt: updatedAt ?? this.updatedAt,
       syncedAt: syncedAt ?? this.syncedAt,
@@ -3938,6 +3986,9 @@ class LessonProgressCompanion extends UpdateCompanion<LessonProgressData> {
     }
     if (completed.present) {
       map['completed'] = Variable<bool>(completed.value);
+    }
+    if (dismissed.present) {
+      map['dismissed'] = Variable<bool>(dismissed.value);
     }
     if (lastWatchedAt.present) {
       map['last_watched_at'] = Variable<DateTime>(lastWatchedAt.value);
@@ -3961,6 +4012,7 @@ class LessonProgressCompanion extends UpdateCompanion<LessonProgressData> {
           ..write('watchedSeconds: $watchedSeconds, ')
           ..write('durationSeconds: $durationSeconds, ')
           ..write('completed: $completed, ')
+          ..write('dismissed: $dismissed, ')
           ..write('lastWatchedAt: $lastWatchedAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('syncedAt: $syncedAt, ')
@@ -6660,6 +6712,7 @@ typedef $$LessonProgressTableCreateCompanionBuilder =
       Value<int> watchedSeconds,
       Value<int?> durationSeconds,
       Value<bool> completed,
+      Value<bool> dismissed,
       required DateTime lastWatchedAt,
       required DateTime updatedAt,
       Value<DateTime?> syncedAt,
@@ -6671,6 +6724,7 @@ typedef $$LessonProgressTableUpdateCompanionBuilder =
       Value<int> watchedSeconds,
       Value<int?> durationSeconds,
       Value<bool> completed,
+      Value<bool> dismissed,
       Value<DateTime> lastWatchedAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> syncedAt,
@@ -6703,6 +6757,11 @@ class $$LessonProgressTableFilterComposer
 
   ColumnFilters<bool> get completed => $composableBuilder(
     column: $table.completed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get dismissed => $composableBuilder(
+    column: $table.dismissed,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6751,6 +6810,11 @@ class $$LessonProgressTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get dismissed => $composableBuilder(
+    column: $table.dismissed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get lastWatchedAt => $composableBuilder(
     column: $table.lastWatchedAt,
     builder: (column) => ColumnOrderings(column),
@@ -6791,6 +6855,9 @@ class $$LessonProgressTableAnnotationComposer
 
   GeneratedColumn<bool> get completed =>
       $composableBuilder(column: $table.completed, builder: (column) => column);
+
+  GeneratedColumn<bool> get dismissed =>
+      $composableBuilder(column: $table.dismissed, builder: (column) => column);
 
   GeneratedColumn<DateTime> get lastWatchedAt => $composableBuilder(
     column: $table.lastWatchedAt,
@@ -6845,6 +6912,7 @@ class $$LessonProgressTableTableManager
                 Value<int> watchedSeconds = const Value.absent(),
                 Value<int?> durationSeconds = const Value.absent(),
                 Value<bool> completed = const Value.absent(),
+                Value<bool> dismissed = const Value.absent(),
                 Value<DateTime> lastWatchedAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> syncedAt = const Value.absent(),
@@ -6854,6 +6922,7 @@ class $$LessonProgressTableTableManager
                 watchedSeconds: watchedSeconds,
                 durationSeconds: durationSeconds,
                 completed: completed,
+                dismissed: dismissed,
                 lastWatchedAt: lastWatchedAt,
                 updatedAt: updatedAt,
                 syncedAt: syncedAt,
@@ -6865,6 +6934,7 @@ class $$LessonProgressTableTableManager
                 Value<int> watchedSeconds = const Value.absent(),
                 Value<int?> durationSeconds = const Value.absent(),
                 Value<bool> completed = const Value.absent(),
+                Value<bool> dismissed = const Value.absent(),
                 required DateTime lastWatchedAt,
                 required DateTime updatedAt,
                 Value<DateTime?> syncedAt = const Value.absent(),
@@ -6874,6 +6944,7 @@ class $$LessonProgressTableTableManager
                 watchedSeconds: watchedSeconds,
                 durationSeconds: durationSeconds,
                 completed: completed,
+                dismissed: dismissed,
                 lastWatchedAt: lastWatchedAt,
                 updatedAt: updatedAt,
                 syncedAt: syncedAt,

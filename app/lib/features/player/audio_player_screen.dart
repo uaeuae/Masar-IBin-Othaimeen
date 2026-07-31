@@ -15,6 +15,7 @@ import '../../data/view_models.dart';
 import '../series/series_providers.dart';
 import '../settings/theme_mode_provider.dart';
 import 'audio_engine.dart';
+import '../onboarding/coach_marks.dart';
 import 'lesson_text_providers.dart';
 import 'lesson_text_view.dart';
 import 'progress_tracker.dart';
@@ -54,6 +55,11 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
   double _speed = 1.0;
   int? _sleepMinutes;
   bool _playingOffline = false;
+
+  static const _coachSequence = 'player';
+  final _textPanelKey = GlobalKey();
+  final _seekKey = GlobalKey();
+  bool _coachScheduled = false;
 
   @override
   void initState() {
@@ -182,6 +188,33 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     }
   }
 
+  /// Points out the read-along panel and the ±10s nudge, once, the first time
+  /// a lesson is opened. Deferred a frame: the marks measure real widgets.
+  void _maybeShowCoachMarks() {
+    if (_coachScheduled) return;
+    if (ref.read(seenCoachMarksProvider).contains(_coachSequence)) return;
+    _coachScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await showCoachMarks(context, [
+        CoachMark(
+          key: _textPanelKey,
+          title: 'اقرأ مع الصوت',
+          body:
+              'نص الدرس يظهر هنا، والجملة المسموعة مظللة. المس أي جملة للانتقال إليها.',
+        ),
+        CoachMark(
+          key: _seekKey,
+          title: 'تقديم وإرجاع ١٠ ثوانٍ',
+          body: 'لإعادة عبارة فاتتك، أو تخطي وقفة.',
+        ),
+      ]);
+      if (mounted) {
+        ref.read(seenCoachMarksProvider.notifier).markSeen(_coachSequence);
+      }
+    });
+  }
+
   /// Levels the lesson against the rest of the library, unless the reader has
   /// turned that off in settings.
   Future<void> _applyGain(LessonWithProgress lesson) async {
@@ -298,6 +331,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     final textAsync = ref.watch(lessonTextProvider(lesson.videoId));
 
     return SizedBox(
+      key: _textPanelKey,
       height: height,
       child: textAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -309,12 +343,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
         ),
         data: (text) {
           if (text == null) {
-            return Center(
-              child: Text(
-                'لا يوجد نص لهذا الدرس.',
-                style: TextStyle(color: scheme.onSurfaceVariant),
-              ),
-            );
+            return _NoTextForLesson(scheme: scheme);
           }
           return LessonTextView(
             text: text,
@@ -386,6 +415,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
       );
     }
 
+    if (current != null) _maybeShowCoachMarks();
     final seriesTitle = detail?.series.titleAr ?? '';
 
     return Scaffold(
@@ -444,8 +474,10 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
               const SizedBox(height: 24),
 
               // ── Artwork card, or the read-along text in its place ────
-              if (showText && current?.textKind != null)
-                _buildTextPanel(context, current!)
+              if (showText &&
+                  current != null &&
+                  current.media == LessonMedia.audio)
+                _buildTextPanel(context, current)
               else
                 Center(
                   child: Container(
@@ -676,6 +708,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                               ),
                               const SizedBox(width: 8),
                               _SeekButton(
+                                key: _seekKey,
                                 forward: true,
                                 onTap: () => _skipBy(10, total),
                               ),
@@ -692,36 +725,17 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                         ),
                       ),
                     ),
-                    // Where the decorative equalizer glyph used to sit.
-                    if (current?.textKind != null)
-                      GestureDetector(
+                    // Always present on an audio lesson, even when no script
+                    // exists — a control that silently disappears on 114 of the
+                    // 500 lessons reads as a broken app rather than as an
+                    // absence of text.
+                    if (current?.media == LessonMedia.audio)
+                      _TextToggle(
+                        on: showText,
+                        available: current?.textKind != null,
                         onTap: () => ref
                             .read(showLessonTextProvider.notifier)
                             .set(!showText),
-                        behavior: HitTestBehavior.opaque,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.subject_rounded,
-                              size: 18,
-                              color: showText
-                                  ? scheme.primary
-                                  : scheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              'النص',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: showText
-                                    ? scheme.primary
-                                    : scheme.onSurfaceVariant,
-                                fontWeight: showText
-                                    ? FontWeight.w700
-                                    : FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
                       )
                     else
                       Icon(
@@ -858,7 +872,7 @@ class _RoundIconButton extends StatelessWidget {
 /// these must NOT be mirrored in RTL — time direction isn't reading direction,
 /// and a flipped "10" reads as nonsense.
 class _SeekButton extends StatelessWidget {
-  const _SeekButton({required this.forward, required this.onTap});
+  const _SeekButton({super.key, required this.forward, required this.onTap});
 
   final bool forward;
   final VoidCallback onTap;
@@ -965,6 +979,101 @@ class _ChapterRow extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Shown in the text panel when a lesson has no script. Says why, and that the
+/// audio is unaffected — the absence is the foundation's, not a failure here.
+class _NoTextForLesson extends StatelessWidget {
+  const _NoTextForLesson({required this.scheme});
+
+  final ColorScheme scheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.subject_outlined,
+              size: 28,
+              color: scheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'لا يوجد نص لهذا الدرس',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: scheme.onSurface, fontSize: 14),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'المؤسسة لم تنشر تفريغًا نصيًا له. الصوت يعمل كالمعتاد.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: scheme.onSurfaceVariant,
+                fontSize: 12,
+                height: 1.6,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The «النص» control. Muted rather than missing when a lesson has no script:
+/// the reader should learn this lesson has no text, not wonder where the
+/// button went.
+class _TextToggle extends StatelessWidget {
+  const _TextToggle({
+    required this.on,
+    required this.available,
+    required this.onTap,
+  });
+
+  final bool on;
+  final bool available;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final masar = masarColorsOf(context);
+    final color = !available
+        ? masar.textFaint
+        : on
+        ? scheme.primary
+        : scheme.onSurfaceVariant;
+
+    return Tooltip(
+      message: available ? 'نص الدرس' : 'لا يوجد نص لهذا الدرس',
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Row(
+          children: [
+            Icon(
+              available ? Icons.subject_rounded : Icons.subject_outlined,
+              size: 18,
+              color: color,
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'النص',
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: color,
+                fontWeight: on && available ? FontWeight.w700 : FontWeight.w400,
+              ),
+            ),
+          ],
         ),
       ),
     );

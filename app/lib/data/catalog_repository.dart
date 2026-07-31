@@ -421,15 +421,22 @@ class CatalogRepository {
         .customSelect(
           '''
           SELECT l.video_id, l.title_ar, l.duration_seconds, l.series_slug, l.position,
-            s.title_ar AS series_title, p.watched_seconds, p.last_watched_at
+            s.title_ar AS series_title, sc.name_ar AS scholar_name,
+            p.watched_seconds, p.last_watched_at
           FROM lesson_progress p
           JOIN lessons l ON l.video_id = p.video_id AND l.status = 'active'
           JOIN series s ON s.slug = l.series_slug
-          WHERE p.completed = 0 AND p.watched_seconds >= 30
+          LEFT JOIN scholars sc ON sc.slug = s.scholar_slug
+          WHERE p.completed = 0 AND p.watched_seconds >= 30 AND p.dismissed = 0
           ORDER BY p.last_watched_at DESC
           LIMIT $limit
           ''',
-          readsFrom: {db.lessonProgress, db.lessons, db.seriesEntries},
+          readsFrom: {
+            db.lessonProgress,
+            db.lessons,
+            db.seriesEntries,
+            db.scholars,
+          },
         )
         .watch()
         .map(
@@ -441,6 +448,7 @@ class CatalogRepository {
                 position: row.read<int>('position'),
                 seriesSlug: row.read<String>('series_slug'),
                 seriesTitleAr: row.read<String>('series_title'),
+                scholarNameAr: row.readNullable<String>('scholar_name'),
                 watchedSeconds: row.read<int>('watched_seconds'),
                 durationSeconds: row.readNullable<int>('duration_seconds'),
                 lastWatchedAt: DateTime.fromMillisecondsSinceEpoch(
@@ -513,6 +521,24 @@ class CatalogRepository {
           ),
       ],
     );
+  }
+
+  /// Scholar registry, for attribution on the series and home screens.
+  Stream<List<ScholarInfo>> watchScholars() {
+    return (db.select(db.scholars)
+          ..orderBy([(s) => OrderingTerm.asc(s.sortOrder)]))
+        .watch()
+        .map(
+          (rows) => [
+            for (final row in rows)
+              ScholarInfo(
+                slug: row.slug,
+                nameAr: row.nameAr,
+                foundationAr: row.foundationAr,
+                website: row.website,
+              ),
+          ],
+        );
   }
 
   // ── Library queries ───────────────────────────────────────────────────
