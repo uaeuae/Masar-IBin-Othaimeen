@@ -39,7 +39,8 @@ function makeSeedTree(files: { scholars?: string; sciences?: string; series?: Re
   writeFileSync(
     join(dir, 'scholars.yaml'),
     files.scholars ??
-      'scholars:\n  - slug: ibn-uthaymeen\n    name_ar: الشيخ محمد بن صالح العثيمين\n    foundation_ar: مؤسسة الشيخ العثيمين الخيرية\n',
+      'scholars:\n  - slug: ibn-uthaymeen\n    name_ar: الشيخ محمد بن صالح العثيمين\n' +
+        '    initial_ar: ع\n    foundation_ar: مؤسسة الشيخ العثيمين الخيرية\n',
   );
   writeFileSync(join(dir, 'sciences.yaml'), files.sciences ?? validSciences);
   for (const [name, content] of Object.entries(files.series ?? { 'sharh-zad.yaml': validSeries })) {

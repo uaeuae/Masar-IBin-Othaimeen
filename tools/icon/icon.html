@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<!--
+  The app icon, transcribed from docs/design/masar-screens.dc.html section 2a
+  («Turn 2 — App icon»). Rendered rather than hand-drawn so the mark stays tied
+  to the design file: change 2a, re-run `node tools/icon/build-icon.mjs`.
+
+  Two variants, selected by ?v=:
+    full — the 1024² master (iOS, and the Android legacy icon)
+    fg   — the roundel alone on transparency, for the Android adaptive
+           foreground and the splash. The wordmark is dropped because the
+           circular adaptive mask would clip it; the design says the same
+           («Wordmark drops "طالب العلم" below 120px»).
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face {
+    font-family: 'Amiri';
+    src: url('../../app/assets/fonts/Amiri-Regular.ttf') format('truetype');
+    font-weight: 400;
+  }
+  html, body { margin: 0; padding: 0; }
+  body { width: 1024px; height: 1024px; overflow: hidden; }
+
+  #icon {
+    width: 1024px;
+    height: 1024px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 44px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(165deg, #21624B 0%, #17492F 100%);
+  }
+
+  /* Two faint gold circles bleeding off opposite corners. */
+  .bleed { position: absolute; border-radius: 50%; }
+  .bleed.tr {
+    top: -180px; right: -180px; width: 560px; height: 560px;
+    border: 3px solid rgba(209,183,116,0.18);
+  }
+  .bleed.bl {
+    bottom: -220px; left: -160px; width: 620px; height: 620px;
+    border: 3px solid rgba(209,183,116,0.12);
+  }
+
+  .ring-outer {
+    width: 520px; height: 520px; border-radius: 50%;
+    border: 7px solid rgba(209,183,116,0.65);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ring-inner {
+    width: 440px; height: 440px; border-radius: 50%;
+    border: 4px solid rgba(209,183,116,0.35);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .wordmark {
+    font-family: 'Amiri', serif;
+    font-size: 216px; color: #F3EFE0; line-height: 1;
+    margin-top: -28px;
+  }
+  .tagline {
+    font-family: 'Amiri', serif;
+    font-size: 76px; color: rgba(243,239,224,0.82); line-height: 1;
+  }
+
+  /* Adaptive foreground: transparent, roundel only. At 520/1024 = 51% the
+     mark already sits inside Android's 66% safe zone, so it needs no rescale. */
+  body.fg #icon { background: none; gap: 0; }
+  body.fg .bleed, body.fg .tagline { display: none; }
+
+  /* Small launcher sizes: the design drops «طالب العلم» below 120px, where it
+     renders as an illegible smudge rather than a word. The roundel carries
+     the mark alone. Keeps the gradient — this is still an opaque icon. */
+  body.small #icon { gap: 0; }
+  body.small .tagline { display: none; }
+</style>
+</head>
+<body>
+  <div id="icon">
+    <div class="bleed tr"></div>
+    <div class="bleed bl"></div>
+    <div class="ring-outer">
+      <div class="ring-inner"><div class="wordmark">مسار</div></div>
+    </div>
+    <div class="tagline">طالب العلم</div>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const variant = params.get('v');
+    if (variant === 'fg' || variant === 'small') {
+      document.body.classList.add(variant);
+    }
+    // `px` re-lays the icon out at the target size rather than rendering 1024
+    // and letting something else downscale it — `zoom` re-runs layout, so the
+    // Amiri strokes stay crisp at 40px instead of turning to grey mush.
+    const px = Number(params.get('px'));
+    if (px) {
+      document.body.style.width = px + 'px';
+      document.body.style.height = px + 'px';
+      document.getElementById('icon').style.zoom = px / 1024;
+    }
+  </script>
+</body>
+</html>

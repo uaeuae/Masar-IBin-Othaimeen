@@ -85,6 +85,21 @@ export function publishCatalog(options: PublishOptions): { version: number; less
     companionByVideoSlug.set(s.companion_of, s.slug);
   }
 
+  // A «قريبًا» badge is a promise about the library, so it has to match it:
+  // a coming-soon scholar with series would badge content that is right there,
+  // and an active scholar with none would open an empty profile.
+  for (const scholar of bundle.scholars) {
+    const seriesCount = activeSeries.filter((s) => s.scholar === scholar.slug).length;
+    if (scholar.status === 'coming_soon' && seriesCount > 0) {
+      problems.push(
+        `scholar "${scholar.slug}" is coming_soon but has ${seriesCount} active series`,
+      );
+    }
+    if (scholar.status === 'active' && seriesCount === 0) {
+      problems.push(`scholar "${scholar.slug}" is active but has no active series`);
+    }
+  }
+
   const audioOnly = options.audioOnly ?? false;
   const exportedSeries = audioOnly ? activeSeries.filter((s) => s.media === 'audio') : activeSeries;
   const exportedSlugs = new Set(exportedSeries.map((s) => s.slug));
@@ -130,8 +145,13 @@ export function publishCatalog(options: PublishOptions): { version: number; less
     scholars: bundle.scholars.map((s) => ({
       slug: s.slug,
       name_ar: s.name_ar,
+      initial_ar: s.initial_ar,
+      accent: s.accent,
+      honorific_ar: s.honorific_ar ?? null,
+      status: s.status,
       foundation_ar: s.foundation_ar,
       website: s.website ?? null,
+      youtube_url: s.youtube_url ?? null,
       sort_order: s.sort_order,
     })),
     sciences: bundle.sciences.map((s) => ({

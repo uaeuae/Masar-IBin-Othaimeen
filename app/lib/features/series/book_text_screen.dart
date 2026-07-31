@@ -82,7 +82,7 @@ class BookTextScreen extends ConsumerWidget {
                     child: EmptyState(
                       icon: Icons.menu_book_outlined,
                       title: 'نص الكتاب غير متوفر',
-                      message: 'المؤسسة لم تنشر نص هذه السلسلة.',
+                      message: 'لم يُنشر نص هذه السلسلة في مصدرها.',
                     ),
                   )
                 else

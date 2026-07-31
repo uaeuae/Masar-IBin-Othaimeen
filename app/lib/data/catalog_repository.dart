@@ -56,8 +56,13 @@ class CatalogRepository {
             ScholarsCompanion.insert(
               slug: s.slug,
               nameAr: s.nameAr,
+              initialAr: Value(s.initialAr),
+              accent: Value(s.accent),
+              honorificAr: Value(s.honorificAr),
+              status: Value(s.status),
               foundationAr: s.foundationAr,
               website: Value(s.website),
+              youtubeUrl: Value(s.youtubeUrl),
               sortOrder: Value(s.sortOrder),
             ),
         ]);
@@ -423,12 +428,11 @@ class CatalogRepository {
         .customSelect(
           '''
           SELECT l.video_id, l.title_ar, l.duration_seconds, l.series_slug, l.position,
-            s.title_ar AS series_title, sc.name_ar AS scholar_name,
+            s.title_ar AS series_title, s.scholar_slug,
             p.watched_seconds, p.last_watched_at
           FROM lesson_progress p
           JOIN lessons l ON l.video_id = p.video_id AND l.status = 'active'
           JOIN series s ON s.slug = l.series_slug
-          LEFT JOIN scholars sc ON sc.slug = s.scholar_slug
           WHERE p.completed = 0 AND p.watched_seconds >= 30 AND p.dismissed = 0
           ORDER BY p.last_watched_at DESC
           LIMIT $limit
@@ -450,7 +454,7 @@ class CatalogRepository {
                 position: row.read<int>('position'),
                 seriesSlug: row.read<String>('series_slug'),
                 seriesTitleAr: row.read<String>('series_title'),
-                scholarNameAr: row.readNullable<String>('scholar_name'),
+                scholarSlug: row.read<String>('scholar_slug'),
                 watchedSeconds: row.read<int>('watched_seconds'),
                 durationSeconds: row.readNullable<int>('duration_seconds'),
                 lastWatchedAt: DateTime.fromMillisecondsSinceEpoch(
@@ -525,21 +529,70 @@ class CatalogRepository {
     );
   }
 
-  /// Scholar registry, for attribution on the series and home screens.
+  /// Scholar registry, for attribution on the series and home screens, and for
+  /// the الشيوخ row in the library. Carries the series count so a coming-soon
+  /// scholar can be told apart from one whose lessons are simply still syncing.
   Stream<List<ScholarInfo>> watchScholars() {
-    return (db.select(db.scholars)
-          ..orderBy([(s) => OrderingTerm.asc(s.sortOrder)]))
+    return db
+        .customSelect(
+          '''
+          SELECT sch.*,
+            (SELECT COUNT(*) FROM series s
+              WHERE s.scholar_slug = sch.slug AND s.companion_of IS NULL) AS series_count
+          FROM scholars sch
+          ORDER BY sch.sort_order
+          ''',
+          readsFrom: {db.scholars, db.seriesEntries},
+        )
         .watch()
+        .map((rows) => [for (final row in rows) _scholarFromRow(row)]);
+  }
+
+  Stream<ScholarInfo?> watchScholar(String slug) => watchScholars().map(
+    (all) => all.where((s) => s.slug == slug).firstOrNull,
+  );
+
+  ScholarInfo _scholarFromRow(QueryRow row) => ScholarInfo(
+    slug: row.read<String>('slug'),
+    nameAr: row.read<String>('name_ar'),
+    initialAr: row.read<String>('initial_ar'),
+    accent: ScholarAccent.fromJson(row.readNullable<String>('accent')),
+    honorificAr: row.readNullable<String>('honorific_ar'),
+    status: ScholarStatus.fromJson(row.readNullable<String>('status')),
+    foundationAr: row.read<String>('foundation_ar'),
+    website: row.readNullable<String>('website'),
+    youtubeUrl: row.readNullable<String>('youtube_url'),
+    seriesCount: row.read<int>('series_count'),
+  );
+
+  /// Totals for a scholar's profile header. Companions are excluded so the
+  /// audio edition of a video series is not counted as a second سلسلة.
+  Stream<ScholarStats> watchScholarStats(String slug) {
+    return db
+        .customSelect(
+          '''
+          SELECT
+            (SELECT COUNT(*) FROM series s
+              WHERE s.scholar_slug = ? AND s.companion_of IS NULL) AS series_count,
+            (SELECT COUNT(*) FROM lessons l
+               JOIN series s ON s.slug = l.series_slug
+              WHERE s.scholar_slug = ? AND s.companion_of IS NULL
+                AND l.status = 'active') AS lesson_count,
+            (SELECT COALESCE(SUM(l.duration_seconds), 0) FROM lessons l
+               JOIN series s ON s.slug = l.series_slug
+              WHERE s.scholar_slug = ? AND s.companion_of IS NULL
+                AND l.status = 'active') AS total_seconds
+          ''',
+          variables: [Variable(slug), Variable(slug), Variable(slug)],
+          readsFrom: {db.scholars, db.seriesEntries, db.lessons},
+        )
+        .watchSingle()
         .map(
-          (rows) => [
-            for (final row in rows)
-              ScholarInfo(
-                slug: row.slug,
-                nameAr: row.nameAr,
-                foundationAr: row.foundationAr,
-                website: row.website,
-              ),
-          ],
+          (row) => ScholarStats(
+            seriesCount: row.read<int>('series_count'),
+            lessonCount: row.read<int>('lesson_count'),
+            totalDurationSeconds: row.read<int>('total_seconds'),
+          ),
         );
   }
 
@@ -555,7 +608,9 @@ class CatalogRepository {
             (SELECT COUNT(*) FROM lessons l
                JOIN series s ON s.slug = l.series_slug
               WHERE s.science_slug = sc.slug AND s.companion_of IS NULL
-                AND l.status = 'active') AS lesson_count
+                AND l.status = 'active') AS lesson_count,
+            (SELECT COUNT(DISTINCT s.scholar_slug) FROM series s
+              WHERE s.science_slug = sc.slug AND s.companion_of IS NULL) AS scholar_count
           FROM sciences sc
           ORDER BY sc.sort_order
           ''',
@@ -573,16 +628,28 @@ class CatalogRepository {
                 descriptionAr: row.readNullable<String>('description_ar'),
                 icon: row.readNullable<String>('icon'),
                 seriesCount: row.read<int>('series_count'),
+                scholarCount: row.read<int>('scholar_count'),
               ),
           ],
         );
   }
 
-  Stream<List<SeriesWithProgress>> watchSeriesByScience(String scienceSlug) {
+  Stream<List<SeriesWithProgress>> watchSeriesByScience(String scienceSlug) =>
+      _watchSeriesWhere('s.science_slug = ?', scienceSlug);
+
+  /// Every سلسلة a scholar teaches — the body of his profile.
+  Stream<List<SeriesWithProgress>> watchSeriesByScholar(String scholarSlug) =>
+      _watchSeriesWhere('s.scholar_slug = ?', scholarSlug);
+
+  Stream<List<SeriesWithProgress>> _watchSeriesWhere(
+    String condition,
+    String value,
+  ) {
     return db
         .customSelect(
           '''
-          SELECT s.slug, s.title_ar, s.description_ar, s.thumbnail_url, s.science_slug, s.level, s.media_type,
+          SELECT s.slug, s.title_ar, s.description_ar, s.thumbnail_url, s.science_slug,
+            s.scholar_slug, s.level, s.media_type,
             (SELECT COUNT(*) FROM lessons l WHERE l.series_slug = s.slug AND l.status = 'active') AS lesson_count,
             (SELECT COALESCE(SUM(l.duration_seconds), 0) FROM lessons l
               WHERE l.series_slug = s.slug AND l.status = 'active') AS total_duration,
@@ -590,10 +657,10 @@ class CatalogRepository {
                JOIN lesson_progress p ON p.video_id = l.video_id AND p.completed = 1
               WHERE l.series_slug = s.slug AND l.status = 'active') AS completed_count
           FROM series s
-          WHERE s.science_slug = ? AND s.companion_of IS NULL
+          WHERE $condition AND s.companion_of IS NULL
           ORDER BY s.title_ar
           ''',
-          variables: [Variable.withString(scienceSlug)],
+          variables: [Variable.withString(value)],
           readsFrom: {db.seriesEntries, db.lessons, db.lessonProgress},
         )
         .watch()
@@ -606,6 +673,7 @@ class CatalogRepository {
                 descriptionAr: row.readNullable<String>('description_ar'),
                 thumbnailUrl: row.readNullable<String>('thumbnail_url'),
                 scienceSlug: row.read<String>('science_slug'),
+                scholarSlug: row.read<String>('scholar_slug'),
                 lessonCount: row.read<int>('lesson_count'),
                 completedCount: row.read<int>('completed_count'),
                 totalDurationSeconds: row.read<int>('total_duration'),

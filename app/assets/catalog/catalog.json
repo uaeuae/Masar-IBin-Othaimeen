@@ -1,13 +1,30 @@
 {
-  "version": 11,
-  "generated_at": "2026-07-31T11:44:22.702Z",
+  "version": 12,
+  "generated_at": "2026-07-31T14:08:39.925Z",
   "scholars": [
     {
       "slug": "ibn-uthaymeen",
       "name_ar": "الشيخ محمد بن صالح العثيمين",
+      "initial_ar": "ع",
+      "accent": "green",
+      "honorific_ar": "رحمه الله",
+      "status": "active",
       "foundation_ar": "مؤسسة الشيخ محمد بن صالح العثيمين الخيرية",
       "website": "https://binothaimeen.net",
+      "youtube_url": "https://www.youtube.com/@ibnothaimeentv",
       "sort_order": 1
+    },
+    {
+      "slug": "ibn-baz",
+      "name_ar": "الشيخ عبد العزيز بن عبد الله بن باز",
+      "initial_ar": "ب",
+      "accent": "blue",
+      "honorific_ar": "رحمه الله",
+      "status": "coming_soon",
+      "foundation_ar": "مؤسسة الشيخ عبد العزيز بن باز الخيرية",
+      "website": "https://binbaz.org.sa",
+      "youtube_url": null,
+      "sort_order": 2
     }
   ],
   "sciences": [

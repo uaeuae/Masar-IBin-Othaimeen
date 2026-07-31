@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../app/theme.dart';
 import '../../core/widgets/back_circle.dart';
+import '../../core/widgets/scholar_avatar.dart';
 import '../../core/widgets/segmented_control.dart';
 import '../../data/providers.dart';
+import '../../data/view_models.dart';
+import '../library/library_providers.dart';
 import 'theme_mode_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -95,20 +97,6 @@ class SettingsScreen extends ConsumerWidget {
                   onTap: () => context.push('/downloads'),
                 ),
                 _LinkRow(
-                  title: 'القناة الرسمية للشيخ',
-                  onTap: () => launchUrl(
-                    Uri.parse('https://www.youtube.com/@ibnothaimeentv'),
-                    mode: LaunchMode.externalApplication,
-                  ),
-                ),
-                _LinkRow(
-                  title: 'موقع المؤسسة',
-                  onTap: () => launchUrl(
-                    Uri.parse('https://binothaimeen.net/'),
-                    mode: LaunchMode.externalApplication,
-                  ),
-                ),
-                _LinkRow(
                   title: 'مسح بيانات التقدم',
                   showDivider: false,
                   onTap: () => _confirmWipe(context, ref),
@@ -117,7 +105,21 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 18),
 
-            // ── Attribution ──────────────────────────────────────────
+            // ── المصادر والإسناد (design 4f) ──────────────────────────
+            // A list rather than one credit line: each scholar has his own
+            // rights holder and his own official site, so there is no single
+            // «المؤسسة» to name — and a list of one still reads as "sources".
+            Text(
+              'المصادر والإسناد',
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const _SourcesCard(),
+            const SizedBox(height: 18),
+
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -129,19 +131,13 @@ class SettingsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'جميع الدروس منسوبة بالكامل إلى',
+                    'مسار طالب العلم — تطبيق تطوعي غير ربحي',
                     style: serif(17, masar.attributionText),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'مؤسسة الشيخ محمد بن صالح العثيمين الخيرية',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'تطبيق تطوعي غير ربحي — بلا حسابات، بلا إعلانات، بلا جمع بيانات. تقدمك محفوظ على جهازك فقط.',
+                    'كل درس منسوب إلى شيخه ومصدره الرسمي. بلا حسابات، بلا إعلانات، '
+                    'بلا جمع بيانات — تقدمك محفوظ على جهازك فقط.',
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: masar.attributionText,
                       fontWeight: FontWeight.w400,
@@ -202,6 +198,82 @@ class SettingsScreen extends ConsumerWidget {
       ).showSnackBar(const SnackBar(content: Text('تم مسح بيانات التقدم')));
     }
   }
+}
+
+/// One row per scholar: his roundel, his foundation, and where the material
+/// comes from — tapping opens his page.
+class _SourcesCard extends ConsumerWidget {
+  const _SourcesCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final masar = masarColorsOf(context);
+    final scholars = ref.watch(scholarsProvider).value ?? const <ScholarInfo>[];
+    if (scholars.isEmpty) return const SizedBox.shrink();
+
+    return _GroupCard(
+      children: [
+        for (final scholar in scholars)
+          InkWell(
+            onTap: () => context.push('/scholar/${scholar.slug}'),
+            child: Container(
+              decoration: scholar == scholars.last
+                  ? null
+                  : BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: theme.dividerTheme.color!),
+                      ),
+                    ),
+              padding: const EdgeInsetsDirectional.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              child: Row(
+                children: [
+                  ScholarAvatar.of(scholar, size: 34),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          scholar.foundationAr,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontSize: 13.5,
+                          ),
+                        ),
+                        const SizedBox(height: 1),
+                        Text(
+                          scholar.status.isComingSoon
+                              ? 'قريبًا'
+                              : _sourceLine(scholar),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: scholar.status.isComingSoon
+                                ? masar.goldTintFg
+                                : masar.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 13,
+                    color: masar.textMuted,
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  static String _sourceLine(ScholarInfo scholar) => [
+    if (scholar.website != null) Uri.parse(scholar.website!).host,
+    if (scholar.youtubeUrl != null) 'القناة الرسمية',
+  ].join(' · ');
 }
 
 class _GroupCard extends StatelessWidget {

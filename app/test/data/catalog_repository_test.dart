@@ -81,9 +81,16 @@ void main() {
     expect(audio.series.companionOf, 'sharh-alwasitiyah');
 
     // The scholar layer: fixture series carry no explicit scholar, so the
-    // default applies; the scholars list itself round-trips.
+    // default applies; the scholars list itself round-trips, including the
+    // announced-but-not-yet-ingested one.
     expect(video.series.scholarSlug, 'ibn-uthaymeen');
-    expect(loadFixture().scholars.single.nameAr, 'الشيخ محمد بن صالح العثيمين');
+    final scholars = await catalog.watchScholars().first;
+    expect(scholars.map((s) => s.slug), ['ibn-uthaymeen', 'ibn-baz']);
+    expect(scholars.first.initialAr, 'ع');
+    expect(scholars.first.seriesCount, greaterThan(0));
+    expect(scholars.last.status, ScholarStatus.comingSoon);
+    // Announced means announced: no series stand behind him.
+    expect(scholars.last.seriesCount, 0);
 
     // Companions are reached from their video series, not the library —
     // they must not appear in browse nor inflate the science counters.

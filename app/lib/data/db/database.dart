@@ -8,9 +8,23 @@ class Scholars extends Table {
   TextColumn get slug => text()();
   TextColumn get nameAr => text()();
 
+  /// The letter in his roundel. Curated in the seed — it comes from the شهرة
+  /// (العثيمين → ع), so it cannot be taken from the start of [nameAr].
+  TextColumn get initialAr => text().withDefault(const Constant('؟'))();
+
+  /// Palette key the theme resolves: green | blue | gold.
+  TextColumn get accent => text().withDefault(const Constant('green'))();
+
+  /// «رحمه الله» / «حفظه الله».
+  TextColumn get honorificAr => text().nullable()();
+
+  /// active | coming_soon. A coming-soon scholar is announced with no series.
+  TextColumn get status => text().withDefault(const Constant('active'))();
+
   /// Rights holder credited in attribution.
   TextColumn get foundationAr => text()();
   TextColumn get website => text().nullable()();
+  TextColumn get youtubeUrl => text().nullable()();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
 
   @override
@@ -205,7 +219,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -239,6 +253,13 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 9) {
         await m.addColumn(seriesEntries, seriesEntries.bookAuthorAr);
+      }
+      if (from < 10) {
+        await m.addColumn(scholars, scholars.initialAr);
+        await m.addColumn(scholars, scholars.accent);
+        await m.addColumn(scholars, scholars.honorificAr);
+        await m.addColumn(scholars, scholars.status);
+        await m.addColumn(scholars, scholars.youtubeUrl);
       }
     },
   );

@@ -7,11 +7,13 @@ import '../../app/theme.dart';
 import '../../core/formatters.dart';
 import '../../core/widgets/back_circle.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/scholar_avatar.dart';
 import '../../core/widgets/science_glyph.dart';
 import '../../data/models/catalog.dart' show CatalogChapter;
 import '../../data/models/enums.dart';
 import '../../data/providers.dart';
 import '../../data/view_models.dart';
+import '../scholars/scholar_providers.dart';
 import '../series/series_providers.dart';
 import '../settings/theme_mode_provider.dart';
 import 'audio_engine.dart';
@@ -416,7 +418,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                 child: EmptyState(
                   icon: Icons.link_off_rounded,
                   title: 'هذا الدرس غير متاح حاليًا',
-                  message: 'الملف الصوتي غير متوفر في موقع المؤسسة.',
+                  message: 'الملف الصوتي غير متوفر في مصدره الرسمي.',
                 ),
               ),
             ],
@@ -427,6 +429,9 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
 
     if (current != null) _maybeShowCoachMarks();
     final seriesTitle = detail?.series.titleAr ?? '';
+    final scholar = detail == null
+        ? null
+        : ref.watch(scholarProvider(detail.series.scholarSlug));
 
     return Scaffold(
       body: Container(
@@ -536,6 +541,19 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                             height: 1.3,
                           ),
                         ),
+                        // Whose درس this is. Inside the artwork card rather
+                        // than the title block: the card is a fixed 240px, so
+                        // the attribution costs no scroll height on a screen
+                        // whose controls are already close to the fold.
+                        if (scholar != null) ...[
+                          const SizedBox(height: 10),
+                          ScholarLine(
+                            scholar: scholar,
+                            avatarSize: 18,
+                            onHero: true,
+                            withHonorific: false,
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -551,7 +569,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  '$seriesTitle · صوتيات المؤسسة',
+                  seriesTitle,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: scheme.onSurfaceVariant,
@@ -1023,7 +1041,7 @@ class _NoTextForLesson extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              'المؤسسة لم تنشر تفريغًا نصيًا له. الصوت يعمل كالمعتاد.',
+              'لم يُنشر تفريغ نصي له في مصدره. الصوت يعمل كالمعتاد.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: scheme.onSurfaceVariant,

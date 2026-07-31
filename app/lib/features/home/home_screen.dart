@@ -13,6 +13,7 @@ import '../../data/providers.dart';
 import '../../data/view_models.dart';
 import '../journeys/journeys_providers.dart';
 import '../onboarding/coach_marks.dart';
+import '../scholars/scholar_providers.dart';
 import '../settings/theme_mode_provider.dart';
 import '../library/library_providers.dart';
 import 'home_providers.dart';
@@ -194,7 +195,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: ResumeHeroCard(
                   key: _resumeKey,
                   seriesTitle: resume.seriesTitleAr,
-                  scholarName: resume.scholarNameAr,
+                  scholar: ref.watch(scholarProvider(resume.scholarSlug)),
                   lessonLabel:
                       'الدرس ${arabicDigits(resume.position)} — ${resume.titleAr}',
                   progress: resume.progress,

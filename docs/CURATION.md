@@ -4,13 +4,31 @@
 
 Every series belongs to exactly one scholar (`scholar:` in the series seed;
 defaults to `ibn-uthaymeen`). Scholars live in `seed/scholars.yaml` with
-their rights-holding foundation for attribution. To add a scholar (e.g.
-الشيخ ابن باز): add the entry there, create series seeds with
-`scholar: <slug>`, and add sync tooling for his official sources (own
-YouTube channel id / site adapter — the current ones are Ibn-Uthaymeen
-specific). The app carries the scholar on every series; per-scholar UI
-(name on cards, filters) is intentionally deferred until a second scholar
-actually ships.
+their rights-holding foundation for attribution.
+
+Fields beyond the obvious ones:
+
+| field | notes |
+| --- | --- |
+| `initial_ar` | The letter in his roundel. **Curated, not derived** — it is the شهرة, not the start of `name_ar`: العثيمين gives ع and ابن باز gives ب, while `name_ar[0]` would print ا for both. |
+| `accent` | `green` \| `blue` \| `gold`. A palette key; the theme owns the actual colours (`MasarColors.scholarAccents`) so they can differ light/dark. |
+| `honorific_ar` | «رحمه الله» / «حفظه الله». Get this right — it is wrong, not merely missing, on a living scholar. |
+| `status` | `active` \| `coming_soon`. |
+| `youtube_url` | Optional; listed among his sources. |
+
+`status: coming_soon` announces a scholar the app does not carry yet: he
+appears in المكتبة → الشيوخ and in الإعدادات → المصادر والإسناد, badged
+«قريبًا», and his page says so instead of showing an empty list. Publishing
+enforces the promise both ways — a `coming_soon` scholar with active series
+fails, and so does an `active` scholar with none.
+
+To add a scholar: add the entry, create series seeds with `scholar: <slug>`,
+and add sync tooling for his official sources (own YouTube channel id / site
+adapter — the current ones are Ibn-Uthaymeen specific). Seed him as
+`coming_soon` first; flip to `active` in the same commit as his first series.
+
+As of 2026-07-31 there are two: `ibn-uthaymeen` (active) and `ibn-baz`
+(coming_soon, no series yet).
 
 Content went live 2026-07-15: 16 active series (1,719 lessons) across the
 4 launch journeys, all synced from @ibnothaimeentv. Since 2026-07-29 the app

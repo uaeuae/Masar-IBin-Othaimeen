@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../app/theme.dart';
+import '../../data/view_models.dart';
 import '../formatters.dart';
+import 'scholar_avatar.dart';
 
 /// The home hero: solid green card, Amiri series title, cream play circle,
 /// gold progress bar, "توقفت عند / متبقٍ" footer. متابعة المشاهدة.
@@ -11,7 +13,7 @@ class ResumeHeroCard extends StatelessWidget {
     required this.seriesTitle,
     required this.lessonLabel,
     required this.progress,
-    this.scholarName,
+    this.scholar,
     this.stoppedAt,
     this.remaining,
     this.onTap,
@@ -23,8 +25,10 @@ class ResumeHeroCard extends StatelessWidget {
   final String lessonLabel;
   final double progress;
 
-  /// Who taught it, shown under the title.
-  final String? scholarName;
+  /// Who taught it. The design (4a) folds his roundel and name into the lesson
+  /// line — «ابن عثيمين · الدرس ١٢ — باب المياه» — so the first thing on the
+  /// home screen says whose lesson is waiting.
+  final ScholarInfo? scholar;
   final Duration? stoppedAt;
   final Duration? remaining;
   final VoidCallback? onTap;
@@ -59,15 +63,17 @@ class ResumeHeroCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(seriesTitle, style: serif(21, masar.onHero)),
-                      if (scholarName != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          scholarName!,
-                          style: TextStyle(
-                            fontFamily: kUiFont,
-                            fontSize: 11.5,
-                            color: masar.onHeroFaint,
-                          ),
+                      if (scholar != null) ...[
+                        const SizedBox(height: 5),
+                        // Kept off the lesson line the design pairs it with:
+                        // the full «الشيخ محمد بن صالح العثيمين» plus a lesson
+                        // title does not fit the card, and ellipsising an
+                        // attribution is worse than giving it a row.
+                        ScholarLine(
+                          scholar: scholar!,
+                          avatarSize: 20,
+                          onHero: true,
+                          withHonorific: false,
                         ),
                       ],
                       const SizedBox(height: 4),

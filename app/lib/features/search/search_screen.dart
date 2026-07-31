@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import '../../app/theme.dart';
 import '../../core/formatters.dart';
 import '../../core/widgets/empty_state.dart';
-import '../../data/models/enums.dart';
 import '../../data/providers.dart';
 import '../../data/view_models.dart';
 
@@ -178,14 +177,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             : Icons.menu_book_outlined,
         title: 'قريبًا إن شاء الله',
         message: _scope == _Scope.fatawa
-            ? 'البحث في فتاوى الشيخ يصل ضمن تحديث قادم.'
+            ? 'البحث في الفتاوى يصل ضمن تحديث قادم.'
             : 'البحث في المتون والكتب يصل ضمن تحديث قادم.',
       );
     }
     if (_query.trim().isEmpty) {
       return const EmptyState(
         icon: Icons.search_rounded,
-        title: 'ابحث في مكتبة الشيخ',
+        title: 'ابحث في المكتبة',
         message: 'اكتب اسم كتاب أو بابًا أو كلمة من عنوان درس.',
       );
     }
@@ -215,9 +214,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 _ResultCard(
                   onTap: () => context.push('/series/${hit.slug}'),
                   title: _highlight(context, hit.titleAr, serif: true),
-                  subtitle:
-                      '${lessonCountLabel(hit.lessonCount)}'
-                      '${hit.media == LessonMedia.audio ? ' · صوتيات المؤسسة' : ''}',
+                  subtitle: lessonCountLabel(hit.lessonCount),
                 ),
               const SizedBox(height: 10),
             ],

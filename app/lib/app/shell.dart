@@ -9,7 +9,7 @@ import 'theme.dart';
 
 /// Three-tab shell (الرئيسية / المسارات / المكتبة). While the catalog imports
 /// on first run, shows the designed splash — green gradient, the مسار roundel,
-/// and the foundation attribution.
+/// and the non-profit note.
 class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.navigationShell});
 
@@ -94,7 +94,7 @@ class _Splash extends StatelessWidget {
                   Text('مسار طالب العلم', style: serif(28, cream)),
                   const SizedBox(height: 8),
                   const Text(
-                    'رحلة طالب العلم مع دروس الشيخ رحمه الله',
+                    'رحلة طالب العلم مع دروس أهل العلم',
                     style: TextStyle(
                       fontFamily: kUiFont,
                       fontSize: 14,
@@ -125,8 +125,12 @@ class _Splash extends StatelessWidget {
               bottom: 56,
               left: 40,
               right: 40,
+              // Names no foundation: the splash renders before the catalog is
+              // read, so it has no scholar data — and with several scholars
+              // there is no single rights holder to credit app-wide. Each one
+              // is named where his lessons are (design 4f).
               child: Text(
-                'جميع الحقوق محفوظة لمؤسسة الشيخ محمد بن صالح العثيمين الخيرية\nتطبيق تطوعي غير ربحي',
+                'تطبيق تطوعي غير ربحي\nكل درس منسوب إلى شيخه ومصدره الرسمي',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: kUiFont,

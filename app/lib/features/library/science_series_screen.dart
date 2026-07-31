@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../app/theme.dart';
 import '../../core/formatters.dart';
 import '../../core/widgets/back_circle.dart';
 import '../../core/widgets/empty_state.dart';
-import '../../core/widgets/level_badge.dart';
 import '../../core/widgets/masar_chip.dart';
 import '../../core/widgets/science_glyph.dart';
+import '../../core/widgets/series_card.dart';
 import '../../core/widgets/skeleton.dart';
-import '../../data/view_models.dart';
+import '../scholars/scholar_providers.dart';
 import 'library_providers.dart';
 
 enum _SeriesSort { newest, shortest, alphabetical }
@@ -36,6 +34,7 @@ class ScienceSeriesScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final seriesAsync = ref.watch(seriesByScienceProvider(scienceSlug));
+    final scholars = ref.watch(scholarsBySlugProvider);
     final sciences = ref.watch(sciencesProvider).value ?? const [];
     final science = sciences.where((s) => s.slug == scienceSlug).firstOrNull;
     final sort = ref.watch(_sortProvider);
@@ -145,91 +144,12 @@ class ScienceSeriesScreen extends ConsumerWidget {
                   )
                 else
                   for (final s in sorted) ...[
-                    _SeriesCard(series: s),
+                    SeriesCard(series: s, scholar: scholars[s.scholarSlug]),
                     if (s != sorted.last) const SizedBox(height: 12),
                   ],
               ],
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-/// White card: Amiri title + level badge, "X حلقة · Y ساعة", progress if started.
-class _SeriesCard extends StatelessWidget {
-  const _SeriesCard({required this.series});
-
-  final SeriesWithProgress series;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-
-    return Card(
-      child: InkWell(
-        onTap: () => context.push('/series/${series.slug}'),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      series.titleAr,
-                      style: serif(19, scheme.onSurface),
-                    ),
-                  ),
-                  if (series.level != null) ...[
-                    const SizedBox(width: 10),
-                    LevelBadge(level: series.level!, compact: true),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                [
-                  episodeCountLabel(series.lessonCount),
-                  if (series.totalDurationSeconds > 0)
-                    durationLabel(
-                      Duration(seconds: series.totalDurationSeconds),
-                    ),
-                ].join(' · '),
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              if (series.started) ...[
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(AppRadius.chip),
-                        child: LinearProgressIndicator(
-                          value: series.progress,
-                          minHeight: 4,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      '${arabicDigits(series.completedCount)} / ${arabicDigits(series.lessonCount)}',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-          ),
         ),
       ),
     );

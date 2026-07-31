@@ -274,7 +274,7 @@ void main() {
     expect(find.text('النص'), findsOneWidget);
     expect(find.text('لا يوجد نص لهذا الدرس'), findsOneWidget);
     expect(
-      find.text('المؤسسة لم تنشر تفريغًا نصيًا له. الصوت يعمل كالمعتاد.'),
+      find.text('لم يُنشر تفريغ نصي له في مصدره. الصوت يعمل كالمعتاد.'),
       findsOneWidget,
     );
   });

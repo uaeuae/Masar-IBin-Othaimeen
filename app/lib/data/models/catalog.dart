@@ -33,8 +33,16 @@ abstract class CatalogScholar with _$CatalogScholar {
   const factory CatalogScholar({
     required String slug,
     required String nameAr,
+    /// Single letter for his roundel — curated, since it comes from the شهرة.
+    @Default('؟') String initialAr,
+    /// Palette key resolved by the theme: green | blue | gold.
+    @Default('green') String accent,
+    String? honorificAr,
+    /// active | coming_soon — announced but not yet ingested.
+    @Default('active') String status,
     required String foundationAr,
     String? website,
+    String? youtubeUrl,
     @Default(0) int sortOrder,
   }) = _CatalogScholar;
 

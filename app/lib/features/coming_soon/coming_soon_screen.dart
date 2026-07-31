@@ -11,7 +11,7 @@ class ComingSoonScreen extends StatelessWidget {
       title = 'المتون',
       message =
           'قراءة المتن بخط وقور مع فهرس الفصول، وبضغطة واحدة: '
-          '«شاهد شرح هذا الموضع» ينقلك إلى موضعه من شرح الشيخ.';
+          '«شاهد شرح هذا الموضع» ينقلك إلى موضعه من الشرح.';
 
   const ComingSoonScreen.notes({super.key})
     : icon = Icons.bookmark_border_rounded,

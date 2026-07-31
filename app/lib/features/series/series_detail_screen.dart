@@ -97,9 +97,11 @@ class _SeriesDetailBody extends ConsumerWidget {
         Text(
           // Counts and hours live in «عن الكتاب» directly below; repeating them
           // here just said the same thing twice.
+          // Named per scholar — «المؤسسة» would mean whichever one the reader
+          // happened to assume.
           series.media == LessonMedia.audio
-              ? 'صوتيات المؤسسة'
-              : 'قناة الشيخ الرسمية',
+              ? 'صوتيات ${scholar?.foundationAr ?? 'المصدر الرسمي'}'
+              : 'القناة الرسمية',
           style: theme.textTheme.bodySmall?.copyWith(
             color: scheme.onSurfaceVariant,
           ),
@@ -110,8 +112,7 @@ class _SeriesDetailBody extends ConsumerWidget {
         BookAboutCard(
           series: series,
           scienceName: scienceName,
-          scholarNameAr: scholar?.nameAr,
-          foundationAr: scholar?.foundationAr,
+          scholar: scholar,
           bookAuthorAr: series.bookAuthorAr,
           hasReadAlongText: detail.lessons.any((l) => l.textKind != null),
           onOpenBookText: detail.lessons.any((l) => l.textKind != null)
@@ -189,7 +190,7 @@ class _SeriesDetailBody extends ConsumerWidget {
           _CompanionBanner(
             icon: Icons.headphones_rounded,
             title: 'الاستماع للنسخة الصوتية',
-            subtitle: 'دروس المؤسسة الكاملة — تعمل في الخلفية وبالشاشة مقفلة',
+            subtitle: 'دروس السلسلة كاملة — تعمل في الخلفية وبالشاشة مقفلة',
             onTap: () => context.push('/series/${series.companionSlug}'),
           ),
           const SizedBox(height: 16),
@@ -197,7 +198,7 @@ class _SeriesDetailBody extends ConsumerWidget {
           _CompanionBanner(
             icon: Icons.ondemand_video_rounded,
             title: 'مشاهدة النسخة المرئية',
-            subtitle: 'مقاطع الدروس على قناة الشيخ الرسمية',
+            subtitle: 'مقاطع الدروس على القناة الرسمية',
             onTap: () => context.push('/series/${series.companionOf}'),
           ),
           const SizedBox(height: 16),

@@ -89,7 +89,7 @@ void main() {
 
     expect(find.text('لا يتوفر نص مقروء لهذه السلسلة'), findsOneWidget);
     expect(
-      find.text('المؤسسة لم تنشر تفريغًا نصيًا لهذه الدروس.'),
+      find.text('لم يُنشر تفريغ نصي لهذه الدروس في مصدرها.'),
       findsOneWidget,
     );
   });

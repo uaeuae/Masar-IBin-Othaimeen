@@ -71,6 +71,21 @@ String seriesCountLabel(int count) {
   );
 }
 
+/// "شيخ واحد" / "شيخان" / "٣ شيوخ"
+String scholarCountLabel(int count) {
+  final n = arabicDigits(count);
+  return Intl.pluralLogic(
+    count,
+    locale: 'ar',
+    zero: 'لا شيوخ',
+    one: 'شيخ واحد',
+    two: 'شيخان',
+    few: '$n شيوخ',
+    many: '$n شيخًا',
+    other: '$n شيخ',
+  );
+}
+
 /// Human duration for lesson/series lengths: "٤٥ دقيقة", "ساعة و١٠ دقائق", "٣ ساعات".
 String durationLabel(Duration duration) {
   final hours = duration.inHours;

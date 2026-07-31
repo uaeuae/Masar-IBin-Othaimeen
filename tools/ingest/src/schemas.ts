@@ -9,10 +9,30 @@ export const scholarSchema = z.object({
   slug: slugSchema,
   /** «الشيخ محمد بن صالح العثيمين» */
   name_ar: z.string().min(1),
+  /**
+   * The single letter in the scholar's roundel. Curated rather than derived,
+   * because it comes from the شهرة and not the start of `name_ar`: العثيمين
+   * gives ع, ابن باز gives ب. `name_ar[0]` would print ا for everyone.
+   */
+  initial_ar: z.string().min(1).max(2),
+  /**
+   * Palette key for the roundel, not a hex value — the colours belong to the
+   * theme so they can differ between light and dark, same as `level`.
+   */
+  accent: z.enum(['green', 'blue', 'gold']).default('green'),
+  /** «رحمه الله» for the departed, «حفظه الله» for the living. */
+  honorific_ar: z.string().min(1).optional(),
+  /**
+   * `coming_soon` announces a scholar whose lessons are not ingested yet: he
+   * appears in the library and settings, badged, with no series behind him.
+   */
+  status: z.enum(['active', 'coming_soon']).default('active'),
   /** Rights holder credited in attribution: «مؤسسة الشيخ ... الخيرية». */
   foundation_ar: z.string().min(1),
   /** Official site, for the about/attribution screens. */
   website: z.string().url().optional(),
+  /** Official channel, shown among his sources. */
+  youtube_url: z.string().url().optional(),
   sort_order: z.number().int().default(0),
 });
 

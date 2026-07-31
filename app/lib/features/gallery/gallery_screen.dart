@@ -50,7 +50,7 @@ class GalleryScreen extends ConsumerWidget {
           ),
           Text('أهلًا بك يا طالب العلم', style: theme.textTheme.headlineSmall),
           Text(
-            'قال الشيخ رحمه الله: العلم يحتاج إلى تدرج — ٤٥ درسًا في ١٢ أسبوعًا.',
+            'طلب العلم يحتاج إلى تدرج — ٤٥ درسًا في ١٢ أسبوعًا.',
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 24),

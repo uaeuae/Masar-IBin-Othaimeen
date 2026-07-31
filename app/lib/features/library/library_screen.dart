@@ -5,8 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../app/theme.dart';
 import '../../core/formatters.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/scholar_avatar.dart';
 import '../../core/widgets/science_glyph.dart';
 import '../../core/widgets/skeleton.dart';
+import '../../data/view_models.dart';
 import 'library_providers.dart';
 
 /// المكتبة — the "browse everything" escape hatch, per the design:
@@ -71,13 +73,16 @@ class LibraryScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'تصفّح جميع سلاسل الشيخ رحمه الله بحسب العلم — دون التقيد بمسار',
+                'تصفّح السلاسل بحسب الشيخ أو العلم — دون التقيد بمسار',
                 style: theme.textTheme.labelLarge?.copyWith(
                   color: scheme.onSurfaceVariant,
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
+              const _ScholarsRow(),
+              Text('العلوم', style: theme.textTheme.titleLarge),
+              const SizedBox(height: 10),
               GridView.count(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -114,7 +119,16 @@ class LibraryScreen extends ConsumerWidget {
                               Text(
                                 science.seriesCount == 0
                                     ? 'قريبًا'
-                                    : '${seriesCountLabel(science.seriesCount)} · ${lessonCountLabel(science.lessonCount)}',
+                                    : [
+                                        seriesCountLabel(science.seriesCount),
+                                        // Only worth saying once it varies —
+                                        // «شيخ واحد» on every tile is noise.
+                                        if (science.scholarCount > 1)
+                                          scholarCountLabel(
+                                            science.scholarCount,
+                                          ),
+                                        lessonCountLabel(science.lessonCount),
+                                      ].join(' · '),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.labelMedium?.copyWith(
@@ -230,6 +244,91 @@ class LibraryScreen extends ConsumerWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// «الشيوخ» — the library's second dimension, per design 3a.
+///
+/// It is what stops the library reading as one scholar's shelf: browsing *by
+/// scholar* is only a meaningful axis if there is more than one, so an
+/// announced-but-not-yet-ingested scholar earns his card here, badged.
+class _ScholarsRow extends ConsumerWidget {
+  const _ScholarsRow();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final scholars = ref.watch(scholarsProvider).value ?? const <ScholarInfo>[];
+    if (scholars.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('الشيوخ', style: theme.textTheme.titleLarge),
+        const SizedBox(height: 10),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final scholar in scholars) ...[
+              Expanded(child: _ScholarCard(scholar: scholar)),
+              if (scholar != scholars.last) const SizedBox(width: 10),
+            ],
+          ],
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+}
+
+class _ScholarCard extends StatelessWidget {
+  const _ScholarCard({required this.scholar});
+
+  final ScholarInfo scholar;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final masar = masarColorsOf(context);
+    final soon = scholar.status.isComingSoon;
+
+    return Card(
+      child: InkWell(
+        onTap: () => context.push('/scholar/${scholar.slug}'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+          child: Column(
+            children: [
+              // Muted rather than hidden: he is announced, not available.
+              Opacity(
+                opacity: soon ? 0.55 : 1,
+                child: ScholarAvatar.of(scholar, size: 52),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                scholar.nameAr,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                soon ? 'قريبًا' : seriesCountLabel(scholar.seriesCount),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: soon ? masar.goldTintFg : scheme.onSurfaceVariant,
+                  fontWeight: soon ? FontWeight.w700 : FontWeight.w400,
                 ),
               ),
             ],

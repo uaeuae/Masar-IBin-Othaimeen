@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/theme.dart';
 import '../../core/formatters.dart';
 import '../../core/widgets/level_badge.dart';
+import '../../core/widgets/scholar_avatar.dart';
 import '../../data/view_models.dart';
 
 /// «عن الكتاب» — what this book is, who taught it, and how much of it there is,
@@ -17,8 +19,7 @@ class BookAboutCard extends StatelessWidget {
     super.key,
     required this.series,
     required this.scienceName,
-    this.scholarNameAr,
-    this.foundationAr,
+    this.scholar,
     this.bookAuthorAr,
     required this.hasReadAlongText,
     this.onOpenBookText,
@@ -26,8 +27,10 @@ class BookAboutCard extends StatelessWidget {
 
   final SeriesWithProgress series;
   final String scienceName;
-  final String? scholarNameAr;
-  final String? foundationAr;
+
+  /// Who taught it, and therefore which foundation holds the rights. Both are
+  /// per-scholar, so neither can be a constant in the card.
+  final ScholarInfo? scholar;
 
   /// Who wrote the matn. The sheikh explains books he mostly did not write, so
   /// «الشارح» and «المؤلف» are different people — and on the handful he did
@@ -92,16 +95,33 @@ class BookAboutCard extends StatelessWidget {
             const SizedBox(height: 6),
             _Fact(icon: Icons.edit_note_rounded, text: 'المؤلف: $bookAuthorAr'),
           ],
-          if (scholarNameAr != null) ...[
-            const SizedBox(height: 6),
-            _Fact(
-              icon: Icons.record_voice_over_rounded,
-              text: 'الشارح: $scholarNameAr',
+          if (scholar != null) ...[
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: () => context.push('/scholar/${scholar!.slug}'),
+              child: Row(
+                children: [
+                  ScholarAvatar.of(scholar!, size: 24),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'الشارح: ${scholar!.nameAr}',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 12,
+                    color: masar.textMuted,
+                  ),
+                ],
+              ),
             ),
-          ],
-          if (foundationAr != null) ...[
-            const SizedBox(height: 6),
-            _Fact(icon: Icons.verified_outlined, text: foundationAr!),
+            const SizedBox(height: 8),
+            _Fact(icon: Icons.verified_outlined, text: scholar!.foundationAr),
           ],
           const SizedBox(height: 6),
           _Fact(
@@ -116,7 +136,7 @@ class BookAboutCard extends StatelessWidget {
           if (!hasReadAlongText) ...[
             const SizedBox(height: 4),
             Text(
-              'المؤسسة لم تنشر تفريغًا نصيًا لهذه الدروس.',
+              'لم يُنشر تفريغ نصي لهذه الدروس في مصدرها.',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: masar.textFaint,
               ),

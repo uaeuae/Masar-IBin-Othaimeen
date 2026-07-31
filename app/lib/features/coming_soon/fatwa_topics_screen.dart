@@ -90,7 +90,7 @@ class FatwaTopicsScreen extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'قريبًا إن شاء الله — فتاوى الشيخ مصنّفة حسب الأبواب، '
+                      'قريبًا إن شاء الله — الفتاوى مصنّفة حسب الأبواب، '
                       'مع الاستماع وقراءة النص',
                       style: theme.textTheme.labelMedium?.copyWith(
                         color: masar.goldTintFg,

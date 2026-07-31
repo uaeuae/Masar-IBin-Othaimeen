@@ -46,6 +46,38 @@ enum LessonTextKind {
   };
 }
 
+/// Whether a scholar's lessons are in the app yet. `comingSoon` announces him
+/// — he shows up in the library and in Settings, badged «قريبًا», with no
+/// series behind him. Publishing rejects any mismatch between the two.
+enum ScholarStatus {
+  active,
+  comingSoon;
+
+  bool get isComingSoon => this == ScholarStatus.comingSoon;
+
+  static ScholarStatus fromJson(String? value) => switch (value) {
+    'active' || null => ScholarStatus.active,
+    'coming_soon' => ScholarStatus.comingSoon,
+    _ => throw ArgumentError('Unknown scholar status: $value'),
+  };
+}
+
+/// Which colour a scholar's roundel takes. A palette key rather than a hex
+/// value, so the shade can differ between light and dark — the theme resolves
+/// it, the same way it resolves [JourneyLevel] for the level badge.
+enum ScholarAccent {
+  green,
+  blue,
+  gold;
+
+  static ScholarAccent fromJson(String? value) => switch (value) {
+    'green' || null => ScholarAccent.green,
+    'blue' => ScholarAccent.blue,
+    'gold' => ScholarAccent.gold,
+    _ => throw ArgumentError('Unknown scholar accent: $value'),
+  };
+}
+
 enum LessonStatus {
   active,
   hidden,

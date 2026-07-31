@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../data/models/enums.dart';
+
 /// Design tokens transcribed from the approved design file
 /// (docs/design/masar-screens.dc.html). Direction: "serene classical" —
 /// deep green on warm ivory, Amiri for classical titles, IBM Plex Sans
@@ -166,6 +168,15 @@ class MasarColors extends ThemeExtension<MasarColors> {
     attributionText: Color(0xFF93A398),
     heroShadow: Color(0x00000000),
   );
+
+  /// Roundel gradients per scholar, from the design's multi-sheikh sheets (3a,
+  /// 3b, 4b). They read as identity marks rather than surface colour, so they
+  /// are identical in both themes — like [heroGreen].
+  static const scholarAccents = <ScholarAccent, List<Color>>{
+    ScholarAccent.green: [Color(0xFF1E5B45), Color(0xFF17492F)],
+    ScholarAccent.blue: [Color(0xFF4E5F8C), Color(0xFF3A4870)],
+    ScholarAccent.gold: [Color(0xFFA8874B), Color(0xFF8A6D38)],
+  };
 
   @override
   MasarColors copyWith() => this;

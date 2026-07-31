@@ -11,6 +11,7 @@ import '../features/journeys/journeys_screen.dart';
 import '../features/library/library_screen.dart';
 import '../features/library/science_series_screen.dart';
 import '../features/player/lesson_player_dispatcher.dart';
+import '../features/scholars/scholar_screen.dart';
 import '../features/series/series_detail_screen.dart';
 import '../features/downloads/downloads_screen.dart';
 import '../features/series/book_text_screen.dart';
@@ -72,6 +73,11 @@ GoRouter _createRouter() => GoRouter(
       path: '/science/:slug',
       builder: (context, state) =>
           ScienceSeriesScreen(scienceSlug: state.pathParameters['slug']!),
+    ),
+    GoRoute(
+      path: '/scholar/:slug',
+      builder: (context, state) =>
+          ScholarScreen(slug: state.pathParameters['slug']!),
     ),
     GoRoute(
       path: '/player/:videoId',

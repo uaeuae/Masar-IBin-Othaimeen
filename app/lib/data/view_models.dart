@@ -187,7 +187,7 @@ class ContinueWatchingItem {
     required this.position,
     required this.seriesSlug,
     required this.seriesTitleAr,
-    this.scholarNameAr,
+    this.scholarSlug = 'ibn-uthaymeen',
     required this.watchedSeconds,
     this.durationSeconds,
     required this.lastWatchedAt,
@@ -201,7 +201,7 @@ class ContinueWatchingItem {
 
   /// Who taught it — attribution belongs next to the lesson, not only in
   /// Settings.
-  final String? scholarNameAr;
+  final String scholarSlug;
   final int watchedSeconds;
   final int? durationSeconds;
   final DateTime lastWatchedAt;
@@ -263,6 +263,7 @@ class ScienceSummary {
     required this.sortOrder,
     required this.seriesCount,
     required this.lessonCount,
+    this.scholarCount = 1,
   });
 
   final String slug;
@@ -272,18 +273,54 @@ class ScienceSummary {
   final int sortOrder;
   final int seriesCount;
   final int lessonCount;
+
+  /// How many scholars teach in this science. Shown only above one — with a
+  /// single scholar it would print «شيخ واحد» on every tile.
+  final int scholarCount;
 }
 
 class ScholarInfo {
   const ScholarInfo({
     required this.slug,
     required this.nameAr,
+    required this.initialAr,
+    required this.accent,
+    this.honorificAr,
+    this.status = ScholarStatus.active,
     required this.foundationAr,
     this.website,
+    this.youtubeUrl,
+    this.seriesCount = 0,
   });
 
   final String slug;
   final String nameAr;
+
+  /// The letter in his roundel — from the شهرة, not the start of [nameAr].
+  final String initialAr;
+  final ScholarAccent accent;
+  final String? honorificAr;
+  final ScholarStatus status;
   final String foundationAr;
   final String? website;
+  final String? youtubeUrl;
+  final int seriesCount;
+
+  /// «الشيخ محمد بن صالح العثيمين رحمه الله» — the form used wherever there is
+  /// room for it. [nameAr] alone is the compact form.
+  String get nameWithHonorific =>
+      honorificAr == null ? nameAr : '$nameAr $honorificAr';
+}
+
+/// Totals behind a scholar's profile header.
+class ScholarStats {
+  const ScholarStats({
+    required this.seriesCount,
+    required this.lessonCount,
+    required this.totalDurationSeconds,
+  });
+
+  final int seriesCount;
+  final int lessonCount;
+  final int totalDurationSeconds;
 }

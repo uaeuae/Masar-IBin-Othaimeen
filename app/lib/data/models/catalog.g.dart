@@ -47,8 +47,13 @@ _CatalogScholar _$CatalogScholarFromJson(Map<String, dynamic> json) =>
     _CatalogScholar(
       slug: json['slug'] as String,
       nameAr: json['name_ar'] as String,
+      initialAr: json['initial_ar'] as String? ?? '؟',
+      accent: json['accent'] as String? ?? 'green',
+      honorificAr: json['honorific_ar'] as String?,
+      status: json['status'] as String? ?? 'active',
       foundationAr: json['foundation_ar'] as String,
       website: json['website'] as String?,
+      youtubeUrl: json['youtube_url'] as String?,
       sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
     );
 
@@ -56,8 +61,13 @@ Map<String, dynamic> _$CatalogScholarToJson(_CatalogScholar instance) =>
     <String, dynamic>{
       'slug': instance.slug,
       'name_ar': instance.nameAr,
+      'initial_ar': instance.initialAr,
+      'accent': instance.accent,
+      'honorific_ar': instance.honorificAr,
+      'status': instance.status,
       'foundation_ar': instance.foundationAr,
       'website': instance.website,
+      'youtube_url': instance.youtubeUrl,
       'sort_order': instance.sortOrder,
     };
 

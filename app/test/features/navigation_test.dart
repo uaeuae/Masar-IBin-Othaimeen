@@ -32,7 +32,7 @@ void main() {
 
     await tester.tap(navItem('المكتبة'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('تصفّح جميع سلاسل الشيخ'), findsOneWidget);
+    expect(find.textContaining('تصفّح السلاسل بحسب الشيخ أو العلم'), findsOneWidget);
     await tester.scrollUntilVisible(
       find.textContaining('الفهرس كامل متاح دون اتصال'),
       300,

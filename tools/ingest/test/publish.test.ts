@@ -12,6 +12,8 @@ function makeWorkspace(options: {
   withLessons?: boolean;
   /** Adds the full audio edition of sharh-zad, the way every video series has one. */
   withCompanion?: boolean;
+  /** Replaces the scholars.yaml body, for the coming-soon integrity checks. */
+  scholars?: string;
 }) {
   const root = mkdtempSync(join(tmpdir(), 'masar-publish-'));
   const seedDir = join(root, 'seed');
@@ -23,7 +25,9 @@ function makeWorkspace(options: {
 
   writeFileSync(
     join(seedDir, 'scholars.yaml'),
-    'scholars:\n  - slug: ibn-uthaymeen\n    name_ar: الشيخ محمد بن صالح العثيمين\n    foundation_ar: مؤسسة الشيخ العثيمين الخيرية\n',
+    options.scholars ??
+      'scholars:\n  - slug: ibn-uthaymeen\n    name_ar: الشيخ محمد بن صالح العثيمين\n' +
+        '    initial_ar: ع\n    foundation_ar: مؤسسة الشيخ العثيمين الخيرية\n',
   );
   writeFileSync(join(seedDir, 'sciences.yaml'), 'sciences:\n  - slug: fiqh\n    name_ar: الفقه\n    sort_order: 1\n');
   writeFileSync(
@@ -129,6 +133,58 @@ describe('publishCatalog', () => {
   it('rejects a published journey referencing a draft series', () => {
     const ws = makeWorkspace({ seriesStatus: 'draft' });
     expect(() => publishCatalog({ ...ws, dryRun: true, now: fixedNow })).toThrow(/non-active series/);
+  });
+
+  describe('coming-soon scholars', () => {
+    const uthaymeen =
+      '  - slug: ibn-uthaymeen\n    name_ar: الشيخ محمد بن صالح العثيمين\n' +
+      '    initial_ar: ع\n    foundation_ar: مؤسسة الشيخ العثيمين الخيرية\n';
+
+    it('is announced in the catalog with no series behind him', () => {
+      const ws = makeWorkspace({
+        scholars:
+          `scholars:\n${uthaymeen}` +
+          '  - slug: ibn-baz\n    name_ar: الشيخ عبد العزيز بن باز\n    initial_ar: ب\n' +
+          '    accent: blue\n    honorific_ar: رحمه الله\n    status: coming_soon\n' +
+          '    foundation_ar: مؤسسة الشيخ ابن باز الخيرية\n    sort_order: 2\n',
+      });
+      publishCatalog({ ...ws, dryRun: false, now: fixedNow });
+      const catalog = JSON.parse(readFileSync(join(ws.outDir, 'catalog.json'), 'utf8'));
+
+      const baz = catalog.scholars.find((s: { slug: string }) => s.slug === 'ibn-baz');
+      expect(baz).toMatchObject({ status: 'coming_soon', initial_ar: 'ب', accent: 'blue' });
+      expect(catalog.series.some((s: { scholar: string }) => s.scholar === 'ibn-baz')).toBe(false);
+      // The one who does have lessons keeps his defaults.
+      expect(catalog.scholars.find((s: { slug: string }) => s.slug === 'ibn-uthaymeen')).toMatchObject({
+        status: 'active',
+        accent: 'green',
+        honorific_ar: null,
+      });
+    });
+
+    it('rejects a coming-soon scholar who already has series', () => {
+      // sharh-zad defaults to ibn-uthaymeen, so badging him «قريبًا» lies.
+      const ws = makeWorkspace({
+        scholars:
+          'scholars:\n  - slug: ibn-uthaymeen\n    name_ar: الشيخ محمد بن صالح العثيمين\n' +
+          '    initial_ar: ع\n    status: coming_soon\n    foundation_ar: مؤسسة الشيخ العثيمين الخيرية\n',
+      });
+      expect(() => publishCatalog({ ...ws, dryRun: true, now: fixedNow })).toThrow(
+        /coming_soon but has 1 active series/,
+      );
+    });
+
+    it('rejects an active scholar with nothing to show', () => {
+      const ws = makeWorkspace({
+        scholars:
+          `scholars:\n${uthaymeen}` +
+          '  - slug: ibn-baz\n    name_ar: الشيخ عبد العزيز بن باز\n    initial_ar: ب\n' +
+          '    foundation_ar: مؤسسة الشيخ ابن باز الخيرية\n',
+      });
+      expect(() => publishCatalog({ ...ws, dryRun: true, now: fixedNow })).toThrow(
+        /active but has no active series/,
+      );
+    });
   });
 
   it('unpublished journeys are simply omitted', () => {

@@ -26,6 +26,49 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _initialArMeta = const VerificationMeta(
+    'initialAr',
+  );
+  @override
+  late final GeneratedColumn<String> initialAr = GeneratedColumn<String>(
+    'initial_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('؟'),
+  );
+  static const VerificationMeta _accentMeta = const VerificationMeta('accent');
+  @override
+  late final GeneratedColumn<String> accent = GeneratedColumn<String>(
+    'accent',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('green'),
+  );
+  static const VerificationMeta _honorificArMeta = const VerificationMeta(
+    'honorificAr',
+  );
+  @override
+  late final GeneratedColumn<String> honorificAr = GeneratedColumn<String>(
+    'honorific_ar',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('active'),
+  );
   static const VerificationMeta _foundationArMeta = const VerificationMeta(
     'foundationAr',
   );
@@ -48,6 +91,17 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _youtubeUrlMeta = const VerificationMeta(
+    'youtubeUrl',
+  );
+  @override
+  late final GeneratedColumn<String> youtubeUrl = GeneratedColumn<String>(
+    'youtube_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _sortOrderMeta = const VerificationMeta(
     'sortOrder',
   );
@@ -64,8 +118,13 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
   List<GeneratedColumn> get $columns => [
     slug,
     nameAr,
+    initialAr,
+    accent,
+    honorificAr,
+    status,
     foundationAr,
     website,
+    youtubeUrl,
     sortOrder,
   ];
   @override
@@ -96,6 +155,33 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
     } else if (isInserting) {
       context.missing(_nameArMeta);
     }
+    if (data.containsKey('initial_ar')) {
+      context.handle(
+        _initialArMeta,
+        initialAr.isAcceptableOrUnknown(data['initial_ar']!, _initialArMeta),
+      );
+    }
+    if (data.containsKey('accent')) {
+      context.handle(
+        _accentMeta,
+        accent.isAcceptableOrUnknown(data['accent']!, _accentMeta),
+      );
+    }
+    if (data.containsKey('honorific_ar')) {
+      context.handle(
+        _honorificArMeta,
+        honorificAr.isAcceptableOrUnknown(
+          data['honorific_ar']!,
+          _honorificArMeta,
+        ),
+      );
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
     if (data.containsKey('foundation_ar')) {
       context.handle(
         _foundationArMeta,
@@ -111,6 +197,12 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
       context.handle(
         _websiteMeta,
         website.isAcceptableOrUnknown(data['website']!, _websiteMeta),
+      );
+    }
+    if (data.containsKey('youtube_url')) {
+      context.handle(
+        _youtubeUrlMeta,
+        youtubeUrl.isAcceptableOrUnknown(data['youtube_url']!, _youtubeUrlMeta),
       );
     }
     if (data.containsKey('sort_order')) {
@@ -136,6 +228,22 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
         DriftSqlType.string,
         data['${effectivePrefix}name_ar'],
       )!,
+      initialAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}initial_ar'],
+      )!,
+      accent: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}accent'],
+      )!,
+      honorificAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}honorific_ar'],
+      ),
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
       foundationAr: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}foundation_ar'],
@@ -143,6 +251,10 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
       website: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}website'],
+      ),
+      youtubeUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}youtube_url'],
       ),
       sortOrder: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
@@ -161,15 +273,34 @@ class Scholar extends DataClass implements Insertable<Scholar> {
   final String slug;
   final String nameAr;
 
+  /// The letter in his roundel. Curated in the seed — it comes from the شهرة
+  /// (العثيمين → ع), so it cannot be taken from the start of [nameAr].
+  final String initialAr;
+
+  /// Palette key the theme resolves: green | blue | gold.
+  final String accent;
+
+  /// «رحمه الله» / «حفظه الله».
+  final String? honorificAr;
+
+  /// active | coming_soon. A coming-soon scholar is announced with no series.
+  final String status;
+
   /// Rights holder credited in attribution.
   final String foundationAr;
   final String? website;
+  final String? youtubeUrl;
   final int sortOrder;
   const Scholar({
     required this.slug,
     required this.nameAr,
+    required this.initialAr,
+    required this.accent,
+    this.honorificAr,
+    required this.status,
     required this.foundationAr,
     this.website,
+    this.youtubeUrl,
     required this.sortOrder,
   });
   @override
@@ -177,9 +308,18 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     final map = <String, Expression>{};
     map['slug'] = Variable<String>(slug);
     map['name_ar'] = Variable<String>(nameAr);
+    map['initial_ar'] = Variable<String>(initialAr);
+    map['accent'] = Variable<String>(accent);
+    if (!nullToAbsent || honorificAr != null) {
+      map['honorific_ar'] = Variable<String>(honorificAr);
+    }
+    map['status'] = Variable<String>(status);
     map['foundation_ar'] = Variable<String>(foundationAr);
     if (!nullToAbsent || website != null) {
       map['website'] = Variable<String>(website);
+    }
+    if (!nullToAbsent || youtubeUrl != null) {
+      map['youtube_url'] = Variable<String>(youtubeUrl);
     }
     map['sort_order'] = Variable<int>(sortOrder);
     return map;
@@ -189,10 +329,19 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     return ScholarsCompanion(
       slug: Value(slug),
       nameAr: Value(nameAr),
+      initialAr: Value(initialAr),
+      accent: Value(accent),
+      honorificAr: honorificAr == null && nullToAbsent
+          ? const Value.absent()
+          : Value(honorificAr),
+      status: Value(status),
       foundationAr: Value(foundationAr),
       website: website == null && nullToAbsent
           ? const Value.absent()
           : Value(website),
+      youtubeUrl: youtubeUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(youtubeUrl),
       sortOrder: Value(sortOrder),
     );
   }
@@ -205,8 +354,13 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     return Scholar(
       slug: serializer.fromJson<String>(json['slug']),
       nameAr: serializer.fromJson<String>(json['nameAr']),
+      initialAr: serializer.fromJson<String>(json['initialAr']),
+      accent: serializer.fromJson<String>(json['accent']),
+      honorificAr: serializer.fromJson<String?>(json['honorificAr']),
+      status: serializer.fromJson<String>(json['status']),
       foundationAr: serializer.fromJson<String>(json['foundationAr']),
       website: serializer.fromJson<String?>(json['website']),
+      youtubeUrl: serializer.fromJson<String?>(json['youtubeUrl']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
     );
   }
@@ -216,8 +370,13 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     return <String, dynamic>{
       'slug': serializer.toJson<String>(slug),
       'nameAr': serializer.toJson<String>(nameAr),
+      'initialAr': serializer.toJson<String>(initialAr),
+      'accent': serializer.toJson<String>(accent),
+      'honorificAr': serializer.toJson<String?>(honorificAr),
+      'status': serializer.toJson<String>(status),
       'foundationAr': serializer.toJson<String>(foundationAr),
       'website': serializer.toJson<String?>(website),
+      'youtubeUrl': serializer.toJson<String?>(youtubeUrl),
       'sortOrder': serializer.toJson<int>(sortOrder),
     };
   }
@@ -225,24 +384,43 @@ class Scholar extends DataClass implements Insertable<Scholar> {
   Scholar copyWith({
     String? slug,
     String? nameAr,
+    String? initialAr,
+    String? accent,
+    Value<String?> honorificAr = const Value.absent(),
+    String? status,
     String? foundationAr,
     Value<String?> website = const Value.absent(),
+    Value<String?> youtubeUrl = const Value.absent(),
     int? sortOrder,
   }) => Scholar(
     slug: slug ?? this.slug,
     nameAr: nameAr ?? this.nameAr,
+    initialAr: initialAr ?? this.initialAr,
+    accent: accent ?? this.accent,
+    honorificAr: honorificAr.present ? honorificAr.value : this.honorificAr,
+    status: status ?? this.status,
     foundationAr: foundationAr ?? this.foundationAr,
     website: website.present ? website.value : this.website,
+    youtubeUrl: youtubeUrl.present ? youtubeUrl.value : this.youtubeUrl,
     sortOrder: sortOrder ?? this.sortOrder,
   );
   Scholar copyWithCompanion(ScholarsCompanion data) {
     return Scholar(
       slug: data.slug.present ? data.slug.value : this.slug,
       nameAr: data.nameAr.present ? data.nameAr.value : this.nameAr,
+      initialAr: data.initialAr.present ? data.initialAr.value : this.initialAr,
+      accent: data.accent.present ? data.accent.value : this.accent,
+      honorificAr: data.honorificAr.present
+          ? data.honorificAr.value
+          : this.honorificAr,
+      status: data.status.present ? data.status.value : this.status,
       foundationAr: data.foundationAr.present
           ? data.foundationAr.value
           : this.foundationAr,
       website: data.website.present ? data.website.value : this.website,
+      youtubeUrl: data.youtubeUrl.present
+          ? data.youtubeUrl.value
+          : this.youtubeUrl,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
     );
   }
@@ -252,47 +430,82 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     return (StringBuffer('Scholar(')
           ..write('slug: $slug, ')
           ..write('nameAr: $nameAr, ')
+          ..write('initialAr: $initialAr, ')
+          ..write('accent: $accent, ')
+          ..write('honorificAr: $honorificAr, ')
+          ..write('status: $status, ')
           ..write('foundationAr: $foundationAr, ')
           ..write('website: $website, ')
+          ..write('youtubeUrl: $youtubeUrl, ')
           ..write('sortOrder: $sortOrder')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(slug, nameAr, foundationAr, website, sortOrder);
+  int get hashCode => Object.hash(
+    slug,
+    nameAr,
+    initialAr,
+    accent,
+    honorificAr,
+    status,
+    foundationAr,
+    website,
+    youtubeUrl,
+    sortOrder,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Scholar &&
           other.slug == this.slug &&
           other.nameAr == this.nameAr &&
+          other.initialAr == this.initialAr &&
+          other.accent == this.accent &&
+          other.honorificAr == this.honorificAr &&
+          other.status == this.status &&
           other.foundationAr == this.foundationAr &&
           other.website == this.website &&
+          other.youtubeUrl == this.youtubeUrl &&
           other.sortOrder == this.sortOrder);
 }
 
 class ScholarsCompanion extends UpdateCompanion<Scholar> {
   final Value<String> slug;
   final Value<String> nameAr;
+  final Value<String> initialAr;
+  final Value<String> accent;
+  final Value<String?> honorificAr;
+  final Value<String> status;
   final Value<String> foundationAr;
   final Value<String?> website;
+  final Value<String?> youtubeUrl;
   final Value<int> sortOrder;
   final Value<int> rowid;
   const ScholarsCompanion({
     this.slug = const Value.absent(),
     this.nameAr = const Value.absent(),
+    this.initialAr = const Value.absent(),
+    this.accent = const Value.absent(),
+    this.honorificAr = const Value.absent(),
+    this.status = const Value.absent(),
     this.foundationAr = const Value.absent(),
     this.website = const Value.absent(),
+    this.youtubeUrl = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ScholarsCompanion.insert({
     required String slug,
     required String nameAr,
+    this.initialAr = const Value.absent(),
+    this.accent = const Value.absent(),
+    this.honorificAr = const Value.absent(),
+    this.status = const Value.absent(),
     required String foundationAr,
     this.website = const Value.absent(),
+    this.youtubeUrl = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : slug = Value(slug),
@@ -301,16 +514,26 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
   static Insertable<Scholar> custom({
     Expression<String>? slug,
     Expression<String>? nameAr,
+    Expression<String>? initialAr,
+    Expression<String>? accent,
+    Expression<String>? honorificAr,
+    Expression<String>? status,
     Expression<String>? foundationAr,
     Expression<String>? website,
+    Expression<String>? youtubeUrl,
     Expression<int>? sortOrder,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (slug != null) 'slug': slug,
       if (nameAr != null) 'name_ar': nameAr,
+      if (initialAr != null) 'initial_ar': initialAr,
+      if (accent != null) 'accent': accent,
+      if (honorificAr != null) 'honorific_ar': honorificAr,
+      if (status != null) 'status': status,
       if (foundationAr != null) 'foundation_ar': foundationAr,
       if (website != null) 'website': website,
+      if (youtubeUrl != null) 'youtube_url': youtubeUrl,
       if (sortOrder != null) 'sort_order': sortOrder,
       if (rowid != null) 'rowid': rowid,
     });
@@ -319,16 +542,26 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
   ScholarsCompanion copyWith({
     Value<String>? slug,
     Value<String>? nameAr,
+    Value<String>? initialAr,
+    Value<String>? accent,
+    Value<String?>? honorificAr,
+    Value<String>? status,
     Value<String>? foundationAr,
     Value<String?>? website,
+    Value<String?>? youtubeUrl,
     Value<int>? sortOrder,
     Value<int>? rowid,
   }) {
     return ScholarsCompanion(
       slug: slug ?? this.slug,
       nameAr: nameAr ?? this.nameAr,
+      initialAr: initialAr ?? this.initialAr,
+      accent: accent ?? this.accent,
+      honorificAr: honorificAr ?? this.honorificAr,
+      status: status ?? this.status,
       foundationAr: foundationAr ?? this.foundationAr,
       website: website ?? this.website,
+      youtubeUrl: youtubeUrl ?? this.youtubeUrl,
       sortOrder: sortOrder ?? this.sortOrder,
       rowid: rowid ?? this.rowid,
     );
@@ -343,11 +576,26 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
     if (nameAr.present) {
       map['name_ar'] = Variable<String>(nameAr.value);
     }
+    if (initialAr.present) {
+      map['initial_ar'] = Variable<String>(initialAr.value);
+    }
+    if (accent.present) {
+      map['accent'] = Variable<String>(accent.value);
+    }
+    if (honorificAr.present) {
+      map['honorific_ar'] = Variable<String>(honorificAr.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
     if (foundationAr.present) {
       map['foundation_ar'] = Variable<String>(foundationAr.value);
     }
     if (website.present) {
       map['website'] = Variable<String>(website.value);
+    }
+    if (youtubeUrl.present) {
+      map['youtube_url'] = Variable<String>(youtubeUrl.value);
     }
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
@@ -363,8 +611,13 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
     return (StringBuffer('ScholarsCompanion(')
           ..write('slug: $slug, ')
           ..write('nameAr: $nameAr, ')
+          ..write('initialAr: $initialAr, ')
+          ..write('accent: $accent, ')
+          ..write('honorificAr: $honorificAr, ')
+          ..write('status: $status, ')
           ..write('foundationAr: $foundationAr, ')
           ..write('website: $website, ')
+          ..write('youtubeUrl: $youtubeUrl, ')
           ..write('sortOrder: $sortOrder, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -4987,8 +5240,13 @@ typedef $$ScholarsTableCreateCompanionBuilder =
     ScholarsCompanion Function({
       required String slug,
       required String nameAr,
+      Value<String> initialAr,
+      Value<String> accent,
+      Value<String?> honorificAr,
+      Value<String> status,
       required String foundationAr,
       Value<String?> website,
+      Value<String?> youtubeUrl,
       Value<int> sortOrder,
       Value<int> rowid,
     });
@@ -4996,8 +5254,13 @@ typedef $$ScholarsTableUpdateCompanionBuilder =
     ScholarsCompanion Function({
       Value<String> slug,
       Value<String> nameAr,
+      Value<String> initialAr,
+      Value<String> accent,
+      Value<String?> honorificAr,
+      Value<String> status,
       Value<String> foundationAr,
       Value<String?> website,
+      Value<String?> youtubeUrl,
       Value<int> sortOrder,
       Value<int> rowid,
     });
@@ -5021,6 +5284,26 @@ class $$ScholarsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get initialAr => $composableBuilder(
+    column: $table.initialAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accent => $composableBuilder(
+    column: $table.accent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get honorificAr => $composableBuilder(
+    column: $table.honorificAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get foundationAr => $composableBuilder(
     column: $table.foundationAr,
     builder: (column) => ColumnFilters(column),
@@ -5028,6 +5311,11 @@ class $$ScholarsTableFilterComposer
 
   ColumnFilters<String> get website => $composableBuilder(
     column: $table.website,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get youtubeUrl => $composableBuilder(
+    column: $table.youtubeUrl,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5056,6 +5344,26 @@ class $$ScholarsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get initialAr => $composableBuilder(
+    column: $table.initialAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accent => $composableBuilder(
+    column: $table.accent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get honorificAr => $composableBuilder(
+    column: $table.honorificAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get foundationAr => $composableBuilder(
     column: $table.foundationAr,
     builder: (column) => ColumnOrderings(column),
@@ -5063,6 +5371,11 @@ class $$ScholarsTableOrderingComposer
 
   ColumnOrderings<String> get website => $composableBuilder(
     column: $table.website,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get youtubeUrl => $composableBuilder(
+    column: $table.youtubeUrl,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5087,6 +5400,20 @@ class $$ScholarsTableAnnotationComposer
   GeneratedColumn<String> get nameAr =>
       $composableBuilder(column: $table.nameAr, builder: (column) => column);
 
+  GeneratedColumn<String> get initialAr =>
+      $composableBuilder(column: $table.initialAr, builder: (column) => column);
+
+  GeneratedColumn<String> get accent =>
+      $composableBuilder(column: $table.accent, builder: (column) => column);
+
+  GeneratedColumn<String> get honorificAr => $composableBuilder(
+    column: $table.honorificAr,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
   GeneratedColumn<String> get foundationAr => $composableBuilder(
     column: $table.foundationAr,
     builder: (column) => column,
@@ -5094,6 +5421,11 @@ class $$ScholarsTableAnnotationComposer
 
   GeneratedColumn<String> get website =>
       $composableBuilder(column: $table.website, builder: (column) => column);
+
+  GeneratedColumn<String> get youtubeUrl => $composableBuilder(
+    column: $table.youtubeUrl,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
@@ -5129,15 +5461,25 @@ class $$ScholarsTableTableManager
               ({
                 Value<String> slug = const Value.absent(),
                 Value<String> nameAr = const Value.absent(),
+                Value<String> initialAr = const Value.absent(),
+                Value<String> accent = const Value.absent(),
+                Value<String?> honorificAr = const Value.absent(),
+                Value<String> status = const Value.absent(),
                 Value<String> foundationAr = const Value.absent(),
                 Value<String?> website = const Value.absent(),
+                Value<String?> youtubeUrl = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ScholarsCompanion(
                 slug: slug,
                 nameAr: nameAr,
+                initialAr: initialAr,
+                accent: accent,
+                honorificAr: honorificAr,
+                status: status,
                 foundationAr: foundationAr,
                 website: website,
+                youtubeUrl: youtubeUrl,
                 sortOrder: sortOrder,
                 rowid: rowid,
               ),
@@ -5145,15 +5487,25 @@ class $$ScholarsTableTableManager
               ({
                 required String slug,
                 required String nameAr,
+                Value<String> initialAr = const Value.absent(),
+                Value<String> accent = const Value.absent(),
+                Value<String?> honorificAr = const Value.absent(),
+                Value<String> status = const Value.absent(),
                 required String foundationAr,
                 Value<String?> website = const Value.absent(),
+                Value<String?> youtubeUrl = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ScholarsCompanion.insert(
                 slug: slug,
                 nameAr: nameAr,
+                initialAr: initialAr,
+                accent: accent,
+                honorificAr: honorificAr,
+                status: status,
                 foundationAr: foundationAr,
                 website: website,
+                youtubeUrl: youtubeUrl,
                 sortOrder: sortOrder,
                 rowid: rowid,
               ),
