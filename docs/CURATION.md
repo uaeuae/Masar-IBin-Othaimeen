@@ -104,11 +104,29 @@ The sheikh teaches *from* a matn he mostly did not write — زاد المستق
 التفسير) are his own. The optional `book_author_ar` seed field names the matn's
 author, and the app shows «المؤلف» beside «الشارح».
 
-**The foundation's API carries no author field.** Checked 2026-07-31: the
-audio-library sections expose title, description (null or an empty
-`{text_display}`), counts and an image; lesson objects expose id, title,
-`objective.content`, `certificate_url` and `created_at`. So this is
-hand-curated, and left empty rather than guessed — an omitted attribution is
+**The foundation's API carries no author field.** Verified 2026-07-31, not assumed:
+
+- `course/sections/{book_library,written_library,matn_library}/10` all return
+  empty — the route accepts any `type` string, so a 200 there means nothing.
+- `binothaimeen.net/sitemap.xml` holds exactly two URL patterns:
+  `voice_library/lessonDetails` (34,444) and `Levels/lessonDetails` (552).
+  There are no book pages on the site at all.
+- Section objects: `id, type, title, description, certificate_url,
+  confirm_subscribers, confirm_certificate, views, image_url,
+  many_lessons_count, many_all_lessons_count, children_count,
+  estimated_minutes`.
+- Lesson objects: `id, title, type, objective, description, estimated_minutes,
+  publish_date, certificate_url, image_url, confirm_subscribers,
+  confirm_certificate, views, created_at, attachments`. `attachments` was empty
+  on every lesson sampled — no PDF of the matn either.
+
+Note `publish_date`, which `site.ts` does NOT read: it is real and varies per
+lesson (رياض from 2011-10-14, كتاب التوحيد from 2008-11-24, incrementing daily),
+unlike `created_at` which is 2022-04-05 for all 500. It is the foundation's
+upload schedule — years after the sheikh died in 2001 — so it is a publication
+date, not a teaching date, and the app deliberately shows neither.
+
+So authors are hand-curated, and left empty rather than guessed — an omitted attribution is
 recoverable, a wrong one in a da'wah app is not.
 
 «نص الكتاب» (`/series/<slug>/book`) assembles the matn from the read-along
