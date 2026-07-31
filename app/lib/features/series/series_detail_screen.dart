@@ -112,7 +112,11 @@ class _SeriesDetailBody extends ConsumerWidget {
           scienceName: scienceName,
           scholarNameAr: scholar?.nameAr,
           foundationAr: scholar?.foundationAr,
+          bookAuthorAr: series.bookAuthorAr,
           hasReadAlongText: detail.lessons.any((l) => l.textKind != null),
+          onOpenBookText: detail.lessons.any((l) => l.textKind != null)
+              ? () => context.push('/series/${series.slug}/book')
+              : null,
         ),
         const SizedBox(height: 16),
 

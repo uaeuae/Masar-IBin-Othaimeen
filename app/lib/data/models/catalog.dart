@@ -68,6 +68,9 @@ abstract class CatalogSeries with _$CatalogSeries {
     JourneyLevel? level,
     @Default(LessonMedia.video) LessonMedia media,
 
+    /// Who wrote the matn — usually not the scholar explaining it.
+    String? bookAuthorAr,
+
     /// Audio companions: set on the audio edition (slug of the video series
     /// it mirrors) — such series are hidden from library browse. Video series
     /// carry the reverse link in [companionSlug].

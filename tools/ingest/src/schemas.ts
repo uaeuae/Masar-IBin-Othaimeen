@@ -63,6 +63,13 @@ export const seriesSeedSchema = z.object({
   /** 'audio' series stream foundation MP3s; 'video' series embed YouTube. */
   media: z.enum(['video', 'audio']).default('video'),
   /**
+   * Who wrote the matn being explained — usually NOT the scholar teaching it
+   * (زاد المستقنع is الحجاوي's, الأربعون is النووي's). Omit when unknown; the
+   * app then shows only the شارح rather than implying an attribution. The
+   * foundation's API carries no author field, so this is hand-curated.
+   */
+  book_author_ar: z.string().min(1).optional(),
+  /**
    * Slug of the video series this audio series is the full audio edition of.
    * Companion series are hidden from library browse; the video series links
    * to them via «النسخة الصوتية». Audio-only field.

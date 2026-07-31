@@ -1,6 +1,6 @@
 {
-  "version": 10,
-  "generated_at": "2026-07-29T17:27:23.911Z",
+  "version": 11,
+  "generated_at": "2026-07-31T11:44:22.702Z",
   "scholars": [
     {
       "slug": "ibn-uthaymeen",
@@ -64,6 +64,7 @@
       "thumbnail_url": null,
       "level": "beginner",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -234,6 +235,7 @@
       "thumbnail_url": null,
       "level": "beginner",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -1054,6 +1056,7 @@
       "thumbnail_url": null,
       "level": "intermediate",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -1354,6 +1357,7 @@
       "thumbnail_url": null,
       "level": "intermediate",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -1615,6 +1619,7 @@
       "thumbnail_url": null,
       "level": "beginner",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -2643,6 +2648,7 @@
       "thumbnail_url": null,
       "level": "beginner",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -10557,6 +10563,7 @@
       "thumbnail_url": null,
       "level": "beginner",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -11182,6 +11189,7 @@
       "thumbnail_url": null,
       "level": "intermediate",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -14647,6 +14655,7 @@
       "thumbnail_url": null,
       "level": "intermediate",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -14871,6 +14880,7 @@
       "thumbnail_url": null,
       "level": "intermediate",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -15537,6 +15547,7 @@
       "thumbnail_url": null,
       "level": "intermediate",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -15803,6 +15814,7 @@
       "thumbnail_url": null,
       "level": "intermediate",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -19859,6 +19871,7 @@
       "thumbnail_url": null,
       "level": "intermediate",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -20477,6 +20490,7 @@
       "thumbnail_url": null,
       "level": "intermediate",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -21979,6 +21993,7 @@
       "thumbnail_url": null,
       "level": "intermediate",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -22831,6 +22846,7 @@
       "thumbnail_url": null,
       "level": "beginner",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [
@@ -24430,6 +24446,7 @@
       "thumbnail_url": null,
       "level": "beginner",
       "media": "audio",
+      "book_author_ar": null,
       "companion_of": null,
       "companion_slug": null,
       "lessons": [

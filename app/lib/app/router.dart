@@ -13,6 +13,7 @@ import '../features/library/science_series_screen.dart';
 import '../features/player/lesson_player_dispatcher.dart';
 import '../features/series/series_detail_screen.dart';
 import '../features/downloads/downloads_screen.dart';
+import '../features/series/book_text_screen.dart';
 import '../features/settings/settings_screen.dart';
 import 'shell.dart';
 
@@ -77,11 +78,19 @@ GoRouter _createRouter() => GoRouter(
       builder: (context, state) => LessonPlayerDispatcher(
         lessonId: state.pathParameters['videoId']!,
         seriesSlug: state.uri.queryParameters['series'],
+        // `t` opens the lesson at a passage — «نص الكتاب» links each line of
+        // the matn to the moment it is explained.
+        startAtSeconds: int.tryParse(state.uri.queryParameters['t'] ?? ''),
       ),
     ),
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/series/:slug/book',
+      builder: (context, state) =>
+          BookTextScreen(slug: state.pathParameters['slug']!),
     ),
     GoRoute(
       path: '/downloads',

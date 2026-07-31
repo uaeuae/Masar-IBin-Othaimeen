@@ -14,10 +14,14 @@ class LessonPlayerDispatcher extends ConsumerWidget {
     super.key,
     required this.lessonId,
     this.seriesSlug,
+    this.startAtSeconds,
   });
 
   final String lessonId;
   final String? seriesSlug;
+
+  /// Where to open the lesson, when arriving from a passage in «نص الكتاب».
+  final int? startAtSeconds;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,7 +49,11 @@ class LessonPlayerDispatcher extends ConsumerWidget {
             .where((l) => l.videoId == lessonId)
             .firstOrNull;
         if (lesson?.media == LessonMedia.audio) {
-          return AudioPlayerScreen(lessonId: lessonId, seriesSlug: slug);
+          return AudioPlayerScreen(
+            lessonId: lessonId,
+            seriesSlug: slug,
+            startAtSeconds: startAtSeconds,
+          );
         }
         return PlayerScreen(videoId: lessonId, seriesSlug: slug);
       },

@@ -97,6 +97,30 @@ All 16 video series have companion seeds (2026-07-17). For تفسير جزء ع�
 audio side is 37 single-lesson per-surah sections listed in mushaf order —
 the episode sort falls back to seed order when titles carry no numbers.
 
+### The book being explained (`book_author_ar`)
+
+The sheikh teaches *from* a matn he mostly did not write — زاد المستقنع is
+الحجاوي's, الأربعون is النووي's — though a few (الأصول من علم الأصول, أصول في
+التفسير) are his own. The optional `book_author_ar` seed field names the matn's
+author, and the app shows «المؤلف» beside «الشارح».
+
+**The foundation's API carries no author field.** Checked 2026-07-31: the
+audio-library sections expose title, description (null or an empty
+`{text_display}`), counts and an image; lesson objects expose id, title,
+`objective.content`, `certificate_url` and `created_at`. So this is
+hand-curated, and left empty rather than guessed — an omitted attribution is
+recoverable, a wrong one in a da'wah app is not.
+
+«نص الكتاب» (`/series/<slug>/book`) assembles the matn from the read-along
+scripts already bundled, and links each passage to the moment it is explained.
+It reads the two script kinds differently, which matters: on a `matn` script
+the sections *are* the book, so the passage is the section's text; on a
+`transcript` the sentences are the sheikh speaking and only the section title
+is matn, so taking the sentences there would reprint the lecture as the book.
+Coverage follows from that — full for رياض الصالحين (1,639 passages) and
+الأربعون; the matn phrases for زاد المستقنع; headings only for كتاب التوحيد;
+nothing for حلية، الأصول، الواسطية، عمدة الأحكام, where the button is hidden.
+
 ### Loudness levelling (`npm run analyze:loudness`)
 
 The foundation's uploads span decades of recording gear and their levels wander

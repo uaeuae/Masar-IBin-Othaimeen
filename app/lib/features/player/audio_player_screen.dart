@@ -30,10 +30,16 @@ class AudioPlayerScreen extends ConsumerStatefulWidget {
     super.key,
     required this.lessonId,
     required this.seriesSlug,
+    this.startAtSeconds,
   });
 
   final String lessonId;
   final String seriesSlug;
+
+  /// Arriving from a passage in «نص الكتاب»: open there rather than at the
+  /// saved position. Applies to the first lesson only — stepping to the next
+  /// one resumes normally.
+  final int? startAtSeconds;
 
   @override
   ConsumerState<AudioPlayerScreen> createState() => _AudioPlayerScreenState();
@@ -150,10 +156,14 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     );
     _tracker = tracker;
 
+    final requested = initial && widget.startAtSeconds != null
+        ? Duration(seconds: widget.startAtSeconds!)
+        : null;
     final resumeFrom =
-        (saved != null && !saved.completed && saved.watchedSeconds > 30)
-        ? Duration(seconds: saved.watchedSeconds)
-        : Duration.zero;
+        requested ??
+        ((saved != null && !saved.completed && saved.watchedSeconds > 30)
+            ? Duration(seconds: saved.watchedSeconds)
+            : Duration.zero);
 
     // An offline copy plays from disk — no network, no buffering, and it works
     // in a tunnel or on a plane.

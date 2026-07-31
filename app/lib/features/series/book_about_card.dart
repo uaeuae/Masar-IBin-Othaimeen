@@ -19,7 +19,9 @@ class BookAboutCard extends StatelessWidget {
     required this.scienceName,
     this.scholarNameAr,
     this.foundationAr,
+    this.bookAuthorAr,
     required this.hasReadAlongText,
+    this.onOpenBookText,
   });
 
   final SeriesWithProgress series;
@@ -27,9 +29,17 @@ class BookAboutCard extends StatelessWidget {
   final String? scholarNameAr;
   final String? foundationAr;
 
+  /// Who wrote the matn. The sheikh explains books he mostly did not write, so
+  /// «الشارح» and «المؤلف» are different people — and on the handful he did
+  /// write, this is simply his own name.
+  final String? bookAuthorAr;
+
   /// False when not one lesson in the series has a read-along script — the
   /// player would otherwise look broken on every single one.
   final bool hasReadAlongText;
+
+  /// Opens «نص الكتاب». Null when no passage text exists to show.
+  final VoidCallback? onOpenBookText;
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +88,16 @@ class BookAboutCard extends StatelessWidget {
           ],
           const SizedBox(height: 12),
           _Fact(icon: Icons.list_rounded, text: facts),
+          if (bookAuthorAr != null) ...[
+            const SizedBox(height: 6),
+            _Fact(icon: Icons.edit_note_rounded, text: 'المؤلف: $bookAuthorAr'),
+          ],
           if (scholarNameAr != null) ...[
             const SizedBox(height: 6),
-            _Fact(icon: Icons.record_voice_over_rounded, text: scholarNameAr!),
+            _Fact(
+              icon: Icons.record_voice_over_rounded,
+              text: 'الشارح: $scholarNameAr',
+            ),
           ],
           if (foundationAr != null) ...[
             const SizedBox(height: 6),
@@ -102,6 +119,17 @@ class BookAboutCard extends StatelessWidget {
               'المؤسسة لم تنشر تفريغًا نصيًا لهذه الدروس.',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: masar.textFaint,
+              ),
+            ),
+          ],
+          if (onOpenBookText != null) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: onOpenBookText,
+                icon: const Icon(Icons.menu_book_outlined, size: 17),
+                label: const Text('عرض نص الكتاب'),
               ),
             ),
           ],

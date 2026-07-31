@@ -153,6 +153,7 @@ export function publishCatalog(options: PublishOptions): { version: number; less
       thumbnail_url: s.thumbnail_url ?? null,
       level: s.level ?? null,
       media: s.media,
+      book_author_ar: s.book_author_ar ?? null,
       // Audio-only: clearing both promotes the companions to browsable
       // (the app hides `companion_of IS NOT NULL`) and hides the
       // cross-edition banners, which have nowhere to link.

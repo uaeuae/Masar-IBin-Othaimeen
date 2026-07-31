@@ -817,6 +817,17 @@ class $SeriesEntriesTable extends SeriesEntries
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _bookAuthorArMeta = const VerificationMeta(
+    'bookAuthorAr',
+  );
+  @override
+  late final GeneratedColumn<String> bookAuthorAr = GeneratedColumn<String>(
+    'book_author_ar',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _mediaTypeMeta = const VerificationMeta(
     'mediaType',
   );
@@ -860,6 +871,7 @@ class $SeriesEntriesTable extends SeriesEntries
     descriptionAr,
     thumbnailUrl,
     level,
+    bookAuthorAr,
     mediaType,
     companionOf,
     companionSlug,
@@ -936,6 +948,15 @@ class $SeriesEntriesTable extends SeriesEntries
         level.isAcceptableOrUnknown(data['level']!, _levelMeta),
       );
     }
+    if (data.containsKey('book_author_ar')) {
+      context.handle(
+        _bookAuthorArMeta,
+        bookAuthorAr.isAcceptableOrUnknown(
+          data['book_author_ar']!,
+          _bookAuthorArMeta,
+        ),
+      );
+    }
     if (data.containsKey('media_type')) {
       context.handle(
         _mediaTypeMeta,
@@ -997,6 +1018,10 @@ class $SeriesEntriesTable extends SeriesEntries
         DriftSqlType.string,
         data['${effectivePrefix}level'],
       ),
+      bookAuthorAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}book_author_ar'],
+      ),
       mediaType: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}media_type'],
@@ -1029,6 +1054,9 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
   /// 'beginner' | 'intermediate' | 'advanced' — optional curation metadata.
   final String? level;
 
+  /// Author of the matn being explained, when known — usually not the scholar.
+  final String? bookAuthorAr;
+
   /// 'video' | 'audio'
   final String mediaType;
 
@@ -1046,6 +1074,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     this.descriptionAr,
     this.thumbnailUrl,
     this.level,
+    this.bookAuthorAr,
     required this.mediaType,
     this.companionOf,
     this.companionSlug,
@@ -1065,6 +1094,9 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     }
     if (!nullToAbsent || level != null) {
       map['level'] = Variable<String>(level);
+    }
+    if (!nullToAbsent || bookAuthorAr != null) {
+      map['book_author_ar'] = Variable<String>(bookAuthorAr);
     }
     map['media_type'] = Variable<String>(mediaType);
     if (!nullToAbsent || companionOf != null) {
@@ -1091,6 +1123,9 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       level: level == null && nullToAbsent
           ? const Value.absent()
           : Value(level),
+      bookAuthorAr: bookAuthorAr == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bookAuthorAr),
       mediaType: Value(mediaType),
       companionOf: companionOf == null && nullToAbsent
           ? const Value.absent()
@@ -1114,6 +1149,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       descriptionAr: serializer.fromJson<String?>(json['descriptionAr']),
       thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
       level: serializer.fromJson<String?>(json['level']),
+      bookAuthorAr: serializer.fromJson<String?>(json['bookAuthorAr']),
       mediaType: serializer.fromJson<String>(json['mediaType']),
       companionOf: serializer.fromJson<String?>(json['companionOf']),
       companionSlug: serializer.fromJson<String?>(json['companionSlug']),
@@ -1130,6 +1166,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
       'descriptionAr': serializer.toJson<String?>(descriptionAr),
       'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
       'level': serializer.toJson<String?>(level),
+      'bookAuthorAr': serializer.toJson<String?>(bookAuthorAr),
       'mediaType': serializer.toJson<String>(mediaType),
       'companionOf': serializer.toJson<String?>(companionOf),
       'companionSlug': serializer.toJson<String?>(companionSlug),
@@ -1144,6 +1181,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     Value<String?> descriptionAr = const Value.absent(),
     Value<String?> thumbnailUrl = const Value.absent(),
     Value<String?> level = const Value.absent(),
+    Value<String?> bookAuthorAr = const Value.absent(),
     String? mediaType,
     Value<String?> companionOf = const Value.absent(),
     Value<String?> companionSlug = const Value.absent(),
@@ -1157,6 +1195,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
         : this.descriptionAr,
     thumbnailUrl: thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
     level: level.present ? level.value : this.level,
+    bookAuthorAr: bookAuthorAr.present ? bookAuthorAr.value : this.bookAuthorAr,
     mediaType: mediaType ?? this.mediaType,
     companionOf: companionOf.present ? companionOf.value : this.companionOf,
     companionSlug: companionSlug.present
@@ -1180,6 +1219,9 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           ? data.thumbnailUrl.value
           : this.thumbnailUrl,
       level: data.level.present ? data.level.value : this.level,
+      bookAuthorAr: data.bookAuthorAr.present
+          ? data.bookAuthorAr.value
+          : this.bookAuthorAr,
       mediaType: data.mediaType.present ? data.mediaType.value : this.mediaType,
       companionOf: data.companionOf.present
           ? data.companionOf.value
@@ -1200,6 +1242,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           ..write('descriptionAr: $descriptionAr, ')
           ..write('thumbnailUrl: $thumbnailUrl, ')
           ..write('level: $level, ')
+          ..write('bookAuthorAr: $bookAuthorAr, ')
           ..write('mediaType: $mediaType, ')
           ..write('companionOf: $companionOf, ')
           ..write('companionSlug: $companionSlug')
@@ -1216,6 +1259,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
     descriptionAr,
     thumbnailUrl,
     level,
+    bookAuthorAr,
     mediaType,
     companionOf,
     companionSlug,
@@ -1231,6 +1275,7 @@ class SeriesRow extends DataClass implements Insertable<SeriesRow> {
           other.descriptionAr == this.descriptionAr &&
           other.thumbnailUrl == this.thumbnailUrl &&
           other.level == this.level &&
+          other.bookAuthorAr == this.bookAuthorAr &&
           other.mediaType == this.mediaType &&
           other.companionOf == this.companionOf &&
           other.companionSlug == this.companionSlug);
@@ -1244,6 +1289,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
   final Value<String?> descriptionAr;
   final Value<String?> thumbnailUrl;
   final Value<String?> level;
+  final Value<String?> bookAuthorAr;
   final Value<String> mediaType;
   final Value<String?> companionOf;
   final Value<String?> companionSlug;
@@ -1256,6 +1302,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     this.descriptionAr = const Value.absent(),
     this.thumbnailUrl = const Value.absent(),
     this.level = const Value.absent(),
+    this.bookAuthorAr = const Value.absent(),
     this.mediaType = const Value.absent(),
     this.companionOf = const Value.absent(),
     this.companionSlug = const Value.absent(),
@@ -1269,6 +1316,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     this.descriptionAr = const Value.absent(),
     this.thumbnailUrl = const Value.absent(),
     this.level = const Value.absent(),
+    this.bookAuthorAr = const Value.absent(),
     this.mediaType = const Value.absent(),
     this.companionOf = const Value.absent(),
     this.companionSlug = const Value.absent(),
@@ -1284,6 +1332,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     Expression<String>? descriptionAr,
     Expression<String>? thumbnailUrl,
     Expression<String>? level,
+    Expression<String>? bookAuthorAr,
     Expression<String>? mediaType,
     Expression<String>? companionOf,
     Expression<String>? companionSlug,
@@ -1297,6 +1346,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
       if (descriptionAr != null) 'description_ar': descriptionAr,
       if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
       if (level != null) 'level': level,
+      if (bookAuthorAr != null) 'book_author_ar': bookAuthorAr,
       if (mediaType != null) 'media_type': mediaType,
       if (companionOf != null) 'companion_of': companionOf,
       if (companionSlug != null) 'companion_slug': companionSlug,
@@ -1312,6 +1362,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     Value<String?>? descriptionAr,
     Value<String?>? thumbnailUrl,
     Value<String?>? level,
+    Value<String?>? bookAuthorAr,
     Value<String>? mediaType,
     Value<String?>? companionOf,
     Value<String?>? companionSlug,
@@ -1325,6 +1376,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
       descriptionAr: descriptionAr ?? this.descriptionAr,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
       level: level ?? this.level,
+      bookAuthorAr: bookAuthorAr ?? this.bookAuthorAr,
       mediaType: mediaType ?? this.mediaType,
       companionOf: companionOf ?? this.companionOf,
       companionSlug: companionSlug ?? this.companionSlug,
@@ -1356,6 +1408,9 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
     if (level.present) {
       map['level'] = Variable<String>(level.value);
     }
+    if (bookAuthorAr.present) {
+      map['book_author_ar'] = Variable<String>(bookAuthorAr.value);
+    }
     if (mediaType.present) {
       map['media_type'] = Variable<String>(mediaType.value);
     }
@@ -1381,6 +1436,7 @@ class SeriesEntriesCompanion extends UpdateCompanion<SeriesRow> {
           ..write('descriptionAr: $descriptionAr, ')
           ..write('thumbnailUrl: $thumbnailUrl, ')
           ..write('level: $level, ')
+          ..write('bookAuthorAr: $bookAuthorAr, ')
           ..write('mediaType: $mediaType, ')
           ..write('companionOf: $companionOf, ')
           ..write('companionSlug: $companionSlug, ')
@@ -5328,6 +5384,7 @@ typedef $$SeriesEntriesTableCreateCompanionBuilder =
       Value<String?> descriptionAr,
       Value<String?> thumbnailUrl,
       Value<String?> level,
+      Value<String?> bookAuthorAr,
       Value<String> mediaType,
       Value<String?> companionOf,
       Value<String?> companionSlug,
@@ -5342,6 +5399,7 @@ typedef $$SeriesEntriesTableUpdateCompanionBuilder =
       Value<String?> descriptionAr,
       Value<String?> thumbnailUrl,
       Value<String?> level,
+      Value<String?> bookAuthorAr,
       Value<String> mediaType,
       Value<String?> companionOf,
       Value<String?> companionSlug,
@@ -5389,6 +5447,11 @@ class $$SeriesEntriesTableFilterComposer
 
   ColumnFilters<String> get level => $composableBuilder(
     column: $table.level,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bookAuthorAr => $composableBuilder(
+    column: $table.bookAuthorAr,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5452,6 +5515,11 @@ class $$SeriesEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get bookAuthorAr => $composableBuilder(
+    column: $table.bookAuthorAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get mediaType => $composableBuilder(
     column: $table.mediaType,
     builder: (column) => ColumnOrderings(column),
@@ -5506,6 +5574,11 @@ class $$SeriesEntriesTableAnnotationComposer
   GeneratedColumn<String> get level =>
       $composableBuilder(column: $table.level, builder: (column) => column);
 
+  GeneratedColumn<String> get bookAuthorAr => $composableBuilder(
+    column: $table.bookAuthorAr,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get mediaType =>
       $composableBuilder(column: $table.mediaType, builder: (column) => column);
 
@@ -5558,6 +5631,7 @@ class $$SeriesEntriesTableTableManager
                 Value<String?> descriptionAr = const Value.absent(),
                 Value<String?> thumbnailUrl = const Value.absent(),
                 Value<String?> level = const Value.absent(),
+                Value<String?> bookAuthorAr = const Value.absent(),
                 Value<String> mediaType = const Value.absent(),
                 Value<String?> companionOf = const Value.absent(),
                 Value<String?> companionSlug = const Value.absent(),
@@ -5570,6 +5644,7 @@ class $$SeriesEntriesTableTableManager
                 descriptionAr: descriptionAr,
                 thumbnailUrl: thumbnailUrl,
                 level: level,
+                bookAuthorAr: bookAuthorAr,
                 mediaType: mediaType,
                 companionOf: companionOf,
                 companionSlug: companionSlug,
@@ -5584,6 +5659,7 @@ class $$SeriesEntriesTableTableManager
                 Value<String?> descriptionAr = const Value.absent(),
                 Value<String?> thumbnailUrl = const Value.absent(),
                 Value<String?> level = const Value.absent(),
+                Value<String?> bookAuthorAr = const Value.absent(),
                 Value<String> mediaType = const Value.absent(),
                 Value<String?> companionOf = const Value.absent(),
                 Value<String?> companionSlug = const Value.absent(),
@@ -5596,6 +5672,7 @@ class $$SeriesEntriesTableTableManager
                 descriptionAr: descriptionAr,
                 thumbnailUrl: thumbnailUrl,
                 level: level,
+                bookAuthorAr: bookAuthorAr,
                 mediaType: mediaType,
                 companionOf: companionOf,
                 companionSlug: companionSlug,

@@ -91,6 +91,7 @@ _CatalogSeries _$CatalogSeriesFromJson(Map<String, dynamic> json) =>
       media:
           $enumDecodeNullable(_$LessonMediaEnumMap, json['media']) ??
           LessonMedia.video,
+      bookAuthorAr: json['book_author_ar'] as String?,
       companionOf: json['companion_of'] as String?,
       companionSlug: json['companion_slug'] as String?,
       lessons:
@@ -110,6 +111,7 @@ Map<String, dynamic> _$CatalogSeriesToJson(_CatalogSeries instance) =>
       'thumbnail_url': instance.thumbnailUrl,
       'level': _$JourneyLevelEnumMap[instance.level],
       'media': _$LessonMediaEnumMap[instance.media]!,
+      'book_author_ar': instance.bookAuthorAr,
       'companion_of': instance.companionOf,
       'companion_slug': instance.companionSlug,
       'lessons': instance.lessons.map((e) => e.toJson()).toList(),

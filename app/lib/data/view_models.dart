@@ -50,6 +50,7 @@ class SeriesWithProgress {
     this.totalDurationSeconds = 0,
     this.level,
     this.media = LessonMedia.video,
+    this.bookAuthorAr,
     this.companionOf,
     this.companionSlug,
     this.scholarSlug = 'ibn-uthaymeen',
@@ -65,6 +66,10 @@ class SeriesWithProgress {
   final int totalDurationSeconds;
   final JourneyLevel? level;
   final LessonMedia media;
+
+  /// Author of the matn, when known — the scholar explains books he mostly
+  /// did not write.
+  final String? bookAuthorAr;
 
   /// Set on audio editions: slug of the video series this one mirrors.
   final String? companionOf;
