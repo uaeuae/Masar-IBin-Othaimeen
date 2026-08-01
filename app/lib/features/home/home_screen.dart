@@ -7,6 +7,7 @@ import '../../core/formatters.dart';
 import '../../core/widgets/masar_chip.dart';
 import '../../core/widgets/progress_ring.dart';
 import '../../core/widgets/resume_hero_card.dart';
+import '../../core/widgets/scholar_avatar.dart';
 import '../../core/widgets/science_glyph.dart';
 import '../../data/models/enums.dart';
 import '../../data/providers.dart';
@@ -250,6 +251,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 8),
             ],
 
+            // ── شيوخك ───────────────────────────────────────────────
+            const _ScholarsStrip(),
+
             // ── مسارات مقترحة ────────────────────────────────────────
             if (shown.isNotEmpty) ...[
               Text(
@@ -292,6 +296,11 @@ class _EnrolledJourneyRow extends ConsumerWidget {
     final scheme = theme.colorScheme;
     final masar = masarColorsOf(context);
     final detail = ref.watch(journeyDetailProvider(journey.slug)).value;
+    final bySlug = ref.watch(scholarsBySlugProvider);
+    final journeyScholars = [
+      for (final slug in journey.scholarSlugs)
+        if (bySlug[slug] != null) bySlug[slug]!,
+    ];
 
     String subtitle =
         '${stageCountLabel(journey.stageCount)} · ${lessonCountLabel(journey.lessonCount)}';
@@ -339,6 +348,16 @@ class _EnrolledJourneyRow extends ConsumerWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
+                    // «مسار العقيدة» exists for more than one scholar, so the
+                    // title alone does not say which one you enrolled in
+                    // (design 4a).
+                    if (journeyScholars.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      StackedScholarAvatars(
+                        scholars: journeyScholars,
+                        size: 18,
+                      ),
+                    ],
                     const SizedBox(height: 3),
                     Text(
                       subtitle,
@@ -475,4 +494,149 @@ Future<bool> _confirmRemove(BuildContext context) async {
     ),
   );
   return confirmed ?? false;
+}
+
+/// «شيوخك» — the scholar row from design 4a.
+///
+/// The design calls it «تابِع شيوخك» and draws a follow affordance. There is no
+/// following in the app and no model behind it, so this is the browse row it
+/// would sit on: tapping opens the scholar, «المزيد» opens the library. Naming
+/// it «شيوخك» rather than «تابِع شيوخك» keeps it from promising a verb that
+/// does nothing.
+class _ScholarsStrip extends ConsumerWidget {
+  const _ScholarsStrip();
+
+  /// Room for three plus «المزيد» before the row starts scrolling.
+  static const _shown = 3;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final scholars = ref.watch(scholarsProvider).value ?? const <ScholarInfo>[];
+    // One scholar is not a set to browse — the resume card already names him.
+    if (scholars.length < 2) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('شيوخك', style: theme.textTheme.titleLarge),
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final scholar in scholars.take(_shown)) ...[
+              Expanded(child: _ScholarTile(scholar: scholar)),
+              const SizedBox(width: 10),
+            ],
+            const Expanded(child: _MoreScholarsTile()),
+          ],
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+}
+
+class _ScholarTile extends StatelessWidget {
+  const _ScholarTile({required this.scholar});
+
+  final ScholarInfo scholar;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final soon = scholar.status.isComingSoon;
+
+    return Card(
+      child: InkWell(
+        onTap: () => context.push('/scholar/${scholar.slug}'),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+          child: Column(
+            children: [
+              // Muted, not hidden: announced is a real state worth showing.
+              Opacity(
+                opacity: soon ? 0.55 : 1,
+                child: ScholarAvatar.of(scholar, size: 46),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                scholar.displayShortName,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MoreScholarsTile extends StatelessWidget {
+  const _MoreScholarsTile();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final masar = masarColorsOf(context);
+
+    return InkWell(
+      onTap: () => context.go('/library'),
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      child: DottedBorderCard(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
+          child: Column(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerHighest,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Icon(Icons.add_rounded, size: 20, color: masar.textMuted),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'المزيد',
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: masar.textMuted,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The design's dashed «المزيد» tile — dashed rather than solid so it reads as
+/// an opening rather than another scholar.
+class DottedBorderCard extends StatelessWidget {
+  const DottedBorderCard({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: scheme.outline, style: BorderStyle.solid),
+      ),
+      child: child,
+    );
+  }
 }

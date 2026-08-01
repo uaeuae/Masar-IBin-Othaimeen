@@ -8,6 +8,11 @@ class Scholars extends Table {
   TextColumn get slug => text()();
   TextColumn get nameAr => text()();
 
+  /// «ابن عثيمين» — for chips, cards and the resume line, where the full name
+  /// would ellipsize. Curated, not derived: it is neither the first word of
+  /// [nameAr] nor the last.
+  TextColumn get shortNameAr => text().nullable()();
+
   /// The letter in his roundel. Curated in the seed — it comes from the شهرة
   /// (العثيمين → ع), so it cannot be taken from the start of [nameAr].
   TextColumn get initialAr => text().withDefault(const Constant('؟'))();
@@ -219,7 +224,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -271,6 +276,9 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(scholars, scholars.honorificAr);
         await m.addColumn(scholars, scholars.status);
         await m.addColumn(scholars, scholars.youtubeUrl);
+      }
+      if (from < 11 && !createdScholars) {
+        await m.addColumn(scholars, scholars.shortNameAr);
       }
     },
   );

@@ -145,6 +145,7 @@ export function publishCatalog(options: PublishOptions): { version: number; less
     scholars: bundle.scholars.map((s) => ({
       slug: s.slug,
       name_ar: s.name_ar,
+      short_name_ar: s.short_name_ar ?? null,
       initial_ar: s.initial_ar,
       accent: s.accent,
       honorific_ar: s.honorific_ar ?? null,

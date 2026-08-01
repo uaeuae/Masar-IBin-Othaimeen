@@ -1,4 +1,6 @@
-import 'package:drift/drift.dart';
+// `drift` and `matcher` both export `isNull`/`isNotNull`; the matchers are what
+// a test wants.
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/test_db.dart';
@@ -64,8 +66,11 @@ void main() {
     expect(columns, containsAll(['slug', 'name_ar', 'foundation_ar']));
     expect(
       columns,
-      containsAll(['initial_ar', 'accent', 'honorific_ar', 'status', 'youtube_url']),
-      reason: 'createTable is not version-aware — the v10 block must not re-add these',
+      containsAll([
+        'initial_ar', 'accent', 'honorific_ar', 'status', 'youtube_url', // v10
+        'short_name_ar', // v11
+      ]),
+      reason: 'createTable is not version-aware — later blocks must not re-add these',
     );
   });
 
@@ -84,7 +89,7 @@ void main() {
         .customSelect('PRAGMA user_version')
         .getSingle()
         .then((row) => row.read<int>('user_version'));
-    expect(stored, 10, reason: 'migration ran to completion and stamped v10');
+    expect(stored, 11, reason: 'migration ran to completion and stamped v11');
 
     // And the table really is the current shape, so catalog import works.
     final columns = await db
@@ -125,6 +130,7 @@ void main() {
 
     final scholars = await db.select(db.scholars).get();
     expect(scholars.single.initialAr, '؟'); // the column default, until import
+    expect(scholars.single.shortNameAr, isNull); // nullable, until import
     expect(scholars.single.nameAr, 'الشيخ محمد بن صالح العثيمين'); // row survived
   });
 }

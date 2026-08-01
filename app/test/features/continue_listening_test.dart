@@ -29,7 +29,9 @@ void main() {
 
     expect(find.text('متابعة المشاهدة'), findsOneWidget);
     expect(find.textContaining('الدرس ١'), findsWidgets);
-    expect(find.text('الشيخ محمد بن صالح العثيمين'), findsOneWidget);
+    // Design 4a folds the attribution into the lesson line, using the شهرة —
+    // the full name would ellipsize the lesson away.
+    expect(find.textContaining('ابن عثيمين · الدرس'), findsOneWidget);
   });
 
   testApp('swiping asks first, and cancelling keeps the card', (

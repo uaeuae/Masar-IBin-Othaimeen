@@ -1,10 +1,11 @@
 {
-  "version": 14,
-  "generated_at": "2026-07-31T18:58:14.051Z",
+  "version": 15,
+  "generated_at": "2026-08-01T14:13:02.835Z",
   "scholars": [
     {
       "slug": "ibn-uthaymeen",
       "name_ar": "الشيخ محمد بن صالح العثيمين",
+      "short_name_ar": "ابن عثيمين",
       "initial_ar": "ع",
       "accent": "green",
       "honorific_ar": "رحمه الله",
@@ -17,6 +18,7 @@
     {
       "slug": "ibn-baz",
       "name_ar": "الشيخ عبد العزيز بن عبد الله بن باز",
+      "short_name_ar": "ابن باز",
       "initial_ar": "ب",
       "accent": "blue",
       "honorific_ar": "رحمه الله",

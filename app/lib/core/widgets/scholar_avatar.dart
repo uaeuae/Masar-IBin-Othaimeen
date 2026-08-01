@@ -82,6 +82,7 @@ class ScholarLine extends StatelessWidget {
     this.avatarSize = 22,
     this.onHero = false,
     this.withHonorific = true,
+    this.useShortName = false,
   });
 
   final ScholarInfo scholar;
@@ -92,11 +93,19 @@ class ScholarLine extends StatelessWidget {
   final bool onHero;
   final bool withHonorific;
 
+  /// Use the curated شهرة. For lines that carry something *else* too — a
+  /// lesson title, a chip — where the full name would push it off the edge.
+  final bool useShortName;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final masar = masarColorsOf(context);
-    final name = withHonorific ? scholar.nameWithHonorific : scholar.nameAr;
+    final name = useShortName
+        ? scholar.displayShortName
+        : withHonorific
+        ? scholar.nameWithHonorific
+        : scholar.nameAr;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -115,6 +124,42 @@ class ScholarLine extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Overlapping roundels for a مسار whose stages come from different scholars
+/// (design 4c). Overlapped rather than spaced so the group reads as one fact
+/// about the journey rather than a list.
+class StackedScholarAvatars extends StatelessWidget {
+  const StackedScholarAvatars({super.key, required this.scholars, this.size = 20});
+
+  final List<ScholarInfo> scholars;
+
+  final double size;
+  static const double _overlap = 6;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return SizedBox(
+      width: size + (scholars.length - 1) * (size - _overlap),
+      height: size,
+      child: Stack(
+        children: [
+          for (final (index, scholar) in scholars.indexed)
+            PositionedDirectional(
+              start: index * (size - _overlap),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: scheme.surface, width: 1.5),
+                ),
+                child: ScholarAvatar.of(scholar, size: size),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

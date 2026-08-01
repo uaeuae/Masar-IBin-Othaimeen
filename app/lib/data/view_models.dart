@@ -296,6 +296,7 @@ class ScholarInfo {
   const ScholarInfo({
     required this.slug,
     required this.nameAr,
+    this.shortNameAr,
     required this.initialAr,
     required this.accent,
     this.honorificAr,
@@ -309,6 +310,10 @@ class ScholarInfo {
   final String slug;
   final String nameAr;
 
+  /// The شهرة — «ابن عثيمين» — for chips, cards and the resume line, where the
+  /// full name would ellipsize away the thing beside it.
+  final String? shortNameAr;
+
   /// The letter in his roundel — from the شهرة, not the start of [nameAr].
   final String initialAr;
   final ScholarAccent accent;
@@ -318,6 +323,9 @@ class ScholarInfo {
   final String? website;
   final String? youtubeUrl;
   final int seriesCount;
+
+  /// Short where one is curated, full otherwise — never a name derived by rule.
+  String get displayShortName => shortNameAr ?? nameAr;
 
   /// «الشيخ محمد بن صالح العثيمين رحمه الله» — the form used wherever there is
   /// room for it. [nameAr] alone is the compact form.

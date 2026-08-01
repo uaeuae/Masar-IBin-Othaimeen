@@ -63,28 +63,28 @@ class ResumeHeroCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(seriesTitle, style: serif(21, masar.onHero)),
-                      if (scholar != null) ...[
-                        const SizedBox(height: 5),
-                        // Kept off the lesson line the design pairs it with:
-                        // the full «الشيخ محمد بن صالح العثيمين» plus a lesson
-                        // title does not fit the card, and ellipsising an
-                        // attribution is worse than giving it a row.
+                      const SizedBox(height: 6),
+                      if (scholar != null)
+                        // «ابن عثيمين · الدرس ١٢ — باب المياه», as the design
+                        // draws it. This only fits because the شهرة is curated
+                        // in the seed; with the full name it ellipsized the
+                        // lesson away, which is why it used to have its own row.
                         ScholarLine(
                           scholar: scholar!,
+                          trailing: lessonLabel,
                           avatarSize: 20,
                           onHero: true,
-                          withHonorific: false,
+                          useShortName: true,
+                        )
+                      else
+                        Text(
+                          lessonLabel,
+                          style: TextStyle(
+                            fontFamily: kUiFont,
+                            fontSize: 13,
+                            color: masar.onHeroDim,
+                          ),
                         ),
-                      ],
-                      const SizedBox(height: 4),
-                      Text(
-                        lessonLabel,
-                        style: TextStyle(
-                          fontFamily: kUiFont,
-                          fontSize: 13,
-                          color: masar.onHeroDim,
-                        ),
-                      ),
                     ],
                   ),
                 ),

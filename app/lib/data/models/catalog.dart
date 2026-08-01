@@ -33,6 +33,8 @@ abstract class CatalogScholar with _$CatalogScholar {
   const factory CatalogScholar({
     required String slug,
     required String nameAr,
+    /// The شهرة, for places the full name does not fit. Null falls back.
+    String? shortNameAr,
     /// Single letter for his roundel — curated, since it comes from the شهرة.
     @Default('؟') String initialAr,
     /// Palette key resolved by the theme: green | blue | gold.

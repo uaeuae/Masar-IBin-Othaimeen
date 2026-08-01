@@ -110,7 +110,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('الشيخ محمد بن صالح العثيمين'), findsOneWidget);
+    expect(find.textContaining('ابن عثيمين'), findsWidgets);
     expect(find.byType(ScholarAvatar), findsWidgets);
   });
 
@@ -158,6 +158,40 @@ void main() {
     await push(tester, '/series/baz-sharh-kitab-altawhid');
     expect(find.text('عن الكتاب'), findsOneWidget);
     expect(find.text('عرض نص الكتاب'), findsNothing);
+  });
+
+
+  testApp('home shows the scholars strip and the resume line names the شهرة', (
+    tester,
+    app,
+  ) async {
+    await ProgressRepository(app.db).saveWatchPosition(
+      videoId: 'fx-riyd-01',
+      watchedSeconds: 400,
+      durationSeconds: 2580,
+    );
+    await tester.pumpAndSettle();
+
+    // Design 4a folds attribution into the lesson line — «ابن عثيمين · الدرس
+    // ١٢ — …». It only fits with the curated شهرة; the full name ellipsized
+    // the lesson away, which is what the short_name_ar seed field is for.
+    expect(find.textContaining('ابن عثيمين · الدرس'), findsOneWidget);
+
+    expect(find.text('شيوخك'), findsOneWidget);
+    expect(find.text('ابن باز'), findsWidgets);
+    expect(find.text('المزيد'), findsOneWidget);
+  });
+
+  testApp('a scholar with no curated short name still renders', (
+    tester,
+    app,
+  ) async {
+    // displayShortName falls back to the full name rather than deriving one —
+    // guessing at an attribution is the one thing this project does not do.
+    final scholars = await app.db.select(app.db.scholars).get();
+    expect(scholars.every((s) => s.nameAr.isNotEmpty), isTrue);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
   });
 
   testApp('no screen credits a single unnamed «المؤسسة»', (tester, app) async {

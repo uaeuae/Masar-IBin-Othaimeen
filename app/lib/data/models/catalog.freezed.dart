@@ -317,7 +317,8 @@ as List<CatalogJourney>,
 /// @nodoc
 mixin _$CatalogScholar {
 
- String get slug; String get nameAr;/// Single letter for his roundel — curated, since it comes from the شهرة.
+ String get slug; String get nameAr;/// The شهرة, for places the full name does not fit. Null falls back.
+ String? get shortNameAr;/// Single letter for his roundel — curated, since it comes from the شهرة.
  String get initialAr;/// Palette key resolved by the theme: green | blue | gold.
  String get accent; String? get honorificAr;/// active | coming_soon — announced but not yet ingested.
  String get status; String get foundationAr; String? get website; String? get youtubeUrl; int get sortOrder;
@@ -333,16 +334,16 @@ $CatalogScholarCopyWith<CatalogScholar> get copyWith => _$CatalogScholarCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogScholar&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.nameAr, nameAr) || other.nameAr == nameAr)&&(identical(other.initialAr, initialAr) || other.initialAr == initialAr)&&(identical(other.accent, accent) || other.accent == accent)&&(identical(other.honorificAr, honorificAr) || other.honorificAr == honorificAr)&&(identical(other.status, status) || other.status == status)&&(identical(other.foundationAr, foundationAr) || other.foundationAr == foundationAr)&&(identical(other.website, website) || other.website == website)&&(identical(other.youtubeUrl, youtubeUrl) || other.youtubeUrl == youtubeUrl)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CatalogScholar&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.nameAr, nameAr) || other.nameAr == nameAr)&&(identical(other.shortNameAr, shortNameAr) || other.shortNameAr == shortNameAr)&&(identical(other.initialAr, initialAr) || other.initialAr == initialAr)&&(identical(other.accent, accent) || other.accent == accent)&&(identical(other.honorificAr, honorificAr) || other.honorificAr == honorificAr)&&(identical(other.status, status) || other.status == status)&&(identical(other.foundationAr, foundationAr) || other.foundationAr == foundationAr)&&(identical(other.website, website) || other.website == website)&&(identical(other.youtubeUrl, youtubeUrl) || other.youtubeUrl == youtubeUrl)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,slug,nameAr,initialAr,accent,honorificAr,status,foundationAr,website,youtubeUrl,sortOrder);
+int get hashCode => Object.hash(runtimeType,slug,nameAr,shortNameAr,initialAr,accent,honorificAr,status,foundationAr,website,youtubeUrl,sortOrder);
 
 @override
 String toString() {
-  return 'CatalogScholar(slug: $slug, nameAr: $nameAr, initialAr: $initialAr, accent: $accent, honorificAr: $honorificAr, status: $status, foundationAr: $foundationAr, website: $website, youtubeUrl: $youtubeUrl, sortOrder: $sortOrder)';
+  return 'CatalogScholar(slug: $slug, nameAr: $nameAr, shortNameAr: $shortNameAr, initialAr: $initialAr, accent: $accent, honorificAr: $honorificAr, status: $status, foundationAr: $foundationAr, website: $website, youtubeUrl: $youtubeUrl, sortOrder: $sortOrder)';
 }
 
 
@@ -353,7 +354,7 @@ abstract mixin class $CatalogScholarCopyWith<$Res>  {
   factory $CatalogScholarCopyWith(CatalogScholar value, $Res Function(CatalogScholar) _then) = _$CatalogScholarCopyWithImpl;
 @useResult
 $Res call({
- String slug, String nameAr, String initialAr, String accent, String? honorificAr, String status, String foundationAr, String? website, String? youtubeUrl, int sortOrder
+ String slug, String nameAr, String? shortNameAr, String initialAr, String accent, String? honorificAr, String status, String foundationAr, String? website, String? youtubeUrl, int sortOrder
 });
 
 
@@ -370,11 +371,12 @@ class _$CatalogScholarCopyWithImpl<$Res>
 
 /// Create a copy of CatalogScholar
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? slug = null,Object? nameAr = null,Object? initialAr = null,Object? accent = null,Object? honorificAr = freezed,Object? status = null,Object? foundationAr = null,Object? website = freezed,Object? youtubeUrl = freezed,Object? sortOrder = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? slug = null,Object? nameAr = null,Object? shortNameAr = freezed,Object? initialAr = null,Object? accent = null,Object? honorificAr = freezed,Object? status = null,Object? foundationAr = null,Object? website = freezed,Object? youtubeUrl = freezed,Object? sortOrder = null,}) {
   return _then(_self.copyWith(
 slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
 as String,nameAr: null == nameAr ? _self.nameAr : nameAr // ignore: cast_nullable_to_non_nullable
-as String,initialAr: null == initialAr ? _self.initialAr : initialAr // ignore: cast_nullable_to_non_nullable
+as String,shortNameAr: freezed == shortNameAr ? _self.shortNameAr : shortNameAr // ignore: cast_nullable_to_non_nullable
+as String?,initialAr: null == initialAr ? _self.initialAr : initialAr // ignore: cast_nullable_to_non_nullable
 as String,accent: null == accent ? _self.accent : accent // ignore: cast_nullable_to_non_nullable
 as String,honorificAr: freezed == honorificAr ? _self.honorificAr : honorificAr // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -467,10 +469,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String slug,  String nameAr,  String initialAr,  String accent,  String? honorificAr,  String status,  String foundationAr,  String? website,  String? youtubeUrl,  int sortOrder)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String slug,  String nameAr,  String? shortNameAr,  String initialAr,  String accent,  String? honorificAr,  String status,  String foundationAr,  String? website,  String? youtubeUrl,  int sortOrder)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CatalogScholar() when $default != null:
-return $default(_that.slug,_that.nameAr,_that.initialAr,_that.accent,_that.honorificAr,_that.status,_that.foundationAr,_that.website,_that.youtubeUrl,_that.sortOrder);case _:
+return $default(_that.slug,_that.nameAr,_that.shortNameAr,_that.initialAr,_that.accent,_that.honorificAr,_that.status,_that.foundationAr,_that.website,_that.youtubeUrl,_that.sortOrder);case _:
   return orElse();
 
 }
@@ -488,10 +490,10 @@ return $default(_that.slug,_that.nameAr,_that.initialAr,_that.accent,_that.honor
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String slug,  String nameAr,  String initialAr,  String accent,  String? honorificAr,  String status,  String foundationAr,  String? website,  String? youtubeUrl,  int sortOrder)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String slug,  String nameAr,  String? shortNameAr,  String initialAr,  String accent,  String? honorificAr,  String status,  String foundationAr,  String? website,  String? youtubeUrl,  int sortOrder)  $default,) {final _that = this;
 switch (_that) {
 case _CatalogScholar():
-return $default(_that.slug,_that.nameAr,_that.initialAr,_that.accent,_that.honorificAr,_that.status,_that.foundationAr,_that.website,_that.youtubeUrl,_that.sortOrder);case _:
+return $default(_that.slug,_that.nameAr,_that.shortNameAr,_that.initialAr,_that.accent,_that.honorificAr,_that.status,_that.foundationAr,_that.website,_that.youtubeUrl,_that.sortOrder);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -508,10 +510,10 @@ return $default(_that.slug,_that.nameAr,_that.initialAr,_that.accent,_that.honor
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String slug,  String nameAr,  String initialAr,  String accent,  String? honorificAr,  String status,  String foundationAr,  String? website,  String? youtubeUrl,  int sortOrder)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String slug,  String nameAr,  String? shortNameAr,  String initialAr,  String accent,  String? honorificAr,  String status,  String foundationAr,  String? website,  String? youtubeUrl,  int sortOrder)?  $default,) {final _that = this;
 switch (_that) {
 case _CatalogScholar() when $default != null:
-return $default(_that.slug,_that.nameAr,_that.initialAr,_that.accent,_that.honorificAr,_that.status,_that.foundationAr,_that.website,_that.youtubeUrl,_that.sortOrder);case _:
+return $default(_that.slug,_that.nameAr,_that.shortNameAr,_that.initialAr,_that.accent,_that.honorificAr,_that.status,_that.foundationAr,_that.website,_that.youtubeUrl,_that.sortOrder);case _:
   return null;
 
 }
@@ -523,11 +525,13 @@ return $default(_that.slug,_that.nameAr,_that.initialAr,_that.accent,_that.honor
 @JsonSerializable()
 
 class _CatalogScholar implements CatalogScholar {
-  const _CatalogScholar({required this.slug, required this.nameAr, this.initialAr = '؟', this.accent = 'green', this.honorificAr, this.status = 'active', required this.foundationAr, this.website, this.youtubeUrl, this.sortOrder = 0});
+  const _CatalogScholar({required this.slug, required this.nameAr, this.shortNameAr, this.initialAr = '؟', this.accent = 'green', this.honorificAr, this.status = 'active', required this.foundationAr, this.website, this.youtubeUrl, this.sortOrder = 0});
   factory _CatalogScholar.fromJson(Map<String, dynamic> json) => _$CatalogScholarFromJson(json);
 
 @override final  String slug;
 @override final  String nameAr;
+/// The شهرة, for places the full name does not fit. Null falls back.
+@override final  String? shortNameAr;
 /// Single letter for his roundel — curated, since it comes from the شهرة.
 @override@JsonKey() final  String initialAr;
 /// Palette key resolved by the theme: green | blue | gold.
@@ -553,16 +557,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogScholar&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.nameAr, nameAr) || other.nameAr == nameAr)&&(identical(other.initialAr, initialAr) || other.initialAr == initialAr)&&(identical(other.accent, accent) || other.accent == accent)&&(identical(other.honorificAr, honorificAr) || other.honorificAr == honorificAr)&&(identical(other.status, status) || other.status == status)&&(identical(other.foundationAr, foundationAr) || other.foundationAr == foundationAr)&&(identical(other.website, website) || other.website == website)&&(identical(other.youtubeUrl, youtubeUrl) || other.youtubeUrl == youtubeUrl)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CatalogScholar&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.nameAr, nameAr) || other.nameAr == nameAr)&&(identical(other.shortNameAr, shortNameAr) || other.shortNameAr == shortNameAr)&&(identical(other.initialAr, initialAr) || other.initialAr == initialAr)&&(identical(other.accent, accent) || other.accent == accent)&&(identical(other.honorificAr, honorificAr) || other.honorificAr == honorificAr)&&(identical(other.status, status) || other.status == status)&&(identical(other.foundationAr, foundationAr) || other.foundationAr == foundationAr)&&(identical(other.website, website) || other.website == website)&&(identical(other.youtubeUrl, youtubeUrl) || other.youtubeUrl == youtubeUrl)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,slug,nameAr,initialAr,accent,honorificAr,status,foundationAr,website,youtubeUrl,sortOrder);
+int get hashCode => Object.hash(runtimeType,slug,nameAr,shortNameAr,initialAr,accent,honorificAr,status,foundationAr,website,youtubeUrl,sortOrder);
 
 @override
 String toString() {
-  return 'CatalogScholar(slug: $slug, nameAr: $nameAr, initialAr: $initialAr, accent: $accent, honorificAr: $honorificAr, status: $status, foundationAr: $foundationAr, website: $website, youtubeUrl: $youtubeUrl, sortOrder: $sortOrder)';
+  return 'CatalogScholar(slug: $slug, nameAr: $nameAr, shortNameAr: $shortNameAr, initialAr: $initialAr, accent: $accent, honorificAr: $honorificAr, status: $status, foundationAr: $foundationAr, website: $website, youtubeUrl: $youtubeUrl, sortOrder: $sortOrder)';
 }
 
 
@@ -573,7 +577,7 @@ abstract mixin class _$CatalogScholarCopyWith<$Res> implements $CatalogScholarCo
   factory _$CatalogScholarCopyWith(_CatalogScholar value, $Res Function(_CatalogScholar) _then) = __$CatalogScholarCopyWithImpl;
 @override @useResult
 $Res call({
- String slug, String nameAr, String initialAr, String accent, String? honorificAr, String status, String foundationAr, String? website, String? youtubeUrl, int sortOrder
+ String slug, String nameAr, String? shortNameAr, String initialAr, String accent, String? honorificAr, String status, String foundationAr, String? website, String? youtubeUrl, int sortOrder
 });
 
 
@@ -590,11 +594,12 @@ class __$CatalogScholarCopyWithImpl<$Res>
 
 /// Create a copy of CatalogScholar
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? slug = null,Object? nameAr = null,Object? initialAr = null,Object? accent = null,Object? honorificAr = freezed,Object? status = null,Object? foundationAr = null,Object? website = freezed,Object? youtubeUrl = freezed,Object? sortOrder = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? slug = null,Object? nameAr = null,Object? shortNameAr = freezed,Object? initialAr = null,Object? accent = null,Object? honorificAr = freezed,Object? status = null,Object? foundationAr = null,Object? website = freezed,Object? youtubeUrl = freezed,Object? sortOrder = null,}) {
   return _then(_CatalogScholar(
 slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
 as String,nameAr: null == nameAr ? _self.nameAr : nameAr // ignore: cast_nullable_to_non_nullable
-as String,initialAr: null == initialAr ? _self.initialAr : initialAr // ignore: cast_nullable_to_non_nullable
+as String,shortNameAr: freezed == shortNameAr ? _self.shortNameAr : shortNameAr // ignore: cast_nullable_to_non_nullable
+as String?,initialAr: null == initialAr ? _self.initialAr : initialAr // ignore: cast_nullable_to_non_nullable
 as String,accent: null == accent ? _self.accent : accent // ignore: cast_nullable_to_non_nullable
 as String,honorificAr: freezed == honorificAr ? _self.honorificAr : honorificAr // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable

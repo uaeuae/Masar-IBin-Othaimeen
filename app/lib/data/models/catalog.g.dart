@@ -47,6 +47,7 @@ _CatalogScholar _$CatalogScholarFromJson(Map<String, dynamic> json) =>
     _CatalogScholar(
       slug: json['slug'] as String,
       nameAr: json['name_ar'] as String,
+      shortNameAr: json['short_name_ar'] as String?,
       initialAr: json['initial_ar'] as String? ?? '؟',
       accent: json['accent'] as String? ?? 'green',
       honorificAr: json['honorific_ar'] as String?,
@@ -61,6 +62,7 @@ Map<String, dynamic> _$CatalogScholarToJson(_CatalogScholar instance) =>
     <String, dynamic>{
       'slug': instance.slug,
       'name_ar': instance.nameAr,
+      'short_name_ar': instance.shortNameAr,
       'initial_ar': instance.initialAr,
       'accent': instance.accent,
       'honorific_ar': instance.honorificAr,

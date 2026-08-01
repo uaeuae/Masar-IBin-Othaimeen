@@ -26,6 +26,17 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _shortNameArMeta = const VerificationMeta(
+    'shortNameAr',
+  );
+  @override
+  late final GeneratedColumn<String> shortNameAr = GeneratedColumn<String>(
+    'short_name_ar',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _initialArMeta = const VerificationMeta(
     'initialAr',
   );
@@ -118,6 +129,7 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
   List<GeneratedColumn> get $columns => [
     slug,
     nameAr,
+    shortNameAr,
     initialAr,
     accent,
     honorificAr,
@@ -154,6 +166,15 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
       );
     } else if (isInserting) {
       context.missing(_nameArMeta);
+    }
+    if (data.containsKey('short_name_ar')) {
+      context.handle(
+        _shortNameArMeta,
+        shortNameAr.isAcceptableOrUnknown(
+          data['short_name_ar']!,
+          _shortNameArMeta,
+        ),
+      );
     }
     if (data.containsKey('initial_ar')) {
       context.handle(
@@ -228,6 +249,10 @@ class $ScholarsTable extends Scholars with TableInfo<$ScholarsTable, Scholar> {
         DriftSqlType.string,
         data['${effectivePrefix}name_ar'],
       )!,
+      shortNameAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}short_name_ar'],
+      ),
       initialAr: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}initial_ar'],
@@ -273,6 +298,11 @@ class Scholar extends DataClass implements Insertable<Scholar> {
   final String slug;
   final String nameAr;
 
+  /// «ابن عثيمين» — for chips, cards and the resume line, where the full name
+  /// would ellipsize. Curated, not derived: it is neither the first word of
+  /// [nameAr] nor the last.
+  final String? shortNameAr;
+
   /// The letter in his roundel. Curated in the seed — it comes from the شهرة
   /// (العثيمين → ع), so it cannot be taken from the start of [nameAr].
   final String initialAr;
@@ -294,6 +324,7 @@ class Scholar extends DataClass implements Insertable<Scholar> {
   const Scholar({
     required this.slug,
     required this.nameAr,
+    this.shortNameAr,
     required this.initialAr,
     required this.accent,
     this.honorificAr,
@@ -308,6 +339,9 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     final map = <String, Expression>{};
     map['slug'] = Variable<String>(slug);
     map['name_ar'] = Variable<String>(nameAr);
+    if (!nullToAbsent || shortNameAr != null) {
+      map['short_name_ar'] = Variable<String>(shortNameAr);
+    }
     map['initial_ar'] = Variable<String>(initialAr);
     map['accent'] = Variable<String>(accent);
     if (!nullToAbsent || honorificAr != null) {
@@ -329,6 +363,9 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     return ScholarsCompanion(
       slug: Value(slug),
       nameAr: Value(nameAr),
+      shortNameAr: shortNameAr == null && nullToAbsent
+          ? const Value.absent()
+          : Value(shortNameAr),
       initialAr: Value(initialAr),
       accent: Value(accent),
       honorificAr: honorificAr == null && nullToAbsent
@@ -354,6 +391,7 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     return Scholar(
       slug: serializer.fromJson<String>(json['slug']),
       nameAr: serializer.fromJson<String>(json['nameAr']),
+      shortNameAr: serializer.fromJson<String?>(json['shortNameAr']),
       initialAr: serializer.fromJson<String>(json['initialAr']),
       accent: serializer.fromJson<String>(json['accent']),
       honorificAr: serializer.fromJson<String?>(json['honorificAr']),
@@ -370,6 +408,7 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     return <String, dynamic>{
       'slug': serializer.toJson<String>(slug),
       'nameAr': serializer.toJson<String>(nameAr),
+      'shortNameAr': serializer.toJson<String?>(shortNameAr),
       'initialAr': serializer.toJson<String>(initialAr),
       'accent': serializer.toJson<String>(accent),
       'honorificAr': serializer.toJson<String?>(honorificAr),
@@ -384,6 +423,7 @@ class Scholar extends DataClass implements Insertable<Scholar> {
   Scholar copyWith({
     String? slug,
     String? nameAr,
+    Value<String?> shortNameAr = const Value.absent(),
     String? initialAr,
     String? accent,
     Value<String?> honorificAr = const Value.absent(),
@@ -395,6 +435,7 @@ class Scholar extends DataClass implements Insertable<Scholar> {
   }) => Scholar(
     slug: slug ?? this.slug,
     nameAr: nameAr ?? this.nameAr,
+    shortNameAr: shortNameAr.present ? shortNameAr.value : this.shortNameAr,
     initialAr: initialAr ?? this.initialAr,
     accent: accent ?? this.accent,
     honorificAr: honorificAr.present ? honorificAr.value : this.honorificAr,
@@ -408,6 +449,9 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     return Scholar(
       slug: data.slug.present ? data.slug.value : this.slug,
       nameAr: data.nameAr.present ? data.nameAr.value : this.nameAr,
+      shortNameAr: data.shortNameAr.present
+          ? data.shortNameAr.value
+          : this.shortNameAr,
       initialAr: data.initialAr.present ? data.initialAr.value : this.initialAr,
       accent: data.accent.present ? data.accent.value : this.accent,
       honorificAr: data.honorificAr.present
@@ -430,6 +474,7 @@ class Scholar extends DataClass implements Insertable<Scholar> {
     return (StringBuffer('Scholar(')
           ..write('slug: $slug, ')
           ..write('nameAr: $nameAr, ')
+          ..write('shortNameAr: $shortNameAr, ')
           ..write('initialAr: $initialAr, ')
           ..write('accent: $accent, ')
           ..write('honorificAr: $honorificAr, ')
@@ -446,6 +491,7 @@ class Scholar extends DataClass implements Insertable<Scholar> {
   int get hashCode => Object.hash(
     slug,
     nameAr,
+    shortNameAr,
     initialAr,
     accent,
     honorificAr,
@@ -461,6 +507,7 @@ class Scholar extends DataClass implements Insertable<Scholar> {
       (other is Scholar &&
           other.slug == this.slug &&
           other.nameAr == this.nameAr &&
+          other.shortNameAr == this.shortNameAr &&
           other.initialAr == this.initialAr &&
           other.accent == this.accent &&
           other.honorificAr == this.honorificAr &&
@@ -474,6 +521,7 @@ class Scholar extends DataClass implements Insertable<Scholar> {
 class ScholarsCompanion extends UpdateCompanion<Scholar> {
   final Value<String> slug;
   final Value<String> nameAr;
+  final Value<String?> shortNameAr;
   final Value<String> initialAr;
   final Value<String> accent;
   final Value<String?> honorificAr;
@@ -486,6 +534,7 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
   const ScholarsCompanion({
     this.slug = const Value.absent(),
     this.nameAr = const Value.absent(),
+    this.shortNameAr = const Value.absent(),
     this.initialAr = const Value.absent(),
     this.accent = const Value.absent(),
     this.honorificAr = const Value.absent(),
@@ -499,6 +548,7 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
   ScholarsCompanion.insert({
     required String slug,
     required String nameAr,
+    this.shortNameAr = const Value.absent(),
     this.initialAr = const Value.absent(),
     this.accent = const Value.absent(),
     this.honorificAr = const Value.absent(),
@@ -514,6 +564,7 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
   static Insertable<Scholar> custom({
     Expression<String>? slug,
     Expression<String>? nameAr,
+    Expression<String>? shortNameAr,
     Expression<String>? initialAr,
     Expression<String>? accent,
     Expression<String>? honorificAr,
@@ -527,6 +578,7 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
     return RawValuesInsertable({
       if (slug != null) 'slug': slug,
       if (nameAr != null) 'name_ar': nameAr,
+      if (shortNameAr != null) 'short_name_ar': shortNameAr,
       if (initialAr != null) 'initial_ar': initialAr,
       if (accent != null) 'accent': accent,
       if (honorificAr != null) 'honorific_ar': honorificAr,
@@ -542,6 +594,7 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
   ScholarsCompanion copyWith({
     Value<String>? slug,
     Value<String>? nameAr,
+    Value<String?>? shortNameAr,
     Value<String>? initialAr,
     Value<String>? accent,
     Value<String?>? honorificAr,
@@ -555,6 +608,7 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
     return ScholarsCompanion(
       slug: slug ?? this.slug,
       nameAr: nameAr ?? this.nameAr,
+      shortNameAr: shortNameAr ?? this.shortNameAr,
       initialAr: initialAr ?? this.initialAr,
       accent: accent ?? this.accent,
       honorificAr: honorificAr ?? this.honorificAr,
@@ -575,6 +629,9 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
     }
     if (nameAr.present) {
       map['name_ar'] = Variable<String>(nameAr.value);
+    }
+    if (shortNameAr.present) {
+      map['short_name_ar'] = Variable<String>(shortNameAr.value);
     }
     if (initialAr.present) {
       map['initial_ar'] = Variable<String>(initialAr.value);
@@ -611,6 +668,7 @@ class ScholarsCompanion extends UpdateCompanion<Scholar> {
     return (StringBuffer('ScholarsCompanion(')
           ..write('slug: $slug, ')
           ..write('nameAr: $nameAr, ')
+          ..write('shortNameAr: $shortNameAr, ')
           ..write('initialAr: $initialAr, ')
           ..write('accent: $accent, ')
           ..write('honorificAr: $honorificAr, ')
@@ -5240,6 +5298,7 @@ typedef $$ScholarsTableCreateCompanionBuilder =
     ScholarsCompanion Function({
       required String slug,
       required String nameAr,
+      Value<String?> shortNameAr,
       Value<String> initialAr,
       Value<String> accent,
       Value<String?> honorificAr,
@@ -5254,6 +5313,7 @@ typedef $$ScholarsTableUpdateCompanionBuilder =
     ScholarsCompanion Function({
       Value<String> slug,
       Value<String> nameAr,
+      Value<String?> shortNameAr,
       Value<String> initialAr,
       Value<String> accent,
       Value<String?> honorificAr,
@@ -5281,6 +5341,11 @@ class $$ScholarsTableFilterComposer
 
   ColumnFilters<String> get nameAr => $composableBuilder(
     column: $table.nameAr,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get shortNameAr => $composableBuilder(
+    column: $table.shortNameAr,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5344,6 +5409,11 @@ class $$ScholarsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get shortNameAr => $composableBuilder(
+    column: $table.shortNameAr,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get initialAr => $composableBuilder(
     column: $table.initialAr,
     builder: (column) => ColumnOrderings(column),
@@ -5399,6 +5469,11 @@ class $$ScholarsTableAnnotationComposer
 
   GeneratedColumn<String> get nameAr =>
       $composableBuilder(column: $table.nameAr, builder: (column) => column);
+
+  GeneratedColumn<String> get shortNameAr => $composableBuilder(
+    column: $table.shortNameAr,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get initialAr =>
       $composableBuilder(column: $table.initialAr, builder: (column) => column);
@@ -5461,6 +5536,7 @@ class $$ScholarsTableTableManager
               ({
                 Value<String> slug = const Value.absent(),
                 Value<String> nameAr = const Value.absent(),
+                Value<String?> shortNameAr = const Value.absent(),
                 Value<String> initialAr = const Value.absent(),
                 Value<String> accent = const Value.absent(),
                 Value<String?> honorificAr = const Value.absent(),
@@ -5473,6 +5549,7 @@ class $$ScholarsTableTableManager
               }) => ScholarsCompanion(
                 slug: slug,
                 nameAr: nameAr,
+                shortNameAr: shortNameAr,
                 initialAr: initialAr,
                 accent: accent,
                 honorificAr: honorificAr,
@@ -5487,6 +5564,7 @@ class $$ScholarsTableTableManager
               ({
                 required String slug,
                 required String nameAr,
+                Value<String?> shortNameAr = const Value.absent(),
                 Value<String> initialAr = const Value.absent(),
                 Value<String> accent = const Value.absent(),
                 Value<String?> honorificAr = const Value.absent(),
@@ -5499,6 +5577,7 @@ class $$ScholarsTableTableManager
               }) => ScholarsCompanion.insert(
                 slug: slug,
                 nameAr: nameAr,
+                shortNameAr: shortNameAr,
                 initialAr: initialAr,
                 accent: accent,
                 honorificAr: honorificAr,

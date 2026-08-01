@@ -10,6 +10,15 @@ export const scholarSchema = z.object({
   /** «الشيخ محمد بن صالح العثيمين» */
   name_ar: z.string().min(1),
   /**
+   * The شهرة — «ابن عثيمين» — for places with no room for the full name: filter
+   * chips, the resume card's lesson line, the scholar cards on Home. Curated
+   * for the same reason `initial_ar` is: it cannot be derived from `name_ar`
+   * by any rule (it is neither the first word nor the last), and guessing at an
+   * attribution is the one thing this project does not do. Falls back to
+   * `name_ar` when absent.
+   */
+  short_name_ar: z.string().min(1).optional(),
+  /**
    * The single letter in the scholar's roundel. Curated rather than derived,
    * because it comes from the شهرة and not the start of `name_ar`: العثيمين
    * gives ع, ابن باز gives ب. `name_ar[0]` would print ا for everyone.

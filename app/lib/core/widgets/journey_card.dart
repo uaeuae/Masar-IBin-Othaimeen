@@ -118,7 +118,7 @@ class JourneyCard extends StatelessWidget {
                       : Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            _StackedAvatars(scholars: scholars),
+                            StackedScholarAvatars(scholars: scholars),
                             const SizedBox(width: 7),
                             Flexible(
                               child: Text(
@@ -185,42 +185,6 @@ class JourneyCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Overlapping roundels for a مسار whose stages come from different scholars
-/// (design 4c). Overlapped rather than spaced so the group reads as one fact
-/// about the journey rather than a list.
-class _StackedAvatars extends StatelessWidget {
-  const _StackedAvatars({required this.scholars});
-
-  final List<ScholarInfo> scholars;
-
-  static const double _size = 20;
-  static const double _overlap = 6;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return SizedBox(
-      width: _size + (scholars.length - 1) * (_size - _overlap),
-      height: _size,
-      child: Stack(
-        children: [
-          for (final (index, scholar) in scholars.indexed)
-            PositionedDirectional(
-              start: index * (_size - _overlap),
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: scheme.surface, width: 1.5),
-                ),
-                child: ScholarAvatar.of(scholar, size: _size),
-              ),
-            ),
-        ],
       ),
     );
   }

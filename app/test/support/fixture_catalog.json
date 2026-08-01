@@ -11,7 +11,8 @@
       "foundation_ar": "مؤسسة الشيخ محمد بن صالح العثيمين الخيرية",
       "website": "https://binothaimeen.net",
       "youtube_url": "https://www.youtube.com/@ibnothaimeentv",
-      "sort_order": 1
+      "sort_order": 1,
+      "short_name_ar": "ابن عثيمين"
     },
     {
       "slug": "ibn-baz",
@@ -23,7 +24,8 @@
       "foundation_ar": "مؤسسة الشيخ عبد العزيز بن باز الخيرية",
       "website": "https://binbaz.org.sa",
       "youtube_url": null,
-      "sort_order": 2
+      "sort_order": 2,
+      "short_name_ar": "ابن باز"
     },
     {
       "slug": "al-fawzan",
@@ -35,7 +37,8 @@
       "foundation_ar": "موقع الشيخ صالح الفوزان",
       "website": "https://alfawzan.af.org.sa",
       "youtube_url": null,
-      "sort_order": 3
+      "sort_order": 3,
+      "short_name_ar": "الفوزان"
     }
   ],
   "generated_at": "2026-07-13T00:00:00Z",

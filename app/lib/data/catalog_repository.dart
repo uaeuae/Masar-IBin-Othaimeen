@@ -56,6 +56,7 @@ class CatalogRepository {
             ScholarsCompanion.insert(
               slug: s.slug,
               nameAr: s.nameAr,
+              shortNameAr: Value(s.shortNameAr),
               initialAr: Value(s.initialAr),
               accent: Value(s.accent),
               honorificAr: Value(s.honorificAr),
@@ -572,6 +573,7 @@ class CatalogRepository {
   ScholarInfo _scholarFromRow(QueryRow row) => ScholarInfo(
     slug: row.read<String>('slug'),
     nameAr: row.read<String>('name_ar'),
+    shortNameAr: row.readNullable<String>('short_name_ar'),
     initialAr: row.read<String>('initial_ar'),
     accent: ScholarAccent.fromJson(row.readNullable<String>('accent')),
     honorificAr: row.readNullable<String>('honorific_ar'),
