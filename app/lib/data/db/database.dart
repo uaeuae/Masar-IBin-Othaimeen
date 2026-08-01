@@ -229,7 +229,33 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
+
+  /// Adds [column] to [table] only if it is not already there.
+  ///
+  /// Reach for this **only** when a released schema version is genuinely
+  /// ambiguous; a plain version-guarded `addColumn` is otherwise correct and
+  /// says more. Version 12 is ambiguous: it declared
+  /// `journey_enrollments.dismissed` on the table without shipping a migration
+  /// for it, so a fresh install on that build got the column from `createAll`
+  /// and stamped 12, while an install that *upgraded* into it stamped 12 with
+  /// no such column. Two different schemas on disk under one version number,
+  /// and only the table itself can say which one this is.
+  Future<void> _addColumnIfMissing(
+    Migrator m,
+    TableInfo table,
+    GeneratedColumn column,
+  ) async {
+    final present = await m.database
+        .customSelect('PRAGMA table_info(${table.actualTableName})')
+        .get()
+        .then((rows) => rows.map((row) => row.read<String>('name')).toSet());
+    // Empty means the table is missing entirely, which no migration path
+    // produces — failing loudly on `addColumn` beats silently skipping it.
+    if (!present.contains(column.name)) {
+      await m.addColumn(table, column);
+    }
+  }
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -284,6 +310,22 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 11 && !createdScholars) {
         await m.addColumn(scholars, scholars.shortNameAr);
+      }
+      // The column `dismissed` was added to [JourneyEnrollments] for v12 and
+      // the migration for it was never written, so every install that upgraded
+      // into v12 was left without it. Nothing failed at import — the column is
+      // only ever read — so «مساراتي» and المسارات both went silently empty
+      // instead: their queries filter on `e.dismissed = 0`, that threw, and the
+      // streams surface as "no data" rather than as an error. Progress was
+      // never lost, only unreadable.
+      //
+      // Hence `_addColumnIfMissing` rather than `addColumn`: see its comment.
+      if (from < 13) {
+        await _addColumnIfMissing(
+          m,
+          journeyEnrollments,
+          journeyEnrollments.dismissed,
+        );
       }
     },
   );

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:masar/core/widgets/journey_card.dart';
 import 'package:masar/core/widgets/masar_chip.dart';
+import 'package:masar/core/widgets/masar_nav_bar.dart';
 import 'package:masar/core/widgets/scholar_avatar.dart';
 import 'package:masar/features/library/scholar_filter.dart';
 
@@ -198,6 +200,53 @@ void main() {
 
     await tapVisible(tester, pill('ibn-baz'));
     expect(find.text('المسائل الأربع التي تجب معرفتها'), findsOneWidget);
+  });
+
+  testApp('the المسارات list narrows to one scholar', (tester, app) async {
+    // Untested until now, which is why it took a bug report to notice it had
+    // gone dark: `journey_enrollments.dismissed` shipped without its migration,
+    // the summary query filters on it, and on an upgraded install the whole
+    // list errored out — chips still on screen, nothing left to filter.
+    //
+    // Tall enough to hold all five cards: the list is lazy, so on the default
+    // 800×600 surface a count would be measuring the viewport, not the filter.
+    await tester.binding.setSurfaceSize(const Size(402, 1400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(MasarNavBar),
+        matching: find.text('المسارات'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    List<String> shownScholars() => tester
+        .widgetList<JourneyCard>(find.byType(JourneyCard))
+        .expand((c) => c.scholars.map((s) => s.slug))
+        .toSet()
+        .toList();
+
+    expect(find.byType(JourneyCard), findsNWidgets(5));
+    expect(shownScholars(), containsAll(['ibn-uthaymeen', 'ibn-baz']));
+
+    await tapVisible(tester, chip(baz));
+
+    // His own مسار plus the shared one — a مسار is his if any of its stages is.
+    expect(find.byType(JourneyCard), findsNWidgets(2));
+    expect(
+      tester
+          .widgetList<JourneyCard>(find.byType(JourneyCard))
+          .map((c) => c.title),
+      ['مسار العقيدة', 'مسار مشترك'],
+    );
+
+    await tapVisible(tester, chip(uthaymeen));
+    expect(find.byType(JourneyCard), findsNWidgets(4));
+    expect(shownScholars(), contains('ibn-uthaymeen'));
+
+    await tapVisible(tester, chip('كل الشيوخ'));
+    expect(find.byType(JourneyCard), findsNWidgets(5));
   });
 
   testApp('a filtered science list shows the filter it is obeying', (

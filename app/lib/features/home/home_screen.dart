@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/theme.dart';
 import '../../core/formatters.dart';
+import '../../core/widgets/level_badge.dart';
 import '../../core/widgets/masar_chip.dart';
 import '../../core/widgets/progress_ring.dart';
 import '../../core/widgets/resume_hero_card.dart';
@@ -74,16 +75,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final level = ref.watch(levelFilterProvider);
 
     final enrolledSlugs = {for (final j in enrolled) j.slug};
-    final suggestions = journeys
+    final unenrolled = journeys
         .where((j) => !enrolledSlugs.contains(j.slug))
-        .where((j) => j.level == level)
-        .take(2)
         .toList();
-    final fallbackSuggestions = journeys
-        .where((j) => !enrolledSlugs.contains(j.slug))
-        .take(2)
-        .toList();
-    final shown = suggestions.isEmpty ? fallbackSuggestions : suggestions;
+    final atLevel = unenrolled.where((j) => j.level == level).toList();
+    // Falling back to another level is the *common* case, not an edge one: no
+    // مسار is «متقدم» yet and only one is «متوسط», so tapping either chip often
+    // leaves the same two cards on screen. Substituting silently is what made
+    // the chips read as dead controls — [substituted] is what says otherwise.
+    final substituted = atLevel.isEmpty && unenrolled.isNotEmpty;
+    final shown = (atLevel.isEmpty ? unenrolled : atLevel).take(2).toList();
     final resume = continueWatching.isEmpty ? null : continueWatching.first;
     // Only once the stream has actually answered: on the first build it has no
     // value yet, and deciding then would drop the resume mark for every reader
@@ -273,6 +274,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 enrolled.isEmpty ? 'ابدأ رحلتك' : 'مسارات مقترحة لك',
                 style: theme.textTheme.titleLarge,
               ),
+              if (substituted) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'لا مسار بمستوى «${level.labelAr}» بعد — هذه مقترحات أخرى',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
               const SizedBox(height: 12),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -421,10 +432,19 @@ class _SuggestionCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ScienceGlyph(
-                nameAr: scienceName,
-                sortOrder: scienceSortOrder,
-                size: 34,
+              Row(
+                children: [
+                  ScienceGlyph(
+                    nameAr: scienceName,
+                    sortOrder: scienceSortOrder,
+                    size: 34,
+                  ),
+                  const Spacer(),
+                  // The level chips at the top of Home claim to pick مسارات
+                  // «المناسبة لمستواك»; without this the reader has no way to
+                  // see what level they were actually offered.
+                  LevelBadge(level: journey.level, compact: true),
+                ],
               ),
               const SizedBox(height: 8),
               Text(
