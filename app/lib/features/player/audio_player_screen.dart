@@ -11,16 +11,14 @@ import '../../core/widgets/scholar_avatar.dart';
 import '../../core/widgets/science_glyph.dart';
 import '../../data/models/catalog.dart' show CatalogChapter;
 import '../../data/models/enums.dart';
-import '../../data/providers.dart';
 import '../../data/view_models.dart';
 import '../scholars/scholar_providers.dart';
 import '../series/series_providers.dart';
 import '../settings/theme_mode_provider.dart';
-import 'audio_engine.dart';
 import '../onboarding/coach_marks.dart';
 import 'lesson_text_providers.dart';
 import 'lesson_text_view.dart';
-import 'progress_tracker.dart';
+import 'playback_controller.dart';
 
 const _speeds = [1.0, 1.25, 1.5, 2.0];
 
@@ -48,21 +46,23 @@ class AudioPlayerScreen extends ConsumerStatefulWidget {
 }
 
 class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
-  late final AudioLessonEngine _engine;
-  late String _currentId;
-  ProgressTracker? _tracker;
-  StreamSubscription<Duration>? _positionsSub;
-  StreamSubscription<void>? _endedSub;
-  StreamSubscription<bool>? _playingSub;
-  Timer? _sleepTimer;
-
-  Duration _position = Duration.zero;
-  bool _isPlaying = false;
-  bool _hasSavedOnce = false;
+  // Playback itself lives in [PlaybackController], which outlives this screen —
+  // that is what lets a lesson keep going while the reader browses. Everything
+  // here is a view onto it; the only local state is the drag in progress, which
+  // belongs to this widget's gesture and nothing else.
   double? _dragFraction;
-  double _speed = 1.0;
-  int? _sleepMinutes;
-  bool _playingOffline = false;
+
+  PlaybackController get _playback =>
+      ref.read(playbackControllerProvider.notifier);
+  PlaybackState get _state => ref.read(playbackControllerProvider);
+
+  String get _currentId => _state.lessonId ?? widget.lessonId;
+  Duration get _position => _state.position;
+  bool get _isPlaying => _state.playing;
+  bool get _hasSavedOnce => _state.savedOnce;
+  double get _speed => _state.speed;
+  int? get _sleepMinutes => _state.sleepMinutes;
+  bool get _playingOffline => _state.offline;
 
   static const _coachSequence = 'player';
   final _textPanelKey = GlobalKey();
@@ -72,31 +72,20 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
   @override
   void initState() {
     super.initState();
-    _currentId = widget.lessonId;
-    _engine = ref.read(audioEngineFactoryProvider)();
-    _positionsSub = _engine.positions.listen(_onPosition);
-    _endedSub = _engine.ended.listen((_) => _onEnded());
-    _playingSub = _engine.playing.listen((playing) {
-      if (mounted) setState(() => _isPlaying = playing);
-    });
+    // Autoplay and «التالي» need the series order, which this screen has and
+    // the controller does not.
+    ref.read(playbackControllerProvider.notifier).neighbourLookup =
+        (id, offset) => _neighborOf(id, offset);
     // The series detail may not be loaded yet on a cold deep-link; wait for
     // the first value before starting.
     Future.microtask(() async {
       await ref.read(seriesDetailProvider(widget.seriesSlug).future);
-      if (mounted) await _startLesson(_currentId, initial: true);
+      if (mounted) await _startLesson(widget.lessonId, initial: true);
     });
   }
 
-  @override
-  void dispose() {
-    _tracker?.flush();
-    _sleepTimer?.cancel();
-    _positionsSub?.cancel();
-    _endedSub?.cancel();
-    _playingSub?.cancel();
-    _engine.dispose();
-    super.dispose();
-  }
+  // No dispose of playback here on purpose: leaving this screen must not stop
+  // the lesson. The controller owns the engine and is torn down with the app.
 
   SeriesDetail? get _series =>
       ref.read(seriesDetailProvider(widget.seriesSlug)).value;
@@ -110,10 +99,26 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     return null;
   }
 
-  LessonWithProgress? _neighbor(int offset) {
+  LessonWithProgress? _neighbor(int offset) => _neighborOf(_currentId, offset);
+
+  Future<void> _startLesson(String id, {bool initial = false}) async {
+    final lesson = _lessonById(id);
+    if (lesson == null) return;
+    await _playback.play(
+      lesson,
+      seriesSlug: widget.seriesSlug,
+      seriesTitle: _series?.series.titleAr ?? '',
+      startAtSeconds: initial ? widget.startAtSeconds : null,
+    );
+    if (mounted) setState(() {});
+  }
+
+  /// Neighbour by series order, for the transport buttons and for the
+  /// controller's autoplay.
+  LessonWithProgress? _neighborOf(String id, int offset) {
     final lessons = _series?.lessons;
     if (lessons == null) return null;
-    final index = lessons.indexWhere((l) => l.videoId == _currentId);
+    final index = lessons.indexWhere((l) => l.videoId == id);
     if (index == -1) return null;
     var target = index + offset;
     while (target >= 0 && target < lessons.length) {
@@ -125,82 +130,6 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
       target += offset > 0 ? 1 : -1;
     }
     return null;
-  }
-
-  Future<void> _startLesson(String id, {bool initial = false}) async {
-    _tracker?.flush();
-
-    final lesson = _lessonById(id);
-    final audioUrl = lesson?.audioUrl;
-    if (lesson == null || audioUrl == null) return;
-
-    final progressRepo = ref.read(progressRepositoryProvider);
-    final saved = await progressRepo.getProgress(id);
-    final catalogDuration = lesson.durationSeconds;
-
-    final tracker = ProgressTracker(
-      totalDuration: catalogDuration == null
-          ? null
-          : Duration(seconds: catalogDuration),
-      persist: (position) {
-        if (mounted && !_hasSavedOnce) setState(() => _hasSavedOnce = true);
-        progressRepo.saveWatchPosition(
-          videoId: id,
-          watchedSeconds: position.inSeconds,
-          durationSeconds:
-              _tracker?.totalDuration?.inSeconds ?? catalogDuration,
-        );
-      },
-      complete: (position) => progressRepo.markCompleted(
-        id,
-        durationSeconds: _tracker?.totalDuration?.inSeconds ?? catalogDuration,
-        watchedSeconds: position.inSeconds,
-      ),
-    );
-    _tracker = tracker;
-
-    final requested = initial && widget.startAtSeconds != null
-        ? Duration(seconds: widget.startAtSeconds!)
-        : null;
-    final resumeFrom =
-        requested ??
-        resumePositionFor(
-          watchedSeconds: saved?.watchedSeconds ?? 0,
-          completed: saved?.completed ?? false,
-          totalSeconds: catalogDuration ?? saved?.durationSeconds,
-        );
-
-    // An offline copy plays from disk — no network, no buffering, and it works
-    // in a tunnel or on a plane.
-    final localPath = await ref
-        .read(downloadRepositoryProvider)
-        .localPathFor(id);
-
-    if (mounted) {
-      setState(() {
-        _currentId = id;
-        _position = resumeFrom;
-        _hasSavedOnce = false;
-        _playingOffline = localPath != null;
-      });
-    }
-
-    await _engine.load(
-      id: id,
-      url: localPath ?? audioUrl,
-      title: 'الدرس ${arabicDigits(lesson.position)} — ${lesson.titleAr}',
-      album: _series?.series.titleAr ?? 'مسار',
-      start: resumeFrom,
-      isLocalFile: localPath != null,
-    );
-    if (_speed != 1.0) await _engine.setSpeed(_speed);
-    await _applyGain(lesson);
-
-    final reported = await _engine.currentDuration();
-    if (reported != null && identical(_tracker, tracker)) {
-      tracker.totalDuration = reported;
-      if (mounted) setState(() {});
-    }
   }
 
   /// Points out the read-along panel and the ±10s nudge, once, the first time
@@ -230,55 +159,20 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     });
   }
 
-  /// Levels the lesson against the rest of the library, unless the reader has
-  /// turned that off in settings.
-  Future<void> _applyGain(LessonWithProgress lesson) async {
-    final normalize = ref.read(normalizeVolumeProvider);
-    await _engine.setGainDb(normalize ? (lesson.gainDb ?? 0) : 0);
-  }
-
-  void _onPosition(Duration position) {
-    _tracker?.onPosition(position);
-    if (mounted && _dragFraction == null) {
-      setState(() => _position = position);
-    }
-  }
-
-  void _onEnded() {
-    _tracker?.onEnded();
-    final next = _neighbor(1);
-    if (next == null) return;
-    if (ref.read(autoplayProvider)) {
-      _startLesson(next.videoId);
-    }
-  }
-
-  /// Nudges playback by [seconds], clamped to the lesson so a tap near either
-  /// end can't seek past it.
-  Future<void> _skipBy(int seconds, Duration? total) async {
-    var target = _position + Duration(seconds: seconds);
-    if (target < Duration.zero) target = Duration.zero;
-    if (total != null && target > total) target = total;
-    setState(() => _position = target);
-    await _engine.seekTo(target);
-  }
+  Future<void> _skipBy(int seconds, Duration? total) =>
+      _playback.skipBy(seconds);
 
   Future<void> _seekToFraction(double fraction, Duration total) async {
     final target = Duration(
       milliseconds: (total.inMilliseconds * fraction).round(),
     );
-    setState(() {
-      _position = target;
-      _dragFraction = null;
-    });
-    await _engine.seekTo(target);
+    setState(() => _dragFraction = null);
+    await _playback.seekTo(target);
   }
 
   void _cycleSpeed() {
     final index = _speeds.indexOf(_speed);
-    final next = _speeds[(index + 1) % _speeds.length];
-    setState(() => _speed = next);
-    _engine.setSpeed(next);
+    _playback.setSpeed(_speeds[(index + 1) % _speeds.length]);
   }
 
   String get _speedLabel {
@@ -324,16 +218,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     );
   }
 
-  void _setSleepTimer(int? minutes) {
-    _sleepTimer?.cancel();
-    setState(() => _sleepMinutes = minutes);
-    if (minutes != null) {
-      _sleepTimer = Timer(Duration(minutes: minutes), () async {
-        if (_isPlaying) await _engine.togglePlay();
-        if (mounted) setState(() => _sleepMinutes = null);
-      });
-    }
-  }
+  void _setSleepTimer(int? minutes) => _playback.setSleepTimer(minutes);
 
   /// The read-along panel, sized to take the artwork's place without pushing
   /// the transport controls off small screens.
@@ -364,10 +249,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
             text: text,
             position: _position,
             height: height,
-            onSeek: (target) {
-              setState(() => _position = target);
-              _engine.seekTo(target);
-            },
+            onSeek: _playback.seekTo,
           );
         },
       ),
@@ -388,6 +270,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     final scheme = theme.colorScheme;
     final masar = masarColorsOf(context);
 
+    final playback = ref.watch(playbackControllerProvider);
     final showText = ref.watch(showLessonTextProvider);
     final detailAsync = ref.watch(seriesDetailProvider(widget.seriesSlug));
     final detail = detailAsync.value;
@@ -395,14 +278,10 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
     final next = _neighbor(1);
     final previous = _neighbor(-1);
 
-    final tracker = _tracker;
-    if (tracker != null &&
-        tracker.totalDuration == null &&
-        current?.durationSeconds != null) {
-      tracker.totalDuration = Duration(seconds: current!.durationSeconds!);
-    }
+    // Prefer what the player reported over what the catalog claims — the file
+    // is the authority on its own length.
     final total =
-        tracker?.totalDuration ??
+        playback.total ??
         (current?.durationSeconds == null
             ? null
             : Duration(seconds: current!.durationSeconds!));
@@ -719,7 +598,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                               ),
                               const SizedBox(width: 8),
                               GestureDetector(
-                                onTap: _engine.togglePlay,
+                                onTap: _playback.toggle,
                                 child: Container(
                                   width: 68,
                                   height: 68,
@@ -848,7 +727,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                           showDivider: index != current.chapters.length - 1,
                           onTap: chapter.startSeconds == null
                               ? null
-                              : () => _engine.seekTo(
+                              : () => _playback.seekTo(
                                   Duration(seconds: chapter.startSeconds!),
                                 ),
                         ),

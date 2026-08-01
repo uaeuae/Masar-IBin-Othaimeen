@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/widgets/empty_state.dart';
 import '../core/widgets/masar_nav_bar.dart';
+import '../features/player/mini_player.dart';
 import '../data/providers.dart';
 import 'theme.dart';
 
@@ -43,12 +44,20 @@ class AppShell extends ConsumerWidget {
       ),
       data: (_) => Scaffold(
         body: navigationShell,
-        bottomNavigationBar: MasarNavBar(
-          currentIndex: navigationShell.currentIndex,
-          onSelect: (index) => navigationShell.goBranch(
-            index,
-            initialLocation: index == navigationShell.currentIndex,
-          ),
+        // The mini player sits between the content and the tabs so a lesson
+        // stays reachable — and pausable — from every tab while it plays.
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const MiniPlayer(),
+            MasarNavBar(
+              currentIndex: navigationShell.currentIndex,
+              onSelect: (index) => navigationShell.goBranch(
+                index,
+                initialLocation: index == navigationShell.currentIndex,
+              ),
+            ),
+          ],
         ),
       ),
     );
