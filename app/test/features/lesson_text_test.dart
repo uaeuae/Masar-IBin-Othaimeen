@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:masar/data/progress_repository.dart';
 import 'package:masar/features/player/lesson_text.dart';
 import 'package:masar/features/player/lesson_text_providers.dart';
 import 'package:masar/features/player/lesson_text_view.dart';
@@ -79,9 +80,42 @@ final _matn = {
   ],
 };
 
-List<Override> _bundleOverride() {
+/// A full-length script: 60 sentences over 40 minutes, so a resumed position
+/// lands far enough down that the row is not built until something scrolls to
+/// it. The three-sentence fixture above cannot show this — every row fits on
+/// screen, so a highlight that never scrolls still looks correct.
+///
+/// The opening sentences are deliberately **short** and the rest long, which is
+/// what a lesson actually sounds like: it starts with البسملة and a greeting
+/// before any real exposition. That shape is what breaks a blind jump — a
+/// `ListView` derives `maxScrollExtent` from the children it has laid out, so
+/// while only the short opening rows exist the extent is a large underestimate,
+/// and a jump computed from it lands nowhere near the target.
+final _longTranscript = {
+  'lesson': 'fx-riyd-01',
+  'kind': 'transcript',
+  'duration': 2580,
+  'measured': 60,
+  'sections': [
+    {
+      'start': 0,
+      'title': 'الدرس',
+      'sentences': [
+        for (var i = 0; i < 60; i++)
+          {
+            't': i * 40,
+            's': i < 10
+                ? 'الجملة رقم $i.'
+                : 'الجملة رقم $i، ${List.filled(40, 'وكلمة').join(' ')}.',
+          },
+      ],
+    },
+  ],
+};
+
+List<Override> _bundleOverride({bool long = false}) {
   final bundle = _TextBundle({
-    'assets/texts/fx-riyd-01.json.gz': _transcript,
+    'assets/texts/fx-riyd-01.json.gz': long ? _longTranscript : _transcript,
     'assets/texts/fx-riyd-02.json.gz': _matn,
   });
   return [
@@ -259,6 +293,78 @@ void main() {
       expect(backgroundOf('المتن الأول.'), isNot(Colors.transparent));
       expect(backgroundOf('تتمة المتن الأول.'), isNot(Colors.transparent));
       expect(backgroundOf('المتن الثاني.'), Colors.transparent);
+    },
+  );
+
+  testApp(
+    'reopening a lesson lands the text on where playback resumes',
+    overrides: _bundleOverride(long: true),
+    seed: (db) async {
+      // Where the reader stopped before closing the app. Sentence 40 starts at
+      // 1600s, forty minutes into a script whose first row is what the panel
+      // opens on.
+      await ProgressRepository(db).saveWatchPosition(
+        videoId: 'fx-riyd-01',
+        watchedSeconds: 1600,
+        durationSeconds: 2580,
+      );
+    },
+    (tester, app) async {
+      await openText(tester, 'fx-riyd-01');
+
+      final resumed = find.textContaining('الجملة رقم 40،');
+      // The panel is a lazy list, so a row that was never scrolled to is not
+      // built at all — finding it *is* the assertion that the view moved.
+      expect(
+        resumed,
+        findsOneWidget,
+        reason: 'the resumed sentence should be on screen, not 40 minutes up',
+      );
+      final container = tester.widget<AnimatedContainer>(
+        find
+            .ancestor(of: resumed, matching: find.byType(AnimatedContainer))
+            .first,
+      );
+      expect(
+        (container.decoration as BoxDecoration?)?.color,
+        isNot(Colors.transparent),
+        reason: 'and highlighted, without waiting for the next sentence',
+      );
+    },
+  );
+
+  testApp(
+    'the load reporting 0:00 does not drag the text back to the top',
+    overrides: _bundleOverride(long: true),
+    seed: (db) async {
+      await ProgressRepository(db).saveWatchPosition(
+        videoId: 'fx-riyd-01',
+        watchedSeconds: 1600,
+        durationSeconds: 2580,
+      );
+    },
+    (tester, app) async {
+      await openText(tester, 'fx-riyd-01');
+      final resumed = find.textContaining('الجملة رقم 40،');
+      expect(resumed, findsOneWidget);
+
+      // just_audio feeds its position stream from every player event, and the
+      // events raised while a source loads still carry the position the player
+      // had before it — zero on the fresh engine a cold start creates. This is
+      // that echo. Believing it snapped the timer to 0:00 and sent the panel
+      // back to the top of the script.
+      app.audioEngine.positionsController.add(Duration.zero);
+      await tester.pumpAndSettle();
+      expect(resumed, findsOneWidget);
+      expect(find.textContaining('الجملة رقم 0.'), findsNothing);
+
+      // Once the engine really is where it was asked to start, reports count
+      // again — including ones behind the start, which by then are the reader
+      // rewinding.
+      app.audioEngine.positionsController.add(const Duration(seconds: 1600));
+      app.audioEngine.positionsController.add(const Duration(seconds: 40));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('الجملة رقم 1.'), findsOneWidget);
     },
   );
 

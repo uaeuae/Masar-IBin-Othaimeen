@@ -100,6 +100,24 @@ class PlaybackController extends Notifier<PlaybackState> {
   /// not be skipped.
   bool _disposed = false;
 
+  /// Where [play] told the engine to start, held until the engine confirms it
+  /// got there. Null whenever there is nothing to wait for.
+  ///
+  /// just_audio's position stream is fed by *every* player event, and the
+  /// events raised while a source loads still carry the position the player
+  /// had before it — zero, on the fresh engine a cold start creates. So a
+  /// lesson resumed at 26:40 reports 0:00 for as long as the load takes, and
+  /// everything downstream believes it: the timer and the seek bar snap to the
+  /// beginning, and the read-along panel scrolls to the top of the script
+  /// before coming back. A report earlier than the position we asked for is
+  /// the load echoing, not the listener moving.
+  Duration? _awaitingStart;
+
+  /// Tolerance on that confirmation — an engine may land a hair short of the
+  /// position it was given, and waiting for an exact match would ignore every
+  /// report that follows.
+  static const _startSlack = Duration(seconds: 2);
+
   @override
   PlaybackState build() {
     ref.onDispose(() {
@@ -187,6 +205,10 @@ class PlaybackController extends Notifier<PlaybackState> {
 
     final localPath = await ref.read(downloadRepositoryProvider).localPathFor(id);
 
+    // Only a resume can be echoed over — a lesson starting at zero has nothing
+    // for a stale zero to overwrite.
+    _awaitingStart = start > Duration.zero ? start : null;
+
     state = state.copyWith(
       lessonId: id,
       seriesSlug: seriesSlug,
@@ -226,6 +248,11 @@ class PlaybackController extends Notifier<PlaybackState> {
 
   void _onPosition(Duration position) {
     if (_disposed) return;
+    final awaiting = _awaitingStart;
+    if (awaiting != null) {
+      if (position + _startSlack < awaiting) return;
+      _awaitingStart = null;
+    }
     _tracker?.onPosition(position);
     state = state.copyWith(position: position);
   }
@@ -244,6 +271,9 @@ class PlaybackController extends Notifier<PlaybackState> {
   Future<void> toggle() => _live.togglePlay();
 
   Future<void> seekTo(Duration position) async {
+    // The listener moving is not the load echoing: a tap on an early sentence
+    // while the lesson is still loading must not be mistaken for one.
+    _awaitingStart = null;
     state = state.copyWith(position: position);
     await _live.seekTo(position);
   }
@@ -279,6 +309,7 @@ class PlaybackController extends Notifier<PlaybackState> {
   Future<void> stop() async {
     _tracker?.flush();
     _tracker = null;
+    _awaitingStart = null;
     _sleepTimer?.cancel();
     if (state.playing) await _live.togglePlay();
     state = const PlaybackState();
