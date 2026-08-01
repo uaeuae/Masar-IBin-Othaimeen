@@ -154,6 +154,7 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
       complete: (position) => progressRepo.markCompleted(
         id,
         durationSeconds: _tracker?.totalDuration?.inSeconds ?? catalogDuration,
+        watchedSeconds: position.inSeconds,
       ),
     );
     _tracker = tracker;
@@ -163,9 +164,11 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
         : null;
     final resumeFrom =
         requested ??
-        ((saved != null && !saved.completed && saved.watchedSeconds > 30)
-            ? Duration(seconds: saved.watchedSeconds)
-            : Duration.zero);
+        resumePositionFor(
+          watchedSeconds: saved?.watchedSeconds ?? 0,
+          completed: saved?.completed ?? false,
+          totalSeconds: catalogDuration ?? saved?.durationSeconds,
+        );
 
     // An offline copy plays from disk — no network, no buffering, and it works
     // in a tunnel or on a plane.

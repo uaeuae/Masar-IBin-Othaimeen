@@ -446,28 +446,41 @@
           "youtube_video_id": "baz-tawhid-01",
           "position": 1,
           "title_ar": "مقدمة الشرح والتعريف بالرسالة ومنهجها",
-          "duration_seconds": 2700,
-          "text_kind": null
+          "duration_seconds": 600,
+          "text_kind": null,
+          "media": "audio",
+          "audio_url": "https://files.example.test/baz/tawhid01.mp3",
+          "gain_db": -1.5,
+          "chapters": []
         },
         {
           "youtube_video_id": "baz-tawhid-02",
           "position": 2,
           "title_ar": "المسائل الأربع التي تجب معرفتها",
-          "duration_seconds": 3120,
-          "text_kind": null
+          "duration_seconds": 540,
+          "text_kind": null,
+          "media": "audio",
+          "audio_url": "https://files.example.test/baz/tawhid02.mp3",
+          "gain_db": -1.5,
+          "chapters": []
         },
         {
           "youtube_video_id": "baz-tawhid-03",
           "position": 3,
           "title_ar": "الأصل الأول: معرفة العبد ربه",
-          "duration_seconds": 2880,
-          "text_kind": null
+          "duration_seconds": 900,
+          "text_kind": null,
+          "media": "audio",
+          "audio_url": "https://files.example.test/baz/tawhid03.mp3",
+          "gain_db": -1.5,
+          "chapters": []
         }
       ],
       "level": "beginner",
       "scholar": "ibn-baz",
       "companion_of": null,
-      "companion_slug": null
+      "companion_slug": null,
+      "media": "audio"
     }
   ],
   "journeys": [

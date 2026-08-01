@@ -47,14 +47,23 @@ class ProgressRepository {
     db.markTablesUpdated({db.lessonProgress});
   }
 
-  Future<void> markCompleted(String videoId, {int? durationSeconds}) async {
+  /// [watchedSeconds] is where the listener actually stopped. It matters
+  /// because completion fires at a *fraction* of the lesson, not at its end:
+  /// recording the full duration instead loses the difference between "heard it
+  /// all" and "stopped a minute short", and the player needs that to know
+  /// whether reopening should resume or start over.
+  Future<void> markCompleted(
+    String videoId, {
+    int? durationSeconds,
+    int? watchedSeconds,
+  }) async {
     final now = _now();
     await db
         .into(db.lessonProgress)
         .insertOnConflictUpdate(
           LessonProgressCompanion(
             videoId: Value(videoId),
-            watchedSeconds: Value(durationSeconds ?? 0),
+            watchedSeconds: Value(watchedSeconds ?? durationSeconds ?? 0),
             durationSeconds: Value(durationSeconds),
             completed: const Value(true),
             lastWatchedAt: Value(now),
