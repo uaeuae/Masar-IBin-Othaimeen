@@ -85,18 +85,62 @@ class ProgressRepository {
         );
   }
 
+  /// Explicit «التحق بالمسار». Undoes a previous removal — asking for it back
+  /// is a clearer signal than the removal was.
   Future<void> enroll(String journeySlug) async {
     final now = _now();
     await db
         .into(db.journeyEnrollments)
-        .insert(
+        .insertOnConflictUpdate(
           JourneyEnrollmentsCompanion.insert(
             journeySlug: journeySlug,
             enrolledAt: now,
             lastActivityAt: now,
+            dismissed: const Value(false),
           ),
-          mode: InsertMode.insertOrIgnore,
         );
+  }
+
+  /// Enrols in whatever مسارات teach [seriesSlug], because listening to a
+  /// lesson from one *is* starting it.
+  ///
+  /// Enrolment used to require finding the مسار and tapping «التحق», so a
+  /// reader could work through a book for an hour and still see an empty
+  /// «مساراتي» — which is what it looked like to anyone who reached a lesson
+  /// from the library or from search rather than through the مسار screen.
+  ///
+  /// Only ever inserts. A مسار the reader removed stays removed: resurrecting
+  /// it on the next lesson would make the remove button useless.
+  Future<void> enrolInJourneysOf(String seriesSlug) async {
+    final now = _now();
+    final slugs = await (db.selectOnly(db.journeyItems, distinct: true)
+          ..addColumns([db.journeyItems.journeySlug])
+          ..where(db.journeyItems.seriesSlug.equals(seriesSlug)))
+        .map((row) => row.read(db.journeyItems.journeySlug)!)
+        .get();
+
+    for (final slug in slugs) {
+      await db
+          .into(db.journeyEnrollments)
+          .insert(
+            JourneyEnrollmentsCompanion.insert(
+              journeySlug: slug,
+              enrolledAt: now,
+              lastActivityAt: now,
+            ),
+            mode: InsertMode.insertOrIgnore,
+          );
+      await touchEnrollment(slug);
+    }
+  }
+
+  /// Takes a مسار off «مساراتي» without forgetting a single lesson of it —
+  /// the progress is in `lesson_progress`, which this does not touch. Tapping
+  /// «التحق» again brings it back with everything intact.
+  Future<void> leaveJourney(String journeySlug) async {
+    await (db.update(db.journeyEnrollments)
+          ..where((e) => e.journeySlug.equals(journeySlug)))
+        .write(const JourneyEnrollmentsCompanion(dismissed: Value(true)));
   }
 
   Future<void> touchEnrollment(String journeySlug) async {

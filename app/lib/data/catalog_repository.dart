@@ -183,7 +183,8 @@ class CatalogRepository {
       (SELECT COALESCE(SUM(l.duration_seconds), 0) FROM lessons l
          JOIN journey_items i ON l.series_slug = i.series_slug
         WHERE i.journey_slug = j.slug AND l.status = 'active') AS total_duration,
-      EXISTS(SELECT 1 FROM journey_enrollments e WHERE e.journey_slug = j.slug) AS enrolled,
+      EXISTS(SELECT 1 FROM journey_enrollments e
+               WHERE e.journey_slug = j.slug AND e.dismissed = 0) AS enrolled,
       -- Derived, never seeded: two journeys can share a title («مسار العقيدة»
       -- exists for two scholars), so the reader needs to see whose it is. Taking
       -- it from the stages' own series means it cannot disagree with them.
@@ -266,6 +267,9 @@ class CatalogRepository {
         .customSelect(
           '$_journeySummarySql '
           'JOIN journey_enrollments e ON e.journey_slug = j.slug '
+          // Removed from «مساراتي» by the reader. Enrolment is automatic now,
+          // so without this the next lesson would put it straight back.
+          'WHERE e.dismissed = 0 '
           'ORDER BY e.last_activity_at DESC',
           readsFrom: _journeyReads,
         )

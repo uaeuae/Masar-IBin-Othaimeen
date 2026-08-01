@@ -272,7 +272,7 @@ class LibraryScreen extends ConsumerWidget {
   }
 }
 
-/// «الشيوخ» — the library's second dimension, per design 3a.
+/// «المشايخ» — the library's second dimension, per design 3a.
 ///
 /// It is what stops the library reading as one scholar's shelf: browsing *by
 /// scholar* is only a meaningful axis if there is more than one, so an
@@ -298,7 +298,7 @@ class _ScholarsRow extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('الشيوخ', style: theme.textTheme.titleLarge),
+        Text('المشايخ', style: theme.textTheme.titleLarge),
         const SizedBox(height: 10),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

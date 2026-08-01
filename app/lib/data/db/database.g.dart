@@ -4429,11 +4429,27 @@ class $JourneyEnrollmentsTable extends JourneyEnrollments
         type: DriftSqlType.dateTime,
         requiredDuringInsert: true,
       );
+  static const VerificationMeta _dismissedMeta = const VerificationMeta(
+    'dismissed',
+  );
+  @override
+  late final GeneratedColumn<bool> dismissed = GeneratedColumn<bool>(
+    'dismissed',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("dismissed" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     journeySlug,
     enrolledAt,
     lastActivityAt,
+    dismissed,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4477,6 +4493,12 @@ class $JourneyEnrollmentsTable extends JourneyEnrollments
     } else if (isInserting) {
       context.missing(_lastActivityAtMeta);
     }
+    if (data.containsKey('dismissed')) {
+      context.handle(
+        _dismissedMeta,
+        dismissed.isAcceptableOrUnknown(data['dismissed']!, _dismissedMeta),
+      );
+    }
     return context;
   }
 
@@ -4498,6 +4520,10 @@ class $JourneyEnrollmentsTable extends JourneyEnrollments
         DriftSqlType.dateTime,
         data['${effectivePrefix}last_activity_at'],
       )!,
+      dismissed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}dismissed'],
+      )!,
     );
   }
 
@@ -4512,10 +4538,16 @@ class JourneyEnrollment extends DataClass
   final String journeySlug;
   final DateTime enrolledAt;
   final DateTime lastActivityAt;
+
+  /// Taken off «مساراتي» by the reader. A flag rather than a delete, because
+  /// listening to any lesson in the مسار enrolls automatically — deleting the
+  /// row would just invite it back on the next lesson.
+  final bool dismissed;
   const JourneyEnrollment({
     required this.journeySlug,
     required this.enrolledAt,
     required this.lastActivityAt,
+    required this.dismissed,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4523,6 +4555,7 @@ class JourneyEnrollment extends DataClass
     map['journey_slug'] = Variable<String>(journeySlug);
     map['enrolled_at'] = Variable<DateTime>(enrolledAt);
     map['last_activity_at'] = Variable<DateTime>(lastActivityAt);
+    map['dismissed'] = Variable<bool>(dismissed);
     return map;
   }
 
@@ -4531,6 +4564,7 @@ class JourneyEnrollment extends DataClass
       journeySlug: Value(journeySlug),
       enrolledAt: Value(enrolledAt),
       lastActivityAt: Value(lastActivityAt),
+      dismissed: Value(dismissed),
     );
   }
 
@@ -4543,6 +4577,7 @@ class JourneyEnrollment extends DataClass
       journeySlug: serializer.fromJson<String>(json['journeySlug']),
       enrolledAt: serializer.fromJson<DateTime>(json['enrolledAt']),
       lastActivityAt: serializer.fromJson<DateTime>(json['lastActivityAt']),
+      dismissed: serializer.fromJson<bool>(json['dismissed']),
     );
   }
   @override
@@ -4552,6 +4587,7 @@ class JourneyEnrollment extends DataClass
       'journeySlug': serializer.toJson<String>(journeySlug),
       'enrolledAt': serializer.toJson<DateTime>(enrolledAt),
       'lastActivityAt': serializer.toJson<DateTime>(lastActivityAt),
+      'dismissed': serializer.toJson<bool>(dismissed),
     };
   }
 
@@ -4559,10 +4595,12 @@ class JourneyEnrollment extends DataClass
     String? journeySlug,
     DateTime? enrolledAt,
     DateTime? lastActivityAt,
+    bool? dismissed,
   }) => JourneyEnrollment(
     journeySlug: journeySlug ?? this.journeySlug,
     enrolledAt: enrolledAt ?? this.enrolledAt,
     lastActivityAt: lastActivityAt ?? this.lastActivityAt,
+    dismissed: dismissed ?? this.dismissed,
   );
   JourneyEnrollment copyWithCompanion(JourneyEnrollmentsCompanion data) {
     return JourneyEnrollment(
@@ -4575,6 +4613,7 @@ class JourneyEnrollment extends DataClass
       lastActivityAt: data.lastActivityAt.present
           ? data.lastActivityAt.value
           : this.lastActivityAt,
+      dismissed: data.dismissed.present ? data.dismissed.value : this.dismissed,
     );
   }
 
@@ -4583,37 +4622,43 @@ class JourneyEnrollment extends DataClass
     return (StringBuffer('JourneyEnrollment(')
           ..write('journeySlug: $journeySlug, ')
           ..write('enrolledAt: $enrolledAt, ')
-          ..write('lastActivityAt: $lastActivityAt')
+          ..write('lastActivityAt: $lastActivityAt, ')
+          ..write('dismissed: $dismissed')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(journeySlug, enrolledAt, lastActivityAt);
+  int get hashCode =>
+      Object.hash(journeySlug, enrolledAt, lastActivityAt, dismissed);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is JourneyEnrollment &&
           other.journeySlug == this.journeySlug &&
           other.enrolledAt == this.enrolledAt &&
-          other.lastActivityAt == this.lastActivityAt);
+          other.lastActivityAt == this.lastActivityAt &&
+          other.dismissed == this.dismissed);
 }
 
 class JourneyEnrollmentsCompanion extends UpdateCompanion<JourneyEnrollment> {
   final Value<String> journeySlug;
   final Value<DateTime> enrolledAt;
   final Value<DateTime> lastActivityAt;
+  final Value<bool> dismissed;
   final Value<int> rowid;
   const JourneyEnrollmentsCompanion({
     this.journeySlug = const Value.absent(),
     this.enrolledAt = const Value.absent(),
     this.lastActivityAt = const Value.absent(),
+    this.dismissed = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   JourneyEnrollmentsCompanion.insert({
     required String journeySlug,
     required DateTime enrolledAt,
     required DateTime lastActivityAt,
+    this.dismissed = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : journeySlug = Value(journeySlug),
        enrolledAt = Value(enrolledAt),
@@ -4622,12 +4667,14 @@ class JourneyEnrollmentsCompanion extends UpdateCompanion<JourneyEnrollment> {
     Expression<String>? journeySlug,
     Expression<DateTime>? enrolledAt,
     Expression<DateTime>? lastActivityAt,
+    Expression<bool>? dismissed,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (journeySlug != null) 'journey_slug': journeySlug,
       if (enrolledAt != null) 'enrolled_at': enrolledAt,
       if (lastActivityAt != null) 'last_activity_at': lastActivityAt,
+      if (dismissed != null) 'dismissed': dismissed,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -4636,12 +4683,14 @@ class JourneyEnrollmentsCompanion extends UpdateCompanion<JourneyEnrollment> {
     Value<String>? journeySlug,
     Value<DateTime>? enrolledAt,
     Value<DateTime>? lastActivityAt,
+    Value<bool>? dismissed,
     Value<int>? rowid,
   }) {
     return JourneyEnrollmentsCompanion(
       journeySlug: journeySlug ?? this.journeySlug,
       enrolledAt: enrolledAt ?? this.enrolledAt,
       lastActivityAt: lastActivityAt ?? this.lastActivityAt,
+      dismissed: dismissed ?? this.dismissed,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -4658,6 +4707,9 @@ class JourneyEnrollmentsCompanion extends UpdateCompanion<JourneyEnrollment> {
     if (lastActivityAt.present) {
       map['last_activity_at'] = Variable<DateTime>(lastActivityAt.value);
     }
+    if (dismissed.present) {
+      map['dismissed'] = Variable<bool>(dismissed.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -4670,6 +4722,7 @@ class JourneyEnrollmentsCompanion extends UpdateCompanion<JourneyEnrollment> {
           ..write('journeySlug: $journeySlug, ')
           ..write('enrolledAt: $enrolledAt, ')
           ..write('lastActivityAt: $lastActivityAt, ')
+          ..write('dismissed: $dismissed, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -7488,6 +7541,7 @@ typedef $$JourneyEnrollmentsTableCreateCompanionBuilder =
       required String journeySlug,
       required DateTime enrolledAt,
       required DateTime lastActivityAt,
+      Value<bool> dismissed,
       Value<int> rowid,
     });
 typedef $$JourneyEnrollmentsTableUpdateCompanionBuilder =
@@ -7495,6 +7549,7 @@ typedef $$JourneyEnrollmentsTableUpdateCompanionBuilder =
       Value<String> journeySlug,
       Value<DateTime> enrolledAt,
       Value<DateTime> lastActivityAt,
+      Value<bool> dismissed,
       Value<int> rowid,
     });
 
@@ -7519,6 +7574,11 @@ class $$JourneyEnrollmentsTableFilterComposer
 
   ColumnFilters<DateTime> get lastActivityAt => $composableBuilder(
     column: $table.lastActivityAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get dismissed => $composableBuilder(
+    column: $table.dismissed,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -7546,6 +7606,11 @@ class $$JourneyEnrollmentsTableOrderingComposer
     column: $table.lastActivityAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get dismissed => $composableBuilder(
+    column: $table.dismissed,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$JourneyEnrollmentsTableAnnotationComposer
@@ -7571,6 +7636,9 @@ class $$JourneyEnrollmentsTableAnnotationComposer
     column: $table.lastActivityAt,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get dismissed =>
+      $composableBuilder(column: $table.dismissed, builder: (column) => column);
 }
 
 class $$JourneyEnrollmentsTableTableManager
@@ -7616,11 +7684,13 @@ class $$JourneyEnrollmentsTableTableManager
                 Value<String> journeySlug = const Value.absent(),
                 Value<DateTime> enrolledAt = const Value.absent(),
                 Value<DateTime> lastActivityAt = const Value.absent(),
+                Value<bool> dismissed = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => JourneyEnrollmentsCompanion(
                 journeySlug: journeySlug,
                 enrolledAt: enrolledAt,
                 lastActivityAt: lastActivityAt,
+                dismissed: dismissed,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -7628,11 +7698,13 @@ class $$JourneyEnrollmentsTableTableManager
                 required String journeySlug,
                 required DateTime enrolledAt,
                 required DateTime lastActivityAt,
+                Value<bool> dismissed = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => JourneyEnrollmentsCompanion.insert(
                 journeySlug: journeySlug,
                 enrolledAt: enrolledAt,
                 lastActivityAt: lastActivityAt,
+                dismissed: dismissed,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

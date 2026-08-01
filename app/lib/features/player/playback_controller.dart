@@ -147,6 +147,9 @@ class PlaybackController extends Notifier<PlaybackState> {
     _tracker?.flush();
 
     final progress = ref.read(progressRepositoryProvider);
+    // Listening to a lesson from a مسار is starting that مسار — it should not
+    // also require finding it and tapping «التحق».
+    await progress.enrolInJourneysOf(seriesSlug);
     final saved = await progress.getProgress(lesson.videoId);
     final catalogDuration = lesson.durationSeconds;
     final id = lesson.videoId;

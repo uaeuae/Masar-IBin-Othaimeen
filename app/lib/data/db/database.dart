@@ -179,6 +179,11 @@ class JourneyEnrollments extends Table {
   DateTimeColumn get enrolledAt => dateTime()();
   DateTimeColumn get lastActivityAt => dateTime()();
 
+  /// Taken off «مساراتي» by the reader. A flag rather than a delete, because
+  /// listening to any lesson in the مسار enrolls automatically — deleting the
+  /// row would just invite it back on the next lesson.
+  BoolColumn get dismissed => boolean().withDefault(const Constant(false))();
+
   @override
   Set<Column> get primaryKey => {journeySlug};
 }
@@ -224,7 +229,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(

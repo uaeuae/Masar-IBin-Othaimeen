@@ -245,7 +245,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const SizedBox(height: 12),
               for (final journey in enrolled) ...[
-                _EnrolledJourneyRow(journey: journey),
+                // Same gesture as the resume card above it: swipe, confirm,
+                // gone. Nothing is forgotten — the lessons keep their progress
+                // and «التحق» brings the مسار back with all of it.
+                Dismissible(
+                  key: ValueKey('journey-${journey.slug}'),
+                  direction: DismissDirection.horizontal,
+                  background: const _RemoveSwipeBackground(),
+                  secondaryBackground: const _RemoveSwipeBackground(),
+                  confirmDismiss: (_) => _confirmLeaveJourney(context),
+                  onDismissed: (_) => ref
+                      .read(progressRepositoryProvider)
+                      .leaveJourney(journey.slug),
+                  child: _EnrolledJourneyRow(journey: journey),
+                ),
                 const SizedBox(height: 12),
               ],
               const SizedBox(height: 8),
@@ -473,6 +486,32 @@ class _RemoveSwipeBackground extends StatelessWidget {
 
 /// Confirms before the card goes — a swipe is easy to do by accident while
 /// scrolling Home.
+Future<bool> _confirmLeaveJourney(BuildContext context) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: const Text('إزالة المسار من الرئيسية؟'),
+      // Says what is kept, not just what goes: the worry with a button like
+      // this is losing months of listening.
+      content: const Text(
+        'لن يظهر المسار في «مساراتي»، ويبقى تقدمك في دروسه كما هو. '
+        'يمكنك الالتحاق به مجددًا في أي وقت.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: const Text('إلغاء'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: const Text('إزالة'),
+        ),
+      ],
+    ),
+  );
+  return confirmed ?? false;
+}
+
 Future<bool> _confirmRemove(BuildContext context) async {
   final confirmed = await showDialog<bool>(
     context: context,
@@ -496,7 +535,7 @@ Future<bool> _confirmRemove(BuildContext context) async {
   return confirmed ?? false;
 }
 
-/// «شيوخك» — the scholar row from design 4a.
+/// «المشايخ» — the scholar row from design 4a.
 ///
 /// The design calls it «تابِع شيوخك» and draws a follow affordance. There is no
 /// following in the app and no model behind it, so this is the browse row it
@@ -519,7 +558,7 @@ class _ScholarsStrip extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('شيوخك', style: theme.textTheme.titleLarge),
+        Text('المشايخ', style: theme.textTheme.titleLarge),
         const SizedBox(height: 12),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

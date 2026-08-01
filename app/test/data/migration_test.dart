@@ -89,7 +89,7 @@ void main() {
         .customSelect('PRAGMA user_version')
         .getSingle()
         .then((row) => row.read<int>('user_version'));
-    expect(stored, 11, reason: 'migration ran to completion and stamped v11');
+    expect(stored, 12, reason: 'migration ran to completion and stamped v12');
 
     // And the table really is the current shape, so catalog import works.
     final columns = await db

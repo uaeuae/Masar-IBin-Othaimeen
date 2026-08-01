@@ -40,9 +40,14 @@ void main() {
     (w) => w is ScholarFilterPill && w.scholar.slug == slug,
   );
 
-  const uthaymeen = 'الشيخ محمد بن صالح العثيمين';
-  const baz = 'الشيخ عبد العزيز بن عبد الله بن باز';
-  const fawzan = 'الشيخ صالح الفوزان';
+  // Chips and pills carry the curated شهرة, not the full name: «الشيخ محمد بن
+  // صالح العثيمين» in a chip row ellipsizes to nothing useful. The full name
+  // still goes to the screen-reader label, which has room for it.
+  const uthaymeen = 'ابن عثيمين';
+  const baz = 'ابن باز';
+  const fawzan = 'الفوزان';
+  const fawzanFull = 'الشيخ صالح الفوزان';
+  const bazFull = 'الشيخ عبد العزيز بن عبد الله بن باز';
 
   testApp('filtering by a scholar narrows the library to his content', (
     tester,
@@ -88,7 +93,7 @@ void main() {
     // A coming_soon scholar has no series, so his chip could only ever empty
     // the screen. He is still announced — on his badged card in الشيوخ.
     expect(chip(fawzan), findsNothing);
-    expect(find.text(fawzan), findsOneWidget);
+    expect(find.text(fawzanFull), findsOneWidget);
     expect(chip(uthaymeen), findsOneWidget);
     expect(chip(baz), findsOneWidget);
   });
@@ -102,7 +107,7 @@ void main() {
       // ابن باز and الفوزان are both still listed here.
       expect(find.text('كل الشيوخ'), findsNothing);
       expect(find.byType(ScholarFilterPill), findsNothing);
-      expect(find.text(baz), findsOneWidget);
+      expect(find.text(bazFull), findsOneWidget);
 
       // …and nothing is being filtered behind the missing chips.
       expect(find.text('الفقه'), findsOneWidget);

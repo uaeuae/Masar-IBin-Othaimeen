@@ -7,6 +7,7 @@ import '../../core/widgets/journey_card.dart';
 import '../../core/widgets/masar_chip.dart';
 import '../../core/widgets/skeleton.dart';
 import '../library/library_providers.dart';
+import '../library/scholar_filter.dart';
 import '../scholars/scholar_providers.dart';
 import 'journeys_providers.dart';
 
@@ -20,6 +21,7 @@ class JourneysScreen extends ConsumerWidget {
     final sciences = ref.watch(sciencesProvider).value ?? const [];
     final scholars = ref.watch(scholarsBySlugProvider);
     final scienceFilter = ref.watch(scienceFilterProvider);
+    final scholarFilter = ref.watch(activeScholarFilterProvider);
 
     String scienceName(String? slug) =>
         sciences
@@ -74,7 +76,13 @@ class JourneysScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
+            // Two مسارات share the title «مسار العقيدة», one per scholar —
+            // filtering by شيخ is what tells the list apart.
+            const Padding(
+              padding: EdgeInsetsDirectional.only(start: 20, end: 20),
+              child: ScholarFilterChips(),
+            ),
             Expanded(
               child: journeysAsync.when(
                 loading: () => ListView(
@@ -99,12 +107,19 @@ class JourneysScreen extends ConsumerWidget {
                             scienceFilter == null ||
                             j.scienceSlug == scienceFilter,
                       )
+                      .where(
+                        (j) =>
+                            scholarFilter == null ||
+                            j.scholarSlugs.contains(scholarFilter),
+                      )
                       .toList();
                   if (filtered.isEmpty) {
-                    return const EmptyState(
+                    return EmptyState(
                       icon: Icons.filter_alt_off_rounded,
                       title: 'لا مسارات تطابق التصفية',
-                      message: 'جرّب اختيار علم آخر.',
+                      message: scholarFilter == null
+                          ? 'جرّب اختيار علم آخر.'
+                          : 'جرّب علمًا آخر، أو أزل تصفية الشيخ.',
                     );
                   }
                   return ListView.separated(

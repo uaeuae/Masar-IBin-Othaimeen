@@ -48,7 +48,7 @@ void main() {
   ) async {
     await openLibrary(tester);
 
-    expect(find.text('الشيوخ'), findsOneWidget);
+    expect(find.text('المشايخ'), findsWidgets);
     expect(find.text('الشيخ محمد بن صالح العثيمين'), findsWidgets);
     expect(find.text('الشيخ عبد العزيز بن عبد الله بن باز'), findsWidgets);
     // Announced, not hidden — one card says «قريبًا», the other a real count.
@@ -182,7 +182,7 @@ void main() {
     // the lesson away, which is what the short_name_ar seed field is for.
     expect(find.textContaining('ابن عثيمين · الدرس'), findsOneWidget);
 
-    expect(find.text('شيوخك'), findsOneWidget);
+    expect(find.text('المشايخ'), findsWidgets);
     expect(find.text('ابن باز'), findsWidgets);
     expect(find.text('المزيد'), findsOneWidget);
   });

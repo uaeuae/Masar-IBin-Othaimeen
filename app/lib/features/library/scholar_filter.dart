@@ -41,7 +41,7 @@ class ScholarFilterChips extends ConsumerWidget {
             for (final scholar in scholars) ...[
               const SizedBox(width: 8),
               MasarChip(
-                label: scholar.nameAr,
+                label: scholar.displayShortName,
                 selected: selected == scholar.slug,
                 onTap: () =>
                     ref.read(scholarFilterProvider.notifier).set(scholar.slug),
@@ -159,7 +159,7 @@ class ScholarFilterPill extends ConsumerWidget {
           padding: EdgeInsetsDirectional.fromSTEB(12, 5, selected ? 10 : 12, 5),
           // Bounded so a pill can never run off the row — `name_ar` is the
           // full name, and the × has to stay reachable at the end of it.
-          constraints: const BoxConstraints(maxWidth: 230),
+          constraints: const BoxConstraints(maxWidth: 200),
           decoration: BoxDecoration(
             color: selected ? scheme.primaryContainer : masar.chipBg,
             borderRadius: BorderRadius.circular(AppRadius.chip),
@@ -174,7 +174,7 @@ class ScholarFilterPill extends ConsumerWidget {
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
-                  scholar.nameAr,
+                  scholar.displayShortName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
