@@ -6,6 +6,7 @@ import '../../app/theme.dart';
 import '../../core/formatters.dart';
 import '../../core/widgets/back_circle.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/masar_refresh.dart';
 import '../../data/providers.dart';
 import '../settings/theme_mode_provider.dart';
 import 'downloads_providers.dart';
@@ -28,101 +29,104 @@ class DownloadsScreen extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-          children: [
-            Row(
-              children: [
-                const BackCircle(),
-                const SizedBox(width: 12),
-                Text('التنزيلات', style: theme.textTheme.headlineSmall),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              bytesAsync.when(
-                loading: () => '…',
-                error: (_, _) => '',
-                data: (bytes) => bytes == 0
-                    ? 'لا توجد دروس منزّلة بعد.'
-                    : 'يشغل ${byteLabel(bytes)} من مساحة الجهاز.',
+        child: MasarRefresh(
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+            children: [
+              Row(
+                children: [
+                  const BackCircle(),
+                  const SizedBox(width: 12),
+                  Text('التنزيلات', style: theme.textTheme.headlineSmall),
+                ],
               ),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: scheme.onSurfaceVariant,
+              const SizedBox(height: 8),
+              Text(
+                bytesAsync.when(
+                  loading: () => '…',
+                  error: (_, _) => '',
+                  data: (bytes) => bytes == 0
+                      ? 'لا توجد دروس منزّلة بعد.'
+                      : 'يشغل ${byteLabel(bytes)} من مساحة الجهاز.',
+                ),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            const SizedBox(height: 18),
+              const SizedBox(height: 18),
 
-            Container(
-              decoration: BoxDecoration(
-                color: scheme.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(AppRadius.card),
-                border: Border.all(color: scheme.outlineVariant),
-              ),
-              clipBehavior: Clip.antiAlias,
-              // List tiles paint their ink on the nearest Material ancestor;
-              // without one the decorated Container swallows the splash.
-              child: Material(
-                color: Colors.transparent,
-                child: SwitchListTile.adaptive(
-                  value: allowMobile,
-                  onChanged: (v) =>
-                      ref.read(allowMobileDataProvider.notifier).set(v),
-                  title: Text(
-                    'السماح بالتنزيل عبر بيانات الجوال',
-                    style: theme.textTheme.titleSmall,
-                  ),
-                  subtitle: Text(
-                    'التنزيل مقتصر على Wi-Fi افتراضيًا — الدرس الواحد قد يتجاوز ٤٠ ميغابايت.',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
+              Container(
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerLow,
+                  borderRadius: BorderRadius.circular(AppRadius.card),
+                  border: Border.all(color: scheme.outlineVariant),
+                ),
+                clipBehavior: Clip.antiAlias,
+                // List tiles paint their ink on the nearest Material ancestor;
+                // without one the decorated Container swallows the splash.
+                child: Material(
+                  color: Colors.transparent,
+                  child: SwitchListTile.adaptive(
+                    value: allowMobile,
+                    onChanged: (v) =>
+                        ref.read(allowMobileDataProvider.notifier).set(v),
+                    title: Text(
+                      'السماح بالتنزيل عبر بيانات الجوال',
+                      style: theme.textTheme.titleSmall,
                     ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 18),
-
-            itemsAsync.when(
-              loading: () => const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-              error: (error, stack) => const EmptyState(
-                icon: Icons.error_outline_rounded,
-                title: 'تعذّر قراءة التنزيلات',
-              ),
-              data: (groups) {
-                if (groups.isEmpty) {
-                  return const EmptyState(
-                    icon: Icons.download_outlined,
-                    title: 'لا توجد تنزيلات',
-                    message:
-                        'نزّل أي درس صوتي من صفحة السلسلة للاستماع إليه دون اتصال.',
-                  );
-                }
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    for (final group in groups) ...[
-                      _SeriesGroup(group: group),
-                      const SizedBox(height: 14),
-                    ],
-                    const SizedBox(height: 4),
-                    TextButton(
-                      onPressed: () => _confirmClearAll(context, ref),
-                      style: TextButton.styleFrom(
-                        foregroundColor: masar.textMuted,
+                    subtitle: Text(
+                      'التنزيل مقتصر على Wi-Fi افتراضيًا — الدرس الواحد قد يتجاوز ٤٠ ميغابايت.',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
                       ),
-                      child: const Text('حذف جميع التنزيلات'),
                     ),
-                  ],
-                );
-              },
-            ),
-          ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+
+              itemsAsync.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                error: (error, stack) => const EmptyState(
+                  icon: Icons.error_outline_rounded,
+                  title: 'تعذّر قراءة التنزيلات',
+                ),
+                data: (groups) {
+                  if (groups.isEmpty) {
+                    return const EmptyState(
+                      icon: Icons.download_outlined,
+                      title: 'لا توجد تنزيلات',
+                      message:
+                          'نزّل أي درس صوتي من صفحة السلسلة للاستماع إليه دون اتصال.',
+                    );
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final group in groups) ...[
+                        _SeriesGroup(group: group),
+                        const SizedBox(height: 14),
+                      ],
+                      const SizedBox(height: 4),
+                      TextButton(
+                        onPressed: () => _confirmClearAll(context, ref),
+                        style: TextButton.styleFrom(
+                          foregroundColor: masar.textMuted,
+                        ),
+                        child: const Text('حذف جميع التنزيلات'),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

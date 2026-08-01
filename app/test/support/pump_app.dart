@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -23,6 +25,25 @@ typedef PumpedApp = ({
   FakeLessonPlayerEngine engine,
   FakeAudioLessonEngine audioEngine,
 });
+
+/// Serves the frozen fixture where the app expects its bundled catalog.
+///
+/// `rootBundle` does real file I/O, which deadlocks under the widget-test
+/// FakeAsync clock — so anything that re-reads the bundle would hang a test
+/// rather than be covered by one. Pull-to-refresh re-reads it, which is why
+/// this exists.
+class _FixtureBundle extends CachingAssetBundle {
+  @override
+  Future<ByteData> load(String key) async {
+    if (key != CatalogRepository.bundledCatalogAsset) {
+      throw FlutterError('unexpected asset in a test: $key');
+    }
+    final bytes = utf8.encode(
+      File('test/support/fixture_catalog.json').readAsStringSync(),
+    );
+    return ByteData.view(Uint8List.fromList(bytes).buffer);
+  }
+}
 
 /// Scrolls the target into view if needed, then taps it and settles.
 ///
@@ -58,10 +79,12 @@ void testApp(
   Future<void> Function(WidgetTester tester, PumpedApp app) body, {
   bool importCatalog = true,
   List<Override> overrides = const [],
+
   /// Coach marks are marked already-seen by default: they cover the screen on
   /// first launch, and every other test would be fighting an overlay. A test
   /// about onboarding sets this true.
   bool showCoachMarks = false,
+
   /// Runs after the catalog import but before the app is pumped, for state the
   /// very first build must already see — coach marks, for instance, decide
   /// what to point at on that build and never reconsider.
@@ -96,12 +119,14 @@ void testApp(
         ProviderScope(
           overrides: [
             databaseProvider.overrideWithValue(db),
+            assetBundleProvider.overrideWithValue(_FixtureBundle()),
             sharedPreferencesProvider.overrideWithValue(prefs),
             playerEngineFactoryProvider.overrideWithValue(() => engine),
             audioEngineFactoryProvider.overrideWithValue(() => audioEngine),
-            // The fixture is imported above; the real bootstrap would load
-            // the bundled asset (real I/O — deadlocks under FakeAsync) and
-            // overwrite the fixture with the production catalog.
+            // The fixture is imported above, so the bootstrap has nothing left
+            // to do. It reads through [_FixtureBundle] either way now, which is
+            // what lets pull-to-refresh — which re-reads the bundle — be tested
+            // at all rather than hang.
             catalogReadyProvider.overrideWith((ref) async {}),
             ...overrides,
           ],

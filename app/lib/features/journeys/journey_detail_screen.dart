@@ -7,6 +7,7 @@ import '../../core/formatters.dart';
 import '../../core/widgets/back_circle.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/level_badge.dart';
+import '../../core/widgets/masar_refresh.dart';
 import '../../core/widgets/scholar_avatar.dart';
 import '../../core/widgets/skeleton.dart';
 import '../../core/widgets/stage_timeline.dart';
@@ -25,26 +26,33 @@ class JourneyDetailScreen extends ConsumerWidget {
     final detailAsync = ref.watch(journeyDetailProvider(slug));
 
     return Scaffold(
-      body: detailAsync.when(
-        loading: () => const Center(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Skeleton(height: 200, width: double.infinity),
+      body: MasarRefresh(
+        child: detailAsync.when(
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Skeleton(height: 200, width: double.infinity),
+            ),
           ),
+          error: (error, stack) => const RefreshableMessage(
+            child: EmptyState(
+              icon: Icons.error_outline_rounded,
+              title: 'تعذر تحميل المسار',
+              message: 'اسحب للأسفل للمحاولة مجددًا.',
+            ),
+          ),
+          data: (detail) {
+            if (detail == null) {
+              return const RefreshableMessage(
+                child: EmptyState(
+                  icon: Icons.search_off_rounded,
+                  title: 'المسار غير موجود',
+                ),
+              );
+            }
+            return _JourneyDetailBody(detail: detail);
+          },
         ),
-        error: (error, stack) => const EmptyState(
-          icon: Icons.error_outline_rounded,
-          title: 'تعذر تحميل المسار',
-        ),
-        data: (detail) {
-          if (detail == null) {
-            return const EmptyState(
-              icon: Icons.search_off_rounded,
-              title: 'المسار غير موجود',
-            );
-          }
-          return _JourneyDetailBody(detail: detail);
-        },
       ),
     );
   }
@@ -67,6 +75,7 @@ class _JourneyDetailBody extends ConsumerWidget {
     ];
 
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       children: [
         // ── Green gradient header carries the journey identity ─────────

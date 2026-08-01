@@ -6,6 +6,7 @@ import '../../app/theme.dart';
 import '../../core/formatters.dart';
 import '../../core/widgets/back_circle.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/masar_refresh.dart';
 import '../../core/widgets/scholar_avatar.dart';
 import '../../core/widgets/series_card.dart';
 import '../../core/widgets/skeleton.dart';
@@ -60,16 +61,19 @@ class ScholarScreen extends ConsumerWidget {
     }
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _Header(scholar: scholar)),
-          if (scholar.status.isComingSoon)
-            SliverToBoxAdapter(child: _ComingSoon(scholar: scholar))
-          else
-            _SeriesList(slug: slug),
-          SliverToBoxAdapter(child: _Permission(scholar: scholar)),
-          const SliverToBoxAdapter(child: SizedBox(height: 28)),
-        ],
+      body: MasarRefresh(
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(child: _Header(scholar: scholar)),
+            if (scholar.status.isComingSoon)
+              SliverToBoxAdapter(child: _ComingSoon(scholar: scholar))
+            else
+              _SeriesList(slug: slug),
+            SliverToBoxAdapter(child: _Permission(scholar: scholar)),
+            const SliverToBoxAdapter(child: SizedBox(height: 28)),
+          ],
+        ),
       ),
     );
   }
@@ -111,7 +115,10 @@ class _Header extends ConsumerWidget {
                 height: 84,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: masar.gold.withAlpha(0x99), width: 2),
+                  border: Border.all(
+                    color: masar.gold.withAlpha(0x99),
+                    width: 2,
+                  ),
                 ),
                 alignment: Alignment.center,
                 child: ScholarAvatar.of(scholar, size: 70, onHero: true),
@@ -288,7 +295,11 @@ class _Permission extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.verified_outlined, size: 16, color: masar.goldTintFg),
+                Icon(
+                  Icons.verified_outlined,
+                  size: 16,
+                  color: masar.goldTintFg,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(

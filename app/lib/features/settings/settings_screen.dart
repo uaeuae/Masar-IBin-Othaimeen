@@ -6,6 +6,7 @@ import '../../app/theme.dart';
 import '../../core/widgets/back_circle.dart';
 import '../../core/widgets/scholar_avatar.dart';
 import '../../core/widgets/segmented_control.dart';
+import '../../core/widgets/masar_refresh.dart';
 import '../../data/providers.dart';
 import '../feedback/feedback_report.dart';
 import '../../data/view_models.dart';
@@ -28,143 +29,147 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          children: [
-            Row(
-              children: [
-                const BackCircle(),
-                const SizedBox(width: 12),
-                Text('الإعدادات', style: theme.textTheme.headlineSmall),
-              ],
-            ),
-            const SizedBox(height: 18),
-
-            // ── المظهر ────────────────────────────────────────────────
-            Text(
-              'المظهر',
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: scheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 10),
-            SegmentedControl<ThemeMode>(
-              segments: const {
-                ThemeMode.light: 'فاتح',
-                ThemeMode.dark: 'داكن',
-                ThemeMode.system: 'تلقائي',
-              },
-              selected: themeMode,
-              onChanged: (mode) =>
-                  ref.read(themeModeProvider.notifier).set(mode),
-            ),
-            const SizedBox(height: 18),
-
-            // ── Toggles ──────────────────────────────────────────────
-            _GroupCard(
-              children: [
-                _ToggleRow(
-                  title: 'التشغيل التلقائي للدرس التالي',
-                  subtitle: 'ينتقل تلقائيًا بعد انتهاء الدرس',
-                  value: autoplay,
-                  onChanged: (v) => ref.read(autoplayProvider.notifier).set(v),
-                ),
-                _ToggleRow(
-                  title: 'توحيد مستوى الصوت',
-                  subtitle:
-                      'يعادل بين الدروس المرتفعة والمنخفضة حسب مستوى كل تسجيل',
-                  value: normalize,
-                  onChanged: (v) =>
-                      ref.read(normalizeVolumeProvider.notifier).set(v),
-                ),
-                _ToggleRow(
-                  title: 'تذكير المتابعة اليومي',
-                  subtitle: 'إشعار لطيف لمواصلة مسارك (قريبًا)',
-                  value: reminder,
-                  onChanged: (v) =>
-                      ref.read(dailyReminderProvider.notifier).set(v),
-                  showDivider: false,
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-
-            // ── Links ────────────────────────────────────────────────
-            _GroupCard(
-              children: [
-                _LinkRow(
-                  title: 'التنزيلات',
-                  onTap: () => context.push('/downloads'),
-                ),
-                _LinkRow(
-                  title: 'الإبلاغ عن خطأ أو اقتراح',
-                  onTap: () => context.push('/feedback'),
-                ),
-                _LinkRow(
-                  title: 'مسح بيانات التقدم',
-                  showDivider: false,
-                  onTap: () => _confirmWipe(context, ref),
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-
-            // ── المصادر والإسناد (design 4f) ──────────────────────────
-            // A list rather than one credit line: each scholar has his own
-            // rights holder and his own official site, so there is no single
-            // «المؤسسة» to name — and a list of one still reads as "sources".
-            Text(
-              'المصادر والإسناد',
-              style: theme.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: scheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 10),
-            const _SourcesCard(),
-            const SizedBox(height: 18),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: masar.attributionBg,
-                borderRadius: BorderRadius.circular(AppRadius.group),
-                border: Border.all(color: masar.attributionBorder),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: MasarRefresh(
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            children: [
+              Row(
                 children: [
-                  Text(
-                    'مسار طالب العلم — تطبيق تطوعي غير ربحي',
-                    style: serif(17, masar.attributionText),
+                  const BackCircle(),
+                  const SizedBox(width: 12),
+                  Text('الإعدادات', style: theme.textTheme.headlineSmall),
+                ],
+              ),
+              const SizedBox(height: 18),
+
+              // ── المظهر ────────────────────────────────────────────────
+              Text(
+                'المظهر',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 10),
+              SegmentedControl<ThemeMode>(
+                segments: const {
+                  ThemeMode.light: 'فاتح',
+                  ThemeMode.dark: 'داكن',
+                  ThemeMode.system: 'تلقائي',
+                },
+                selected: themeMode,
+                onChanged: (mode) =>
+                    ref.read(themeModeProvider.notifier).set(mode),
+              ),
+              const SizedBox(height: 18),
+
+              // ── Toggles ──────────────────────────────────────────────
+              _GroupCard(
+                children: [
+                  _ToggleRow(
+                    title: 'التشغيل التلقائي للدرس التالي',
+                    subtitle: 'ينتقل تلقائيًا بعد انتهاء الدرس',
+                    value: autoplay,
+                    onChanged: (v) =>
+                        ref.read(autoplayProvider.notifier).set(v),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'كل درس منسوب إلى شيخه ومصدره الرسمي. بلا حسابات، بلا إعلانات، '
-                    'بلا جمع بيانات — تقدمك محفوظ على جهازك فقط.',
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: masar.attributionText,
-                      fontWeight: FontWeight.w400,
-                      height: 1.7,
-                    ),
+                  _ToggleRow(
+                    title: 'توحيد مستوى الصوت',
+                    subtitle:
+                        'يعادل بين الدروس المرتفعة والمنخفضة حسب مستوى كل تسجيل',
+                    value: normalize,
+                    onChanged: (v) =>
+                        ref.read(normalizeVolumeProvider.notifier).set(v),
+                  ),
+                  _ToggleRow(
+                    title: 'تذكير المتابعة اليومي',
+                    subtitle: 'إشعار لطيف لمواصلة مسارك (قريبًا)',
+                    value: reminder,
+                    onChanged: (v) =>
+                        ref.read(dailyReminderProvider.notifier).set(v),
+                    showDivider: false,
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 18),
-            Center(
-              child: Text(
-                'Masar v$kAppVersion',
-                textDirection: TextDirection.ltr,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontFamily: kMonoFont,
-                  fontSize: 11,
-                  color: masar.textFaint,
+              const SizedBox(height: 18),
+
+              // ── Links ────────────────────────────────────────────────
+              _GroupCard(
+                children: [
+                  _LinkRow(
+                    title: 'التنزيلات',
+                    onTap: () => context.push('/downloads'),
+                  ),
+                  _LinkRow(
+                    title: 'الإبلاغ عن خطأ أو اقتراح',
+                    onTap: () => context.push('/feedback'),
+                  ),
+                  _LinkRow(
+                    title: 'مسح بيانات التقدم',
+                    showDivider: false,
+                    onTap: () => _confirmWipe(context, ref),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+
+              // ── المصادر والإسناد (design 4f) ──────────────────────────
+              // A list rather than one credit line: each scholar has his own
+              // rights holder and his own official site, so there is no single
+              // «المؤسسة» to name — and a list of one still reads as "sources".
+              Text(
+                'المصادر والإسناد',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: scheme.onSurfaceVariant,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 10),
+              const _SourcesCard(),
+              const SizedBox(height: 18),
+
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: masar.attributionBg,
+                  borderRadius: BorderRadius.circular(AppRadius.group),
+                  border: Border.all(color: masar.attributionBorder),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'مسار طالب العلم — تطبيق تطوعي غير ربحي',
+                      style: serif(17, masar.attributionText),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'كل درس منسوب إلى شيخه ومصدره الرسمي. بلا حسابات، بلا إعلانات، '
+                      'بلا جمع بيانات — تقدمك محفوظ على جهازك فقط.',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: masar.attributionText,
+                        fontWeight: FontWeight.w400,
+                        height: 1.7,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+              Center(
+                child: Text(
+                  'Masar v$kAppVersion',
+                  textDirection: TextDirection.ltr,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontFamily: kMonoFont,
+                    fontSize: 11,
+                    color: masar.textFaint,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

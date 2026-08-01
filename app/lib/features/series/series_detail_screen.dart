@@ -8,6 +8,7 @@ import '../../core/widgets/back_circle.dart';
 import '../../core/widgets/empty_state.dart';
 import '../../core/widgets/lesson_row.dart';
 import '../../core/widgets/skeleton.dart';
+import '../../core/widgets/masar_refresh.dart';
 import '../../data/models/enums.dart';
 import '../../data/view_models.dart';
 import '../downloads/download_button.dart';
@@ -28,24 +29,32 @@ class SeriesDetailScreen extends ConsumerWidget {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: detailAsync.when(
-          loading: () => ListView(
-            padding: const EdgeInsets.all(20),
-            children: const [Skeleton(height: 260, width: double.infinity)],
+        child: MasarRefresh(
+          child: detailAsync.when(
+            loading: () => ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(20),
+              children: const [Skeleton(height: 260, width: double.infinity)],
+            ),
+            error: (error, stack) => const RefreshableMessage(
+              child: EmptyState(
+                icon: Icons.error_outline_rounded,
+                title: 'تعذر تحميل السلسلة',
+                message: 'اسحب للأسفل للمحاولة مجددًا.',
+              ),
+            ),
+            data: (detail) {
+              if (detail == null) {
+                return const RefreshableMessage(
+                  child: EmptyState(
+                    icon: Icons.search_off_rounded,
+                    title: 'السلسلة غير موجودة',
+                  ),
+                );
+              }
+              return _SeriesDetailBody(detail: detail);
+            },
           ),
-          error: (error, stack) => const EmptyState(
-            icon: Icons.error_outline_rounded,
-            title: 'تعذر تحميل السلسلة',
-          ),
-          data: (detail) {
-            if (detail == null) {
-              return const EmptyState(
-                icon: Icons.search_off_rounded,
-                title: 'السلسلة غير موجودة',
-              );
-            }
-            return _SeriesDetailBody(detail: detail);
-          },
         ),
       ),
     );
@@ -76,6 +85,7 @@ class _SeriesDetailBody extends ConsumerWidget {
         '';
 
     return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       children: [
         const Row(children: [BackCircle()]),

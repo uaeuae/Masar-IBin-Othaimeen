@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart'
     show ErrorDescription, FlutterError, FlutterErrorDetails, debugPrint;
+import 'package:flutter/services.dart' show AssetBundle, rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,8 +28,19 @@ final databaseProvider = Provider<AppDatabase>((ref) {
   return db;
 });
 
+/// Where the bundled catalog snapshot is read from.
+///
+/// Overridden in tests: `rootBundle` does real file I/O, which deadlocks under
+/// the widget-test FakeAsync clock. Without this seam anything that re-reads the
+/// bundle — startup, and now pull-to-refresh — simply hangs a widget test
+/// instead of being exercised by it.
+final assetBundleProvider = Provider<AssetBundle>((ref) => rootBundle);
+
 final catalogRepositoryProvider = Provider<CatalogRepository>(
-  (ref) => CatalogRepository(ref.watch(databaseProvider)),
+  (ref) => CatalogRepository(
+    ref.watch(databaseProvider),
+    bundle: ref.watch(assetBundleProvider),
+  ),
 );
 
 final progressRepositoryProvider = Provider<ProgressRepository>(

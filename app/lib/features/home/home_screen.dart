@@ -6,6 +6,7 @@ import '../../app/theme.dart';
 import '../../core/formatters.dart';
 import '../../core/widgets/level_badge.dart';
 import '../../core/widgets/masar_chip.dart';
+import '../../core/widgets/masar_refresh.dart';
 import '../../core/widgets/progress_ring.dart';
 import '../../core/widgets/resume_hero_card.dart';
 import '../../core/widgets/scholar_avatar.dart';
@@ -109,199 +110,204 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          children: [
-            // ── Greeting + settings ──────────────────────────────────
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'السلام عليكم ورحمة الله',
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          color: scheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'أهلًا بك يا طالب العلم',
-                        style: theme.textTheme.headlineSmall,
-                      ),
-                    ],
-                  ),
-                ),
-                Semantics(
-                  button: true,
-                  label: 'الإعدادات',
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () => context.push('/settings'),
-                    child: Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: scheme.primaryContainer,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: masar.greenTintBorder),
-                      ),
-                      alignment: Alignment.center,
-                      child: Icon(
-                        // The design put a clock roundel here, but the button
-                        // opens Settings — a clock promised something else.
-                        Icons.settings_rounded,
-                        size: 20,
-                        color: scheme.onPrimaryContainer,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // ── Level chips (onboarding replacement) ─────────────────
-            // Scrolls: three chips fit a phone at the default text size with
-            // almost nothing to spare, and overflow as soon as the reader turns
-            // text up. A chip row that clips is worse than one that scrolls.
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                key: _levelKey,
-                children: [
-                  for (final l in JourneyLevel.values) ...[
-                    MasarChip(
-                      label: l.labelAr,
-                      selected: level == l,
-                      onTap: () => ref.read(levelFilterProvider.notifier).set(l),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // ── متابعة المشاهدة ──────────────────────────────────────
-            if (resume != null) ...[
-              Text('متابعة المشاهدة', style: theme.textTheme.titleLarge),
-              const SizedBox(height: 12),
-              Dismissible(
-                key: ValueKey('resume-${resume.videoId}'),
-                // Either way: a one-way swipe would feel backwards to half the
-                // gestures in an RTL layout.
-                direction: DismissDirection.horizontal,
-                background: const _RemoveSwipeBackground(),
-                secondaryBackground: const _RemoveSwipeBackground(),
-                confirmDismiss: (_) => _confirmRemove(context),
-                onDismissed: (_) => ref
-                    .read(progressRepositoryProvider)
-                    .dismissFromContinue(resume.videoId),
-                child: ResumeHeroCard(
-                  key: _resumeKey,
-                  seriesTitle: resume.seriesTitleAr,
-                  scholar: ref.watch(scholarProvider(resume.scholarSlug)),
-                  lessonLabel:
-                      'الدرس ${arabicDigits(resume.position)} — ${resume.titleAr}',
-                  progress: resume.progress,
-                  stoppedAt: Duration(seconds: resume.watchedSeconds),
-                  remaining: resume.durationSeconds == null
-                      ? null
-                      : Duration(
-                          seconds:
-                              (resume.durationSeconds! - resume.watchedSeconds)
-                                  .clamp(0, 1 << 31),
-                        ),
-                  onTap: () => context.push(
-                    '/player/${resume.videoId}?series=${resume.seriesSlug}',
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
-
-            // ── مساراتي ─────────────────────────────────────────────
-            if (enrolled.isNotEmpty) ...[
+        child: MasarRefresh(
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            children: [
+              // ── Greeting + settings ──────────────────────────────────
               Row(
                 children: [
                   Expanded(
-                    child: Text('مساراتي', style: theme.textTheme.titleLarge),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'السلام عليكم ورحمة الله',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'أهلًا بك يا طالب العلم',
+                          style: theme.textTheme.headlineSmall,
+                        ),
+                      ],
+                    ),
                   ),
-                  GestureDetector(
-                    onTap: () => context.go('/journeys'),
-                    child: Text(
-                      'عرض الكل',
-                      style: TextStyle(
-                        fontFamily: kUiFont,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                        color: scheme.primary,
+                  Semantics(
+                    button: true,
+                    label: 'الإعدادات',
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () => context.push('/settings'),
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: scheme.primaryContainer,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: masar.greenTintBorder),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          // The design put a clock roundel here, but the button
+                          // opens Settings — a clock promised something else.
+                          Icons.settings_rounded,
+                          size: 20,
+                          color: scheme.onPrimaryContainer,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              for (final journey in enrolled) ...[
-                // Same gesture as the resume card above it: swipe, confirm,
-                // gone. Nothing is forgotten — the lessons keep their progress
-                // and «التحق» brings the مسار back with all of it.
+              const SizedBox(height: 20),
+
+              // ── Level chips (onboarding replacement) ─────────────────
+              // Scrolls: three chips fit a phone at the default text size with
+              // almost nothing to spare, and overflow as soon as the reader turns
+              // text up. A chip row that clips is worse than one that scrolls.
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  key: _levelKey,
+                  children: [
+                    for (final l in JourneyLevel.values) ...[
+                      MasarChip(
+                        label: l.labelAr,
+                        selected: level == l,
+                        onTap: () =>
+                            ref.read(levelFilterProvider.notifier).set(l),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ── متابعة المشاهدة ──────────────────────────────────────
+              if (resume != null) ...[
+                Text('متابعة المشاهدة', style: theme.textTheme.titleLarge),
+                const SizedBox(height: 12),
                 Dismissible(
-                  key: ValueKey('journey-${journey.slug}'),
+                  key: ValueKey('resume-${resume.videoId}'),
+                  // Either way: a one-way swipe would feel backwards to half the
+                  // gestures in an RTL layout.
                   direction: DismissDirection.horizontal,
                   background: const _RemoveSwipeBackground(),
                   secondaryBackground: const _RemoveSwipeBackground(),
-                  confirmDismiss: (_) => _confirmLeaveJourney(context),
+                  confirmDismiss: (_) => _confirmRemove(context),
                   onDismissed: (_) => ref
                       .read(progressRepositoryProvider)
-                      .leaveJourney(journey.slug),
-                  child: _EnrolledJourneyRow(journey: journey),
-                ),
-                const SizedBox(height: 12),
-              ],
-              const SizedBox(height: 8),
-            ],
-
-            // ── شيوخك ───────────────────────────────────────────────
-            const _ScholarsStrip(),
-
-            // ── مسارات مقترحة ────────────────────────────────────────
-            if (shown.isNotEmpty) ...[
-              Text(
-                enrolled.isEmpty ? 'ابدأ رحلتك' : 'مسارات مقترحة لك',
-                style: theme.textTheme.titleLarge,
-              ),
-              if (substituted) ...[
-                const SizedBox(height: 4),
-                Text(
-                  'لا مسار بمستوى «${level.labelAr}» بعد — هذه مقترحات أخرى',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w400,
+                      .dismissFromContinue(resume.videoId),
+                  child: ResumeHeroCard(
+                    key: _resumeKey,
+                    seriesTitle: resume.seriesTitleAr,
+                    scholar: ref.watch(scholarProvider(resume.scholarSlug)),
+                    lessonLabel:
+                        'الدرس ${arabicDigits(resume.position)} — ${resume.titleAr}',
+                    progress: resume.progress,
+                    stoppedAt: Duration(seconds: resume.watchedSeconds),
+                    remaining: resume.durationSeconds == null
+                        ? null
+                        : Duration(
+                            seconds:
+                                (resume.durationSeconds! -
+                                        resume.watchedSeconds)
+                                    .clamp(0, 1 << 31),
+                          ),
+                    onTap: () => context.push(
+                      '/player/${resume.videoId}?series=${resume.seriesSlug}',
+                    ),
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
-              const SizedBox(height: 12),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (final journey in shown) ...[
+
+              // ── مساراتي ─────────────────────────────────────────────
+              if (enrolled.isNotEmpty) ...[
+                Row(
+                  children: [
                     Expanded(
-                      child: _SuggestionCard(
-                        journey: journey,
-                        scienceName: scienceName(journey.scienceSlug),
-                        scienceSortOrder: scienceOrder(journey.scienceSlug),
+                      child: Text('مساراتي', style: theme.textTheme.titleLarge),
+                    ),
+                    GestureDetector(
+                      onTap: () => context.go('/journeys'),
+                      child: Text(
+                        'عرض الكل',
+                        style: TextStyle(
+                          fontFamily: kUiFont,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: scheme.primary,
+                        ),
                       ),
                     ),
-                    if (journey != shown.last) const SizedBox(width: 12),
                   ],
+                ),
+                const SizedBox(height: 12),
+                for (final journey in enrolled) ...[
+                  // Same gesture as the resume card above it: swipe, confirm,
+                  // gone. Nothing is forgotten — the lessons keep their progress
+                  // and «التحق» brings the مسار back with all of it.
+                  Dismissible(
+                    key: ValueKey('journey-${journey.slug}'),
+                    direction: DismissDirection.horizontal,
+                    background: const _RemoveSwipeBackground(),
+                    secondaryBackground: const _RemoveSwipeBackground(),
+                    confirmDismiss: (_) => _confirmLeaveJourney(context),
+                    onDismissed: (_) => ref
+                        .read(progressRepositoryProvider)
+                        .leaveJourney(journey.slug),
+                    child: _EnrolledJourneyRow(journey: journey),
+                  ),
+                  const SizedBox(height: 12),
                 ],
-              ),
+                const SizedBox(height: 8),
+              ],
+
+              // ── شيوخك ───────────────────────────────────────────────
+              const _ScholarsStrip(),
+
+              // ── مسارات مقترحة ────────────────────────────────────────
+              if (shown.isNotEmpty) ...[
+                Text(
+                  enrolled.isEmpty ? 'ابدأ رحلتك' : 'مسارات مقترحة لك',
+                  style: theme.textTheme.titleLarge,
+                ),
+                if (substituted) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'لا مسار بمستوى «${level.labelAr}» بعد — هذه مقترحات أخرى',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final journey in shown) ...[
+                      Expanded(
+                        child: _SuggestionCard(
+                          journey: journey,
+                          scienceName: scienceName(journey.scienceSlug),
+                          scienceSortOrder: scienceOrder(journey.scienceSlug),
+                        ),
+                      ),
+                      if (journey != shown.last) const SizedBox(width: 12),
+                    ],
+                  ],
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -661,7 +667,11 @@ class _MoreScholarsTile extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
-                child: Icon(Icons.add_rounded, size: 20, color: masar.textMuted),
+                child: Icon(
+                  Icons.add_rounded,
+                  size: 20,
+                  color: masar.textMuted,
+                ),
               ),
               const SizedBox(height: 6),
               Text(
