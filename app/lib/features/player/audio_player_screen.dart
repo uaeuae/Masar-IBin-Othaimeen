@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/theme.dart';
 import '../../core/formatters.dart';
@@ -12,6 +13,7 @@ import '../../core/widgets/science_glyph.dart';
 import '../../data/models/catalog.dart' show CatalogChapter;
 import '../../data/models/enums.dart';
 import '../../data/view_models.dart';
+import '../feedback/feedback_report.dart';
 import '../scholars/scholar_providers.dart';
 import '../series/series_providers.dart';
 import '../settings/theme_mode_provider.dart';
@@ -161,6 +163,27 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
 
   Future<void> _skipBy(int seconds, Duration? total) =>
       _playback.skipBy(seconds);
+
+  /// Opens a report already carrying this lesson, its series, its scholar and
+  /// the moment being listened to — the reader only has to say what is wrong.
+  void _reportLesson(LessonWithProgress lesson) {
+    final scholar = _series == null
+        ? null
+        : ref.read(scholarProvider(_series!.series.scholarSlug));
+    context.push(
+      Uri(
+        path: '/feedback',
+        queryParameters: {
+          'kind': ReportKind.wrongInfo.name,
+          'lesson': lesson.videoId,
+          'title': 'الدرس ${arabicDigits(lesson.position)} — ${lesson.titleAr}',
+          if (_series != null) 'series': _series!.series.titleAr,
+          if (scholar != null) 'scholar': scholar.nameAr,
+          'at': '${_position.inSeconds}',
+        },
+      ).toString(),
+    );
+  }
 
   Future<void> _seekToFraction(double fraction, Duration total) async {
     final target = Duration(
@@ -335,36 +358,60 @@ class _AudioPlayerScreenState extends ConsumerState<AudioPlayerScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const BackCircle(),
+                  // Flexible: this line is the only thing here that can give
+                  // way, and the row gained a button.
+                  Flexible(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_playingOffline) ...[
+                          Icon(
+                            Icons.download_done_rounded,
+                            size: 13,
+                            color: scheme.primary,
+                          ),
+                          const SizedBox(width: 4),
+                        ],
+                        Flexible(
+                          child: Text(
+                            _playingOffline
+                                ? 'تشغيل من التنزيلات'
+                                : 'تشغيل صوتي · يعمل في الخلفية',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: _playingOffline
+                                  ? scheme.primary
+                                  : scheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (_playingOffline) ...[
-                        Icon(
-                          Icons.download_done_rounded,
-                          size: 13,
-                          color: scheme.primary,
-                        ),
-                        const SizedBox(width: 4),
-                      ],
-                      Text(
-                        _playingOffline
-                            ? 'تشغيل من التنزيلات'
-                            : 'تشغيل صوتي · يعمل في الخلفية',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: _playingOffline
-                              ? scheme.primary
-                              : scheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      // Here rather than only in Settings: a wrong title or a
+                      // mis-attributed lesson is noticed while listening to it,
+                      // and a report that names the lesson is worth far more
+                      // than one that says «هناك خطأ».
+                      _RoundIconButton(
+                        icon: Icons.flag_outlined,
+                        onTap: current == null
+                            ? null
+                            : () => _reportLesson(current),
+                      ),
+                      const SizedBox(width: 8),
+                      _RoundIconButton(
+                        icon: _sleepMinutes == null
+                            ? Icons.bedtime_outlined
+                            : Icons.bedtime,
+                        highlighted: _sleepMinutes != null,
+                        onTap: _pickSleepTimer,
                       ),
                     ],
-                  ),
-                  _RoundIconButton(
-                    icon: _sleepMinutes == null
-                        ? Icons.bedtime_outlined
-                        : Icons.bedtime,
-                    highlighted: _sleepMinutes != null,
-                    onTap: _pickSleepTimer,
                   ),
                 ],
               ),
@@ -752,7 +799,10 @@ class _RoundIconButton extends StatelessWidget {
   });
 
   final IconData icon;
-  final VoidCallback onTap;
+
+  /// Null disables the button — the report action has nothing to report until
+  /// the lesson has loaded.
+  final VoidCallback? onTap;
   final bool highlighted;
 
   @override
@@ -771,7 +821,11 @@ class _RoundIconButton extends StatelessWidget {
         child: Icon(
           icon,
           size: 16,
-          color: highlighted ? scheme.primary : scheme.onSurfaceVariant,
+          color: onTap == null
+              ? scheme.onSurfaceVariant.withAlpha(0x66)
+              : highlighted
+              ? scheme.primary
+              : scheme.onSurfaceVariant,
         ),
       ),
     );

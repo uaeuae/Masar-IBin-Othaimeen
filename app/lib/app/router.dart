@@ -14,6 +14,8 @@ import '../features/player/lesson_player_dispatcher.dart';
 import '../features/scholars/scholar_screen.dart';
 import '../features/series/series_detail_screen.dart';
 import '../features/downloads/downloads_screen.dart';
+import '../features/feedback/feedback_report.dart';
+import '../features/feedback/feedback_screen.dart';
 import '../features/series/book_text_screen.dart';
 import '../features/settings/settings_screen.dart';
 import 'shell.dart';
@@ -92,6 +94,25 @@ GoRouter _createRouter() => GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+    // Reachable from Settings, and from the player with the lesson attached —
+    // «خطأ في المعلومات» is close to useless without knowing which lesson.
+    GoRoute(
+      path: '/feedback',
+      builder: (context, state) {
+        final q = state.uri.queryParameters;
+        return FeedbackScreen(
+          initialKind: ReportKind.values.firstWhere(
+            (k) => k.name == q['kind'],
+            orElse: () => ReportKind.wrongInfo,
+          ),
+          lessonId: q['lesson'],
+          lessonTitle: q['title'],
+          seriesTitle: q['series'],
+          scholarName: q['scholar'],
+          positionSeconds: int.tryParse(q['at'] ?? ''),
+        );
+      },
     ),
     GoRoute(
       path: '/series/:slug/book',

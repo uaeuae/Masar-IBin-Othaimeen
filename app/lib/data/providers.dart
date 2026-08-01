@@ -82,6 +82,13 @@ final downloadsProvider = StreamProvider<Map<String, DownloadStatus>>(
   (ref) => ref.watch(downloadRepositoryProvider).watchAll(),
 );
 
+/// Which content snapshot this device is on. Worth reporting with a bug: a
+/// «wrong info» report is about a specific catalog, and content is corrected by
+/// republishing it.
+final catalogVersionProvider = FutureProvider<int>(
+  (ref) => ref.watch(catalogRepositoryProvider).currentVersion(),
+);
+
 /// Resolves once the bundled catalog has been imported (first run) or a
 /// catalog is already present. Screens gate on this before querying.
 ///

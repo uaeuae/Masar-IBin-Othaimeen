@@ -52,7 +52,9 @@ void main() {
     await tester.tap(find.byIcon(Icons.settings_rounded));
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.text('Masar v1.0.0'), 300);
+    // Version comes from one constant now, so the footer cannot drift from
+    // what a bug report claims.
+    await tester.scrollUntilVisible(find.textContaining('Masar v'), 300);
     expect(
       find.textContaining('مؤسسة الشيخ محمد بن صالح العثيمين الخيرية'),
       findsOneWidget,

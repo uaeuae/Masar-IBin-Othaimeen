@@ -119,6 +119,11 @@ void main() {
     app,
   ) async {
     await push(tester, '/settings');
+    // Settings grew a report row, so the sources list sits below the fold.
+    await tester.scrollUntilVisible(
+      find.text('مؤسسة الشيخ محمد بن صالح العثيمين الخيرية'),
+      300,
+    );
 
     expect(find.text('المصادر والإسناد'), findsOneWidget);
     expect(

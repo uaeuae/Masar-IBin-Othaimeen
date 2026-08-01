@@ -7,6 +7,7 @@ import '../../core/widgets/back_circle.dart';
 import '../../core/widgets/scholar_avatar.dart';
 import '../../core/widgets/segmented_control.dart';
 import '../../data/providers.dart';
+import '../feedback/feedback_report.dart';
 import '../../data/view_models.dart';
 import '../library/library_providers.dart';
 import 'theme_mode_provider.dart';
@@ -97,6 +98,10 @@ class SettingsScreen extends ConsumerWidget {
                   onTap: () => context.push('/downloads'),
                 ),
                 _LinkRow(
+                  title: 'الإبلاغ عن خطأ أو اقتراح',
+                  onTap: () => context.push('/feedback'),
+                ),
+                _LinkRow(
                   title: 'مسح بيانات التقدم',
                   showDivider: false,
                   onTap: () => _confirmWipe(context, ref),
@@ -150,7 +155,7 @@ class SettingsScreen extends ConsumerWidget {
             const SizedBox(height: 18),
             Center(
               child: Text(
-                'Masar v1.0.0',
+                'Masar v$kAppVersion',
                 textDirection: TextDirection.ltr,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontFamily: kMonoFont,
