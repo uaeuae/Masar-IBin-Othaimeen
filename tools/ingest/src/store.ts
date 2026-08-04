@@ -51,6 +51,19 @@ export interface StoredLesson {
     /** Segment bounds recovered from the audio by `find_anchors`. */
     anchors: number;
     unbounded_seconds: number;
+    /**
+     * Whether the transcript is what is actually said in this recording, which
+     * alignment quality cannot answer. `gap` is how much better the audio
+     * matches the text at the aligned moment than 45 s away; near zero means
+     * the timings carry no information about this recording, however neatly
+     * they were placed.
+     */
+    correspondence?: {
+      samples: number;
+      cer: number;
+      cer_shifted: number;
+      gap: number;
+    } | null;
   } | null;
   chapters?: StoredChapter[];
   /**

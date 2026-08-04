@@ -220,17 +220,36 @@ describe('buildLessonText', () => {
         }),
       );
 
-    it('is set when every span the aligner placed was bounded', () => {
-      const text = aligned({ anchors: 4, unbounded_seconds: 0 });
+    const good = { samples: 40, cer: 0.48, cer_shifted: 0.8, gap: 0.32 };
+
+    it('is set when the spans were bounded and the text matches the audio', () => {
+      const text = aligned({ anchors: 4, unbounded_seconds: 0, correspondence: good });
       expect(text!.measured).toBeGreaterThan(0);
       expect(text!.synced).toBe(true);
     });
 
     it('is absent when a long span had to be walked blind', () => {
-      const text = aligned({ anchors: 0, unbounded_seconds: 5400 });
+      const text = aligned({ anchors: 0, unbounded_seconds: 5400, correspondence: good });
       // Still measured — that is exactly why counting sentences misleads.
       expect(text!.measured).toBeGreaterThan(0);
       expect(text!.synced).toBeUndefined();
+    });
+
+    it('is absent when the transcript is not what the recording says', () => {
+      // Placed perfectly and still unfollowable: the published text is not the
+      // words spoken in this recording. شرح كتاب التوحيد measures here, and no
+      // amount of alignment work moves it — the old aligner scored it the same.
+      const text = aligned({
+        anchors: 0,
+        unbounded_seconds: 0,
+        correspondence: { samples: 40, cer: 0.75, cer_shifted: 0.79, gap: 0.04 },
+      });
+      expect(text!.measured).toBeGreaterThan(0);
+      expect(text!.synced).toBeUndefined();
+    });
+
+    it('is absent when correspondence was never measured', () => {
+      expect(aligned({ anchors: 4, unbounded_seconds: 0 })!.synced).toBeUndefined();
     });
 
     it('is absent for a lesson aligned before coverage was recorded', () => {

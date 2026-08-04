@@ -345,6 +345,21 @@ export function buildLessonText(lesson: StoredLesson): LessonText | null {
 const MAX_TRUSTED_UNBOUNDED_SECONDS = 300;
 
 /**
+ * How much better the audio must match the text at the aligned moment than 45 s
+ * away, before a lesson may claim to be followable.
+ *
+ * This is the gate that alignment quality cannot substitute for. A lesson whose
+ * published transcript is not what was said in that recording places perfectly
+ * and reads wrongly, and the two are indistinguishable without measuring
+ * against the audio. Measured per lesson by `measure_correspondence`, so every
+ * lesson is judged rather than a sample standing in for its series — which
+ * matters because it varies by series far more than by aligner: تفسير جزء عمّ
+ * lands at +0.111…+0.147 while شرح كتاب التوحيد lands at +0.034…+0.057, with
+ * the same aligner on the same day.
+ */
+const MIN_CORRESPONDENCE_GAP = 0.09;
+
+/**
  * Whether a lesson's times are good enough to follow along to.
  *
  * A lesson aligned before `alignment` was recorded has no coverage to read, and
@@ -356,7 +371,10 @@ function isSynced(lesson: StoredLesson, aligned: number): boolean {
   if (aligned <= 0) return false;
   const coverage = lesson.alignment;
   if (!coverage) return false;
-  return (coverage.unbounded_seconds ?? Infinity) <= MAX_TRUSTED_UNBOUNDED_SECONDS;
+  if ((coverage.unbounded_seconds ?? Infinity) > MAX_TRUSTED_UNBOUNDED_SECONDS) return false;
+  // Placed well is not the same as placed against the right words.
+  const gap = coverage.correspondence?.gap;
+  return typeof gap === 'number' && gap >= MIN_CORRESPONDENCE_GAP;
 }
 
 /**

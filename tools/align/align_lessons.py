@@ -36,7 +36,9 @@ import argparse
 import bisect
 import gzip
 import json
+import random
 import re
+import statistics
 import subprocess
 import sys
 import unicodedata
@@ -57,9 +59,27 @@ MODEL_ID = "jonatasgrosman/wav2vec2-large-xlsr-53-arabic"
 CHUNK_SECONDS = 30.0
 CHUNK_OVERLAP_SECONDS = 1.0
 
-# The alignment trellis is frames x tokens, so a 20 minute section will not fit
-# in memory; anything longer than this gets sub-divided.
-MAX_SEGMENT_SECONDS = 300.0
+# The longest span that may be placed in a single trellis.
+#
+# This was 300 s on the belief that "a 20 minute section will not fit in
+# memory". Measured, that is simply false: torchaudio's forced_align does not
+# materialise a frames x tokens trellis, and a whole 91-minute lesson — 275,038
+# frames against 37,598 tokens — aligns at a flat **1.18 GiB** in 93 s, the same
+# peak as a 5-minute one. Every span from 5 to 91 minutes was tried; none came
+# close to the 11 GiB card.
+#
+# That matters more than a tuning constant should, because everything below it
+# existed to work around the imagined limit. A span that fits in one trellis is
+# placed by a single globally optimal monotonic path, so there is no window
+# boundary for error to cross and nothing for drift to accumulate across. Sub-
+# dividing was never more accurate — it was the price of a memory ceiling that
+# was not there.
+#
+# Two hours, so that no lesson in the library is ever sub-divided at all; the
+# longest is under 100 minutes. The anchoring and walking paths below remain as
+# fallbacks for a section the trellis genuinely refuses (more tokens than
+# frames, which means the text and the audio do not correspond).
+MAX_SEGMENT_SECONDS = 7200.0
 # Within a sub-divided section: how much of each sub-window to trust before
 # resuming from the last sentence it placed.
 WINDOW_TRUST = 0.6
@@ -119,6 +139,34 @@ ANCHOR_MIN_SPACING_SECONDS = 1.0
 #: `decode_words` is an argmax over emissions already in memory, and the n-gram
 #: index is over a shorter stream than its parent's.
 MAX_ANCHOR_DEPTH = 3
+
+# --- Does the transcript match what is actually said? ---
+#
+# A separate question from "is it aligned well", and the one that decides
+# whether a lesson can be read along at all. Placing a sentence perfectly is
+# worth nothing if the published text is not what the sheikh said in that
+# recording, and the two failures look identical from the outside.
+#
+# Measured the same way validate_decode.py measures a whole series: cut the
+# audio where alignment says the sentence starts, decode it, and compare to the
+# sentence. Then do it again 45 s later, where the answer is known to be wrong.
+# The gap between the two is the signal — absolute CER confounds transcript
+# quality with recording quality, since an old noisy tape decodes badly however
+# well it is timed.
+#
+# Run per lesson rather than per series because it turned out to vary by series
+# far more than by aligner. On identical samples of 100 sentences with the same
+# aligner: تفسير جزء عمّ scored a gap of **+0.318** with 51% of sentences under
+# 0.50 CER, while شرح كتاب التوحيد scored **+0.043** with 17% — and that series
+# scored +0.049 with the *old* aligner too, so no amount of alignment work moves
+# it. Sampling one series and trusting the rest would have shipped that.
+CORRESPONDENCE_SAMPLES = 40
+CORRESPONDENCE_WINDOW_SECONDS = 6.0
+CORRESPONDENCE_SHIFT_SECONDS = 45.0
+#: Shorter sentences decode too noisily to score.
+CORRESPONDENCE_MIN_CHARS = 25
+#: Fewer scorable sentences than this and the measurement is not worth trusting.
+CORRESPONDENCE_MIN_SAMPLES = 12
 
 
 def normalise(text: str) -> str:
@@ -186,6 +234,10 @@ class Aligner:
         return torch.cat(pieces, dim=0) if pieces else torch.zeros(0, 1)
 
     @torch.inference_mode()
+    def decode_text(self, emission: torch.Tensor) -> str:
+        """What the model heard in this window, as plain text."""
+        return " ".join(word for word, _ in self.decode_words(emission))
+
     def decode_words(self, emission: torch.Tensor) -> list[tuple[str, int]]:
         """Greedy CTC over a window: each recognised word and the frame it starts.
 
@@ -426,6 +478,75 @@ def find_anchors(
     return anchors
 
 
+def cer(reference: str, hypothesis: str) -> float:
+    """Levenshtein distance / reference length, on the match-only form."""
+    ref, hyp = normalise(reference), normalise(hypothesis)
+    if not ref:
+        return 1.0
+    previous = list(range(len(hyp) + 1))
+    for i, r in enumerate(ref, 1):
+        current = [i]
+        for j, h in enumerate(hyp, 1):
+            current.append(
+                min(previous[j] + 1, current[j - 1] + 1, previous[j - 1] + (r != h))
+            )
+        previous = current
+    return previous[-1] / len(ref)
+
+
+def measure_correspondence(
+    aligner: Aligner,
+    emission: torch.Tensor,
+    sentences: list[Sentence],
+    times: dict[int, float],
+    seed: int,
+) -> dict | None:
+    """Whether this lesson's text is what is being said in this recording.
+
+    Costs almost nothing: the emissions are already computed, so each sample is
+    an argmax over a six-second slice of them.
+    """
+    scorable = [
+        s
+        for s in sentences
+        if s.index in times and len(normalise(s.text)) >= CORRESPONDENCE_MIN_CHARS
+    ]
+    if len(scorable) < CORRESPONDENCE_MIN_SAMPLES:
+        return None
+    picked = random.Random(seed).sample(
+        scorable, min(CORRESPONDENCE_SAMPLES, len(scorable))
+    )
+
+    def heard_at(seconds: float) -> str:
+        first = max(int(seconds * FRAMES_PER_SECOND), 0)
+        last = min(
+            first + int(CORRESPONDENCE_WINDOW_SECONDS * FRAMES_PER_SECOND),
+            emission.shape[0],
+        )
+        if last - first < 2:
+            return ""
+        return aligner.decode_text(emission[first:last])
+
+    aligned, shifted = [], []
+    for sentence in picked:
+        at = times[sentence.index]
+        aligned.append(cer(sentence.text, heard_at(at)))
+        shifted.append(cer(sentence.text, heard_at(at + CORRESPONDENCE_SHIFT_SECONDS)))
+    if not aligned:
+        return None
+
+    here = statistics.median(aligned)
+    elsewhere = statistics.median(shifted)
+    return {
+        "samples": len(picked),
+        "cer": round(here, 3),
+        "cer_shifted": round(elsewhere, 3),
+        # The only number that travels: a gap near zero means the timestamps
+        # carry no information about this recording.
+        "gap": round(elsewhere - here, 3),
+    }
+
+
 @dataclass
 class Coverage:
     """How well a lesson could be *bounded* — which is not what `measured` says.
@@ -581,7 +702,7 @@ def align_segment(
 
 def align_lesson(
     lesson: dict, aligner: Aligner, texts_dir: Path, log
-) -> tuple[dict[int, float], Coverage] | None:
+) -> tuple[dict[int, float], Coverage, dict | None] | None:
     url = lesson.get("audio_url")
     if not url:
         return None
@@ -619,6 +740,10 @@ def align_lesson(
             aligner, emission, section["sentences"], float(start), end, times, coverage
         )
 
+    correspondence = measure_correspondence(
+        aligner, emission, [s for sec in sections for s in sec["sentences"]],
+        times, seed=len(times),
+    )
     worst = coverage.worst_unbounded
     log(
         f"  placed {len(times)}/{script['count']} sentences"
@@ -628,8 +753,13 @@ def align_lesson(
             if worst > MAX_SEGMENT_SECONDS
             else " · fully bounded"
         )
+        + (
+            f" · correspondence gap {correspondence['gap']:+.3f}"
+            if correspondence
+            else " · correspondence not measurable"
+        )
     )
-    return times, coverage
+    return times, coverage, correspondence
 
 
 def main() -> int:
@@ -682,7 +812,7 @@ def main() -> int:
                 continue
             if not result or not result[0]:
                 continue
-            times, coverage = result
+            times, coverage, correspondence = result
             lesson["sentence_times"] = {
                 str(k): round(v, 2) for k, v in sorted(times.items())
             }
@@ -692,6 +822,7 @@ def main() -> int:
             lesson["alignment"] = {
                 "anchors": coverage.anchors,
                 "unbounded_seconds": round(coverage.worst_unbounded, 1),
+                **({"correspondence": correspondence} if correspondence else {}),
             }
             dirty = True
             done += 1
