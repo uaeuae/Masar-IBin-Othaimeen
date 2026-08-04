@@ -199,4 +199,58 @@ describe('buildLessonText', () => {
     expect(buildLessonText(lesson({ chapters: [] }))).toBeNull();
     expect(buildLessonText(lesson({ chapters: [{ start_seconds: 5, title: 'مدخل', body: '' }] }))).toBeNull();
   });
+
+  describe('synced', () => {
+    // The distinction this whole change exists for: a lesson walked blind
+    // across an hour of audio carries a measured time on every sentence and is
+    // still minutes wrong. 376 of 386 shipped assets were in that state while
+    // the app called them precisely synced, because `measured` was all it had.
+    const aligned = (alignment: unknown, count = 6) =>
+      buildLessonText(
+        lesson({
+          duration_seconds: 3600,
+          alignment: alignment as never,
+          sentence_times: Object.fromEntries(
+            Array.from({ length: count }, (_, i) => [String(i), i * 100]),
+          ),
+          chapters: [
+            { start_seconds: 0, title: 'تفسير الآيات (1-11)', body: 'كلام المفسر هنا. '.repeat(200) },
+            { start_seconds: 1800, title: 'تفسير الآيات (12-16)', body: 'وتتمة الكلام هنا. '.repeat(200) },
+          ],
+        }),
+      );
+
+    it('is set when every span the aligner placed was bounded', () => {
+      const text = aligned({ anchors: 4, unbounded_seconds: 0 });
+      expect(text!.measured).toBeGreaterThan(0);
+      expect(text!.synced).toBe(true);
+    });
+
+    it('is absent when a long span had to be walked blind', () => {
+      const text = aligned({ anchors: 0, unbounded_seconds: 5400 });
+      // Still measured — that is exactly why counting sentences misleads.
+      expect(text!.measured).toBeGreaterThan(0);
+      expect(text!.synced).toBeUndefined();
+    });
+
+    it('is absent for a lesson aligned before coverage was recorded', () => {
+      // The 376. Guessing in their favour would preserve the bug, so an
+      // unknown lesson is untrusted rather than assumed good.
+      expect(aligned(undefined)!.synced).toBeUndefined();
+    });
+
+    it('is absent when nothing was measured at all', () => {
+      const text = buildLessonText(
+        lesson({
+          duration_seconds: 900,
+          chapters: [
+            { start_seconds: 0, title: 'تفسير الآيات (1-11)', body: 'كلام المفسر هنا. '.repeat(200) },
+            { start_seconds: 400, title: 'تفسير الآيات (12-16)', body: 'وتتمة الكلام هنا. '.repeat(200) },
+          ],
+        }),
+      );
+      expect(text!.measured).toBeUndefined();
+      expect(text!.synced).toBeUndefined();
+    });
+  });
 });

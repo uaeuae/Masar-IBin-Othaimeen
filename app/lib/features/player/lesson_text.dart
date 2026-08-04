@@ -17,6 +17,7 @@ class LessonText {
     required this.kind,
     required this.sections,
     this.measured = 0,
+    this.synced = false,
   }) : sentences = [for (final section in sections) ...section.sentences];
 
   final String lessonId;
@@ -27,9 +28,15 @@ class LessonText {
   /// interpolated between markers.
   final int measured;
 
-  /// True when the highlight is tracking measured times, so the UI can drop
-  /// the «تقريبية» hedge.
-  bool get isMeasured => measured > 0 && measured >= sentences.length ~/ 2;
+  /// Whether those times can actually be followed along to.
+  ///
+  /// Not the same question as [measured], and conflating the two is what
+  /// shipped a lesson that was minutes out of step while the player claimed
+  /// exact sync. A lesson the aligner had to walk blind across an hour comes
+  /// back with a time on every sentence — 407 of 407, on the lesson this was
+  /// reported for — and every one of them can be wrong. The catalog decides
+  /// this upstream, where it knows whether each span was bounded at both ends.
+  final bool synced;
 
   /// Every sentence in playback order — what the highlight indexes into.
   final List<TextSentence> sentences;
@@ -90,6 +97,10 @@ class LessonText {
       kind: kind ?? LessonTextKind.matn,
       sections: sections,
       measured: (json['measured'] as num?)?.toInt() ?? 0,
+      // Absent means no: an asset built before the aligner recorded its
+      // coverage cannot vouch for itself, and that is the whole population
+      // whose drift this exists to catch.
+      synced: json['synced'] == true,
     );
   }
 }

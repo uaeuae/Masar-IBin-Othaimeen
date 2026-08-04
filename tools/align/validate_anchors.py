@@ -37,6 +37,8 @@ import torch
 
 from align_lessons import (
     FRAMES_PER_SECOND,
+    MAX_ANCHOR_DEPTH,
+    Coverage,
     Aligner,
     align_segment,
     find_anchors,
@@ -92,9 +94,11 @@ def main() -> int:
             times: dict[int, float] = {}
             mark, clock = 0, 0.0
             for position, seconds in [*kept, (len(sentences), total)]:
+                # depth at the cap: the held-out anchors must stay held out,
+                # so the segment may not go looking for them again.
                 align_segment(
                     aligner, emission, sentences[mark:position], clock, seconds,
-                    times, anchored=True,
+                    times, Coverage(), depth=MAX_ANCHOR_DEPTH,
                 )
                 mark, clock = position, seconds
 

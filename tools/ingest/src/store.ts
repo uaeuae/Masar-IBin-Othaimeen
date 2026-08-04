@@ -37,6 +37,21 @@ export interface StoredLesson {
    * back to interpolation between markers, which drifts.
    */
   sentence_times?: Record<string, number> | null;
+  /**
+   * How well the aligner could *bound* this lesson, written alongside
+   * `sentence_times` by the same run.
+   *
+   * Needed because `sentence_times` alone cannot distinguish a lesson placed
+   * inside real bounds from one walked blind across an hour — both come back
+   * with a number on every sentence. `unbounded_seconds` is the longest span
+   * that had no bound at either end; 0 means every time is trustworthy.
+   * Absent on lessons aligned before this was recorded.
+   */
+  alignment?: {
+    /** Segment bounds recovered from the audio by `find_anchors`. */
+    anchors: number;
+    unbounded_seconds: number;
+  } | null;
   chapters?: StoredChapter[];
   /**
    * Flat lesson transcript, for sources that publish the text without markers

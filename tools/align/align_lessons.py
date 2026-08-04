@@ -33,7 +33,7 @@ resumable and `npm run build:texts` picks them up.
 from __future__ import annotations
 
 import argparse
-import difflib
+import bisect
 import gzip
 import json
 import re
@@ -73,24 +73,30 @@ WINDOW_TRUST = 0.6
 # into the next for an hour.
 #
 # So anchors are recovered from the audio instead: greedy-decode the segment,
-# match the recognised words against the transcript's, and every long run of
+# match what was recognised against the transcript, and every unambiguous
 # agreement is a place where we know what is being said and when. Those become
 # segment bounds, which puts a marker-less source back into the case the aligner
 # was built for.
 #
-# A run this long is required before a match is trusted. Arabic religious prose
-# repeats short formulas constantly — «صلى الله عليه وسلم» is four words on its
-# own — so shorter runs match the wrong instance; raising it costs anchors and
-# lengthens the unbounded stretches between them. Measured on binbaz, paired
-# over 96 sentences (validate_decode gap): 3 -> +0.068, 4 -> +0.109,
-# 5 -> +0.113. Three is worse than doing nothing at all (+0.069).
-ANCHOR_WORDS = 5
-# The anchor rarely lands on a sentence's first word. When it lands a few words
-# in, the sentence's start is estimated by stepping back that many words in the
-# recognised text. That extrapolation assumes the two word streams run 1:1 over
-# the step, which only holds for a short one — allowing 16 buys more anchors and
-# measures worse for it (+0.099 against +0.113).
-ANCHOR_BACKOFF_WORDS = 8
+# Matching is done on CHARACTERS, not words. Word matching needs the decode to
+# agree about where words end, and on this material it does not — «كل أمة» is
+# recognised as the single token «قلكلمه». It cost a 91-minute lesson all but 8
+# of its anchors, every one of them in the first third, leaving the 50 minutes
+# after minute 40 to be walked blind. That is where a reader reported the
+# highlight coming apart, and the characters were there the whole time.
+#
+#: Seed length in characters. A seed has to occur exactly once on each side —
+#: that is what makes a match unambiguous without any scoring — so it cannot be
+#: short. Measured on the reference lesson, by anchors found and by the worst
+#: span left unanchored: 10 -> 1,170 seeds / 3.8 min, 12 -> 770 / 6.5 min,
+#: 14 -> 489 / 21.8 min, 18 -> 189 / 26.5 min.
+ANCHOR_NGRAM = 10
+# A seed rarely lands on a sentence's first character. When it lands further in,
+# the sentence's start is dated from the seed's own time — an approximation that
+# only stays honest over a short backoff, so a seed deep inside a sentence is
+# discarded rather than extrapolated back.
+#: Characters, not words: the stream this indexes into has no spaces in it.
+ANCHOR_BACKOFF_CHARS = 60
 # Boundaries are pulled this much earlier than measured. Forced alignment cannot
 # place a token before the window starts, so a boundary that is slightly late
 # clips the sentence it opens, while one that is slightly early costs nothing.
@@ -102,6 +108,17 @@ ANCHOR_RATE_BAND = (0.3, 3.0)
 # Anchors closer together than this are not worth a separate segment; the first
 # one already bounds the error well enough.
 ANCHOR_MIN_SPACING_SECONDS = 1.0
+#: How many times a span may be re-anchored inside its own pieces.
+#:
+#: One pass used to be the rule, on the reasoning that the match is exhaustive
+#: so there is nothing left to find. That holds only for the stream it was
+#: given, and a narrower window is a different problem: seeds must be unique on
+#: each side, so a repeated phrase that is ambiguous across a whole lesson can
+#: be the only occurrence inside one of its pieces, and the rate band is
+#: recomputed from the piece rather than the lesson. Each level is nearly free —
+#: `decode_words` is an argmax over emissions already in memory, and the n-gram
+#: index is over a shorter stream than its parent's.
+MAX_ANCHOR_DEPTH = 3
 
 
 def normalise(text: str) -> str:
@@ -280,11 +297,23 @@ def find_anchors(
 ) -> list[tuple[int, float]]:
     """Segment bounds recovered from the audio, for a section no markers bound.
 
-    Greedy-decodes the window and matches the recognised words against the
-    transcript's. difflib's matching blocks are a longest-common-subsequence, so
-    they are monotonic by construction — a run of agreement cannot be matched to
-    an earlier moment than the run before it, which is exactly the property a
-    segment bound needs.
+    Greedy-decodes the window and matches what was recognised against the
+    transcript **as characters, not words**.
+
+    Word-level matching was tried first and quietly fails on the material this
+    library is made of. It needs the decode to agree with the transcript about
+    where words *end*, and a model listening to recitation and connected speech
+    does not: «كل أمة» comes back as one token, «قلكلمه». One 91-minute lesson
+    yielded 8 anchors, all in its first third, and every one of the 50 minutes
+    after minute 40 went unmatched — which is precisely where a reader reported
+    the highlight coming apart. The characters are all there; only the spaces
+    are wrong. Dropping to a character stream found 1,170 seeds across the same
+    lesson and cut its worst unanchored span from 58 minutes to 6.5.
+
+    Seeds are n-grams occurring exactly **once on each side**, so a match is
+    unambiguous without any scoring, and the chain through them is a longest
+    increasing subsequence — monotonic by construction, which is what a segment
+    bound requires.
 
     Returns (position in `sentences`, seconds) pairs, increasing in both.
     """
@@ -293,48 +322,86 @@ def find_anchors(
     if last - first < 2:
         return []
     heard = aligner.decode_words(emission[first:last])
-    if len(heard) < ANCHOR_WORDS:
+    if not heard:
         return []
 
-    # Transcript words, each tagged with the sentence it belongs to and how far
-    # into that sentence it sits, so a match can be turned back into a sentence
-    # start rather than just a word start.
-    written: list[str] = []
+    # Audio side: one character stream, each character carrying the frame of
+    # the word it came from.
+    audio_chars: list[str] = []
+    audio_frame: list[int] = []
+    for word, frame in heard:
+        for char in word:
+            audio_chars.append(char)
+            audio_frame.append(frame)
+
+    # Text side: the same, each character carrying the sentence it belongs to
+    # and how far into that sentence it sits — so a match can be turned back
+    # into a sentence *start* rather than a position in the middle of one.
+    text_chars: list[str] = []
     origin: list[tuple[int, int]] = []
     for position, sentence in enumerate(sentences):
         offset = 0
         for raw in normalise(sentence.text).split():
-            word = "".join(c for c in raw if c.isalpha())
-            if word:
-                written.append(word)
+            for char in "".join(c for c in raw if c.isalpha()):
+                text_chars.append(char)
                 origin.append((position, offset))
                 offset += 1
-    if len(written) < ANCHOR_WORDS:
+    if len(audio_chars) < ANCHOR_NGRAM or len(text_chars) < ANCHOR_NGRAM:
         return []
 
-    matcher = difflib.SequenceMatcher(
-        None, written, [w for w, _ in heard], autojunk=False
+    audio = "".join(audio_chars)
+    text = "".join(text_chars)
+
+    audio_at: dict[str, list[int]] = {}
+    for i in range(len(audio) - ANCHOR_NGRAM + 1):
+        audio_at.setdefault(audio[i : i + ANCHOR_NGRAM], []).append(i)
+    text_at: dict[str, list[int]] = {}
+    for i in range(len(text) - ANCHOR_NGRAM + 1):
+        text_at.setdefault(text[i : i + ANCHOR_NGRAM], []).append(i)
+
+    seeds = sorted(
+        (positions[0], audio_at[gram][0])
+        for gram, positions in text_at.items()
+        if len(positions) == 1 and len(audio_at.get(gram, ())) == 1
     )
-    # Each sentence keeps its best candidate — the one whose match landed
-    # closest to the sentence's own first word, since that needs the least
-    # extrapolation back.
+    if not seeds:
+        return []
+
+    # Longest increasing subsequence over the audio index: the seeds are already
+    # sorted by text position, so this keeps the largest subset that also
+    # advances through the audio, and drops any that would go backwards.
+    tails: list[int] = []
+    tail_audio: list[int] = []
+    previous = [-1] * len(seeds)
+    for i, (_, audio_index) in enumerate(seeds):
+        slot = bisect.bisect_left(tail_audio, audio_index)
+        previous[i] = tails[slot - 1] if slot else -1
+        if slot == len(tails):
+            tails.append(i)
+            tail_audio.append(audio_index)
+        else:
+            tails[slot] = i
+            tail_audio[slot] = audio_index
+    chain: list[tuple[int, int]] = []
+    cursor = tails[-1] if tails else -1
+    while cursor != -1:
+        chain.append(seeds[cursor])
+        cursor = previous[cursor]
+    chain.reverse()
+
+    # Each sentence keeps the seed that landed closest to its own first
+    # character, since that needs the least extrapolation back.
     best: dict[int, tuple[int, float]] = {}
-    for block in matcher.get_matching_blocks():
-        if block.size < ANCHOR_WORDS:
+    for text_index, audio_index in chain:
+        position, offset = origin[text_index]
+        if offset > ANCHOR_BACKOFF_CHARS:
             continue
-        for step in range(block.size):
-            position, offset = origin[block.a + step]
-            if offset > ANCHOR_BACKOFF_WORDS:
-                continue
-            source = block.b + step - offset
-            if source < 0:
-                continue
-            seconds = (first + heard[source][1]) / FRAMES_PER_SECOND
-            if offset:
-                seconds -= ANCHOR_MARGIN_SECONDS
-            previous = best.get(position)
-            if previous is None or offset < previous[0]:
-                best[position] = (offset, seconds)
+        seconds = (first + audio_frame[audio_index]) / FRAMES_PER_SECOND
+        if offset:
+            seconds -= ANCHOR_MARGIN_SECONDS
+        existing = best.get(position)
+        if existing is None or offset < existing[0]:
+            best[position] = (offset, seconds)
 
     # Keep only a chain that advances through both the text and the audio at a
     # rate this section could actually have been spoken at.
@@ -359,6 +426,31 @@ def find_anchors(
     return anchors
 
 
+@dataclass
+class Coverage:
+    """How well a lesson could be *bounded* — which is not what `measured` says.
+
+    Every sentence the aligner touches gets a number, including the ones it
+    walked blind across an hour of audio; counting them says nothing about
+    whether they are right. What separates a trustworthy lesson from a drifting
+    one is whether every span it placed was bounded at both ends — by a real
+    marker, by an audio-derived anchor, or by being short enough for one
+    trellis. So record the spans that were not.
+    """
+
+    anchors: int = 0
+    #: Lengths, in seconds, of the spans that had to be walked blind.
+    unbounded: list[float] = None  # type: ignore[assignment]
+
+    def __post_init__(self) -> None:
+        if self.unbounded is None:
+            self.unbounded = []
+
+    @property
+    def worst_unbounded(self) -> float:
+        return max(self.unbounded, default=0.0)
+
+
 def align_segment(
     aligner: Aligner,
     emission: torch.Tensor,
@@ -366,7 +458,8 @@ def align_segment(
     start_seconds: float,
     end_seconds: float,
     times: dict[int, float],
-    anchored: bool = False,
+    coverage: Coverage,
+    depth: int = 0,
 ) -> None:
     """Places one section's sentences inside the audio its markers bound."""
     if not sentences:
@@ -396,14 +489,21 @@ def align_segment(
 
     # Too long for one trellis, and (for a marker-less source) with no real
     # bounds to trap the error. Recover bounds from the audio and recurse, which
-    # puts each piece back into the short, bounded case above. `anchored` stops
-    # a piece that is still too long from being decoded a second time — there
-    # are no further anchors to find inside one, by construction.
-    if not anchored:
+    # puts each piece back into the short, bounded case above.
+    #
+    # Each piece is re-anchored in turn rather than only the parent, up to
+    # MAX_ANCHOR_DEPTH: a gap left by the parent's pass is its own span, with its
+    # own speech rate, and anchors the parent rejected can be found inside it.
+    # Termination is by construction — find_anchors returns positions strictly
+    # inside (mark, len) and times strictly inside (clock, end), so every child
+    # is shorter than its parent in both text and audio — with the depth cap as
+    # a backstop.
+    if depth < MAX_ANCHOR_DEPTH:
         anchors = find_anchors(
             aligner, emission, sentences, start_seconds, end_seconds
         )
         if anchors:
+            coverage.anchors += len(anchors)
             mark, clock = 0, start_seconds
             for position, seconds in [*anchors, (len(sentences), end_seconds)]:
                 align_segment(
@@ -413,7 +513,8 @@ def align_segment(
                     clock,
                     seconds,
                     times,
-                    anchored=True,
+                    coverage,
+                    depth=depth + 1,
                 )
                 mark, clock = position, seconds
             return
@@ -428,6 +529,10 @@ def align_segment(
     # and measured no better (gap +0.114 against +0.113 over 96 sentences), so
     # the simpler rule stays.
     span = max(end_seconds - start_seconds, 1.0)
+    # The one path whose output cannot be trusted, so it is the one worth
+    # recording: everything placed from here on is carried on the previous
+    # window's error. Measured at 135 s off at the median and up to 690 s.
+    coverage.unbounded.append(span)
     tokens_per_second = max(sum(len(s.tokens) for s in sentences) / span, 1.0)
     sub_frames = int(MAX_SEGMENT_SECONDS * FRAMES_PER_SECOND)
     cursor = first
@@ -476,7 +581,7 @@ def align_segment(
 
 def align_lesson(
     lesson: dict, aligner: Aligner, texts_dir: Path, log
-) -> dict[int, float] | None:
+) -> tuple[dict[int, float], Coverage] | None:
     url = lesson.get("audio_url")
     if not url:
         return None
@@ -495,6 +600,7 @@ def align_lesson(
         return None
 
     times: dict[int, float] = {}
+    coverage = Coverage()
     sections = script["sections"]
     for position, section in enumerate(sections):
         start = section["start"]
@@ -510,11 +616,20 @@ def align_lesson(
         if end <= start:
             continue
         align_segment(
-            aligner, emission, section["sentences"], float(start), end, times
+            aligner, emission, section["sentences"], float(start), end, times, coverage
         )
 
-    log(f"  placed {len(times)}/{script['count']} sentences")
-    return times
+    worst = coverage.worst_unbounded
+    log(
+        f"  placed {len(times)}/{script['count']} sentences"
+        f" · {coverage.anchors} anchors"
+        + (
+            f" · WALKED BLIND across {worst / 60:.0f} min — not trustworthy"
+            if worst > MAX_SEGMENT_SECONDS
+            else " · fully bounded"
+        )
+    )
+    return times, coverage
 
 
 def main() -> int:
@@ -561,14 +676,22 @@ def main() -> int:
 
             log(f"{path.stem} #{lesson['position']}")
             try:
-                times = align_lesson(lesson, aligner, args.texts_dir, log)
+                result = align_lesson(lesson, aligner, args.texts_dir, log)
             except Exception as error:  # noqa: BLE001 — one bad lesson must not stop the run
                 log(f"  ! failed: {error}")
                 continue
-            if not times:
+            if not result or not result[0]:
                 continue
+            times, coverage = result
             lesson["sentence_times"] = {
                 str(k): round(v, 2) for k, v in sorted(times.items())
+            }
+            # Travels with the times so `build:texts` can tell the app whether
+            # to trust them. Without it the app can only count sentences that
+            # got a number, which is true of a drifting lesson too.
+            lesson["alignment"] = {
+                "anchors": coverage.anchors,
+                "unbounded_seconds": round(coverage.worst_unbounded, 1),
             }
             dirty = True
             done += 1

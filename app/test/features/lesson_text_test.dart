@@ -37,6 +37,8 @@ final _transcript = {
   'lesson': 'fx-riyd-01',
   'kind': 'transcript',
   'duration': 2580,
+  // Bounded alignment: the panel may point at a sentence.
+  'synced': true,
   'sections': [
     {
       'start': 54,
@@ -96,6 +98,7 @@ final _longTranscript = {
   'kind': 'transcript',
   'duration': 2580,
   'measured': 60,
+  'synced': true,
   'sections': [
     {
       'start': 0,
@@ -169,7 +172,7 @@ void main() {
       await openLesson(tester, 'fx-riyd-01');
 
       expect(find.text('الجملة الأولى.'), findsOneWidget);
-      expect(find.text('مزامنة تقريبية · المس جملة للانتقال'), findsOneWidget);
+      expect(find.text('المس جملة للانتقال'), findsOneWidget);
     },
   );
 
@@ -367,6 +370,74 @@ void main() {
       expect(find.textContaining('الجملة رقم 1.'), findsOneWidget);
     },
   );
+
+  group('a lesson whose timing cannot be trusted', () {
+    // The state that shipped: 407 of 407 sentences carried a measured time and
+    // the panel claimed exact sync, while the aligner had walked 58 minutes of
+    // the lesson blind. The text is right; only the clock is wrong. So the
+    // panel becomes a reading page rather than a confident liar.
+    final unsynced = {
+      'lesson': 'fx-riyd-01',
+      'kind': 'transcript',
+      'duration': 2580,
+      'measured': 3, // every sentence measured — and still not followable
+      'sections': _transcript['sections'],
+    };
+    List<Override> overrides() => [
+      lessonTextRepositoryProvider.overrideWithValue(
+        LessonTextRepository(
+          bundle: _TextBundle({'assets/texts/fx-riyd-01.json.gz': unsynced}),
+        ),
+      ),
+    ];
+
+    Color? backgroundOf(WidgetTester tester, String sentence) {
+      final container = tester.widget<AnimatedContainer>(
+        find
+            .ancestor(
+              of: find.text(sentence),
+              matching: find.byType(AnimatedContainer),
+            )
+            .first,
+      );
+      return (container.decoration as BoxDecoration?)?.color;
+    }
+
+    testApp('says so, and highlights nothing', overrides: overrides(), (
+      tester,
+      app,
+    ) async {
+      await openText(tester, 'fx-riyd-01');
+      expect(find.text('لا توجد مزامنة لهذا الدرس — النص للقراءة'), findsOneWidget);
+      expect(find.text('المس جملة للانتقال'), findsNothing);
+      // The text itself is still all there to read.
+      expect(find.text('الجملة الأولى.'), findsOneWidget);
+      expect(find.text('الجملة الثالثة.'), findsOneWidget);
+
+      app.audioEngine.positionsController.add(const Duration(seconds: 60));
+      await tester.pumpAndSettle();
+      expect(backgroundOf(tester, 'الجملة الأولى.'), Colors.transparent);
+      expect(backgroundOf(tester, 'الجملة الثانية.'), Colors.transparent);
+      expect(backgroundOf(tester, 'الجملة الثالثة.'), Colors.transparent);
+    });
+
+    testApp('ignores taps rather than seeking somewhere wrong', overrides: overrides(), (
+      tester,
+      app,
+    ) async {
+      await openText(tester, 'fx-riyd-01');
+
+      await tester.tap(find.text('الجملة الثالثة.'));
+      await tester.pumpAndSettle();
+      // A tap seeks to the sentence's own timestamp. Offering that is the same
+      // untruth as the highlight — pointing at a moment we cannot vouch for.
+      expect(app.audioEngine.seeks, isEmpty);
+
+      await tester.longPress(find.text('الجملة الثالثة.'));
+      await tester.pumpAndSettle();
+      expect(find.text('تمت المزامنة من هذا الموضع'), findsNothing);
+    });
+  });
 
   testApp('a lesson with no text says so instead of hiding the control', (
     tester,

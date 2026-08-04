@@ -33,6 +33,20 @@ export interface LessonText {
   duration: number | null;
   /** Sentences whose time was measured by forced alignment, not estimated. */
   measured?: number;
+  /**
+   * Whether those times can actually be followed along to.
+   *
+   * Distinct from `measured`, and the distinction is the whole point: a lesson
+   * walked blind across an hour of audio has a number on every sentence and is
+   * still minutes wrong. `measured` counts sentences that got a value; this
+   * says every value was bounded at both ends — by a marker, by an
+   * audio-derived anchor, or by a span short enough to align in one piece.
+   *
+   * Absent means false. A lesson that is not synced still ships its text; the
+   * app shows it as a reading page with no highlight, which is honest, rather
+   * than highlighting a sentence that is not the one being spoken.
+   */
+  synced?: boolean;
   sections: TextSection[];
 }
 
@@ -268,6 +282,7 @@ export function buildLessonText(lesson: StoredLesson): LessonText | null {
       kind: 'transcript',
       duration,
       ...(flatAligned > 0 ? { measured: flatAligned } : {}),
+      ...(isSynced(lesson, flatAligned) ? { synced: true } : {}),
       sections: flatSections,
     };
   }
@@ -310,11 +325,38 @@ export function buildLessonText(lesson: StoredLesson): LessonText | null {
     lesson: lesson.youtube_video_id,
     kind,
     duration,
-    // `measured` tells the app the highlight can be trusted, so it can stop
-    // calling the sync approximate.
+    // How many sentences carry a measured time — a coverage figure, and NOT a
+    // statement that the highlight can be followed. `synced` is that statement.
     ...(aligned > 0 ? { measured: aligned } : {}),
+    ...(isSynced(lesson, aligned) ? { synced: true } : {}),
     sections,
   };
+}
+
+/**
+ * The longest span the aligner had to walk without bounds at both ends. Beyond
+ * this, its own error compounds window over window — measured at 135 s off at
+ * the median and up to 690 s (tools/align/README.md), which is the difference
+ * between reading along and being lied to.
+ *
+ * Mirrors `MAX_SEGMENT_SECONDS` in align_lessons.py, where the same number
+ * decides whether a span gets walked in the first place.
+ */
+const MAX_TRUSTED_UNBOUNDED_SECONDS = 300;
+
+/**
+ * Whether a lesson's times are good enough to follow along to.
+ *
+ * A lesson aligned before `alignment` was recorded has no coverage to read, and
+ * is treated as unsynced rather than assumed good: that is exactly the
+ * population — 376 of 386 assets — whose drift this whole change exists to fix,
+ * so guessing in its favour would preserve the bug.
+ */
+function isSynced(lesson: StoredLesson, aligned: number): boolean {
+  if (aligned <= 0) return false;
+  const coverage = lesson.alignment;
+  if (!coverage) return false;
+  return (coverage.unbounded_seconds ?? Infinity) <= MAX_TRUSTED_UNBOUNDED_SECONDS;
 }
 
 /**

@@ -23,11 +23,18 @@ const _stepWithin = 6;
 /// The read-along panel: the lesson's text with the sentence being spoken
 /// highlighted, taking the artwork card's place in the audio player.
 ///
-/// Sentence times on a transcript are *estimated* between the markers the
-/// foundation timestamps — exact at every section start, drifting a little in
-/// between. Hence «مزامنة تقريبية» on screen, tap-to-seek, and long-press to
-/// re-anchor when the estimate has slipped. Matn text carries no per-sentence
-/// time at all (the speech isn't in it), so there the whole passage lights up.
+/// Three modes, because the timing behind a lesson comes in three strengths:
+///
+/// - **transcript, synced** — each sentence was placed inside bounds the
+///   aligner could verify. The spoken sentence is highlighted, the view follows
+///   it, a tap seeks to it, and a long-press re-anchors a drifted estimate.
+/// - **transcript, not synced** — the text is right and the times are not, so
+///   the panel becomes a reading page: no highlight, no auto-scroll, no seeking.
+///   Showing a confident highlight that is minutes out is worse than showing
+///   none, and that is what shipped.
+/// - **matn** — the speech is not in this text at all, so there is nothing to
+///   time below section level; the whole passage between two of the
+///   foundation's own markers lights up, which is exact.
 class LessonTextView extends StatefulWidget {
   const LessonTextView({
     super.key,
@@ -85,6 +92,15 @@ class _LessonTextViewState extends State<LessonTextView> {
 
   int _indexNow() => widget.text.indexAt(widget.position - _syncOffset);
 
+  /// Whether this lesson's times are good enough to point at a sentence with.
+  ///
+  /// Matn text never claimed per-sentence timing — the speech is not in it, so
+  /// it lights the whole passage its markers bound, and those markers are the
+  /// foundation's own. A transcript claims to know each sentence, and cannot
+  /// always back it; see [LessonText.synced].
+  bool get _canFollow =>
+      widget.text.kind == LessonTextKind.matn || widget.text.synced;
+
   bool get _autoScrollAllowed {
     final last = _lastManualScroll;
     return last == null || DateTime.now().difference(last) > _manualScrollGrace;
@@ -109,7 +125,7 @@ class _LessonTextViewState extends State<LessonTextView> {
   /// Each pass re-reads the extent, which is a better estimate every time more
   /// rows have been measured, so this converges instead of guessing twice.
   void _scrollTo(int index, {int attempt = 0}) {
-    if (index < 0 || !_autoScrollAllowed || !mounted) return;
+    if (index < 0 || !_canFollow || !_autoScrollAllowed || !mounted) return;
     final context = _keys[index]?.currentContext;
     if (context != null) {
       Scrollable.ensureVisible(
@@ -202,7 +218,14 @@ class _LessonTextViewState extends State<LessonTextView> {
       }
       for (final sentence in section.sentences) {
         final i = index++;
-        final highlighted = isMatn
+        // Unsynced: nothing is highlighted, and nothing is tappable either. A
+        // tap seeks to the sentence's own timestamp, so offering it would be
+        // the same untruth as the highlight — pointing at a moment we cannot
+        // vouch for. Long-press re-anchors against the estimate, which is
+        // meaningless when there is no estimate worth correcting.
+        final highlighted = !_canFollow
+            ? false
+            : isMatn
             ? sectionIndex == currentSection
             : i == _current;
         final key = _keys.putIfAbsent(i, GlobalKey.new);
@@ -211,11 +234,15 @@ class _LessonTextViewState extends State<LessonTextView> {
             key: key,
             sentence: sentence,
             highlighted: highlighted,
-            onTap: () {
-              final t = sentence.t ?? sentence.sectionStart;
-              if (t != null) widget.onSeek(Duration(seconds: t));
-            },
-            onLongPress: isMatn ? null : () => _resync(sentence),
+            onTap: !_canFollow
+                ? null
+                : () {
+                    final t = sentence.t ?? sentence.sectionStart;
+                    if (t != null) widget.onSeek(Duration(seconds: t));
+                  },
+            onLongPress: (isMatn || !_canFollow)
+                ? null
+                : () => _resync(sentence),
           ),
         );
       }
@@ -232,21 +259,28 @@ class _LessonTextViewState extends State<LessonTextView> {
               Icon(
                 isMatn
                     ? Icons.menu_book_rounded
-                    : widget.text.isMeasured
+                    : _canFollow
                     ? Icons.graphic_eq_rounded
                     : Icons.subject_rounded,
                 size: 13,
                 color: masar.textFaint,
               ),
               const SizedBox(width: 6),
-              Text(
-                isMatn
-                    ? 'نص المتن'
-                    : widget.text.isMeasured
-                    ? 'المس جملة للانتقال'
-                    : 'مزامنة تقريبية · المس جملة للانتقال',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: masar.textFaint,
+              Flexible(
+                child: Text(
+                  isMatn
+                      ? 'نص المتن'
+                      : _canFollow
+                      ? 'المس جملة للانتقال'
+                      // Says the text is here to read, not that the sync is
+                      // merely rough — «تقريبية» invited the reader to trust a
+                      // highlight that could be minutes out.
+                      : 'لا توجد مزامنة لهذا الدرس — النص للقراءة',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: masar.textFaint,
+                  ),
                 ),
               ),
             ],
@@ -339,13 +373,15 @@ class _SentenceRow extends StatelessWidget {
     super.key,
     required this.sentence,
     required this.highlighted,
-    required this.onTap,
+    this.onTap,
     this.onLongPress,
   });
 
   final TextSentence sentence;
   final bool highlighted;
-  final VoidCallback onTap;
+
+  /// Null on an unsynced lesson: the row is text to read, not a seek target.
+  final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
   @override
