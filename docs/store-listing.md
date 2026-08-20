@@ -84,10 +84,8 @@ browsing → **4+**.
 > paths. Audio streams directly from the two scholars' official
 > charitable foundations' own servers (sounds.binothaimeen.net,
 > files.zadapps.info); nothing is re-hosted. Every lesson is attributed
-> to its scholar and source in the UI, and the foundations have been
-> contacted for permission [update with date sent / approval received].
-> The app requires no account and collects no data, so no demo login is
-> needed.
+> to its scholar and source in the UI. The app requires no account and
+> collects no data, so no demo login is needed.
 
 ## Screenshots (to produce — see RELEASE-CHECKLIST.md)
 

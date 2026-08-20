@@ -33,17 +33,6 @@
       folder `/docs`; needs repo **admin**) and switch the stores to
       `https://uaeuae.github.io/Masar-IBin-Othaimeen/privacy/`
 
-## Etiquette / goodwill (recommended before launch)
-The app now streams from **two** foundations' own hosts, so both deserve the
-note — same message, and each is credited by name in الإعدادات → المصادر والإسناد
-and on its scholar's page.
-- [ ] Email مؤسسة الشيخ محمد بن صالح العثيمين الخيرية: non-profit intent,
-      official-embed-only playback, prominent attribution, offer to comply
-      with any request (contact via binothaimeen.net)
-- [ ] Email مؤسسة الشيخ عبد العزيز بن باز الخيرية: same, noting the app streams
-      their audio from files.zadapps.info rather than re-hosting it
-      (contact via binbaz.org.sa)
-
 ## Final verification on a clean device
 - [ ] `flutter build appbundle --release`, install via internal testing track
 - [ ] First run in **airplane mode**: bundled catalog renders, journeys browsable
@@ -62,10 +51,6 @@ and on its scholar's page.
 ## iOS App Store (production release)
 Prereq: TestFlight pipeline already ships every push to main (codemagic.yaml);
 promoting to the store is metadata + review, no new build machinery.
-- [ ] **Send both permission letters first** (docs/outreach/) and wait for a
-      reply — the letters promise to ask before publishing, and App Review
-      (guideline 5.2.1) can demand proof of content rights at any time. Keep
-      any written approval; attach it in App Review notes if asked.
 - [ ] Privacy policy hosted (see Store listing above) and linked in
       App Store Connect → App Privacy
 - [ ] App Privacy questionnaire: **Data Not Collected** (matches the policy;
