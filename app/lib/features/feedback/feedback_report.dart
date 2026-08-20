@@ -9,7 +9,7 @@ const kFeedbackEmail = 'm@pixeldrive.ae';
 /// The app's own version, in one place. Settings used to print «Masar v1.0.0»
 /// while pubspec said 0.1.0+1 — a report carrying the wrong version is worse
 /// than one carrying none, since it sends you looking at the wrong build.
-const kAppVersion = String.fromEnvironment('APP_VERSION', defaultValue: '0.1.0');
+const kAppVersion = String.fromEnvironment('APP_VERSION', defaultValue: '1.0.0');
 
 /// What the reader is telling us.
 enum ReportKind {
