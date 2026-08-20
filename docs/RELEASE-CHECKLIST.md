@@ -24,7 +24,11 @@
 - [ ] **Data safety form**: no data collected; declare only what's true.
       If Sentry is added later, declare crash diagnostics then.
 - [ ] Content rating questionnaire (education/religion, no UGC)
-- [ ] Privacy policy URL — host `docs/privacy-policy.md` (e.g. GitHub Pages) and link it
+- [ ] Privacy policy URL — enable GitHub Pages on the repo (Settings → Pages →
+      Deploy from a branch → `main`, folder `/docs`; needs repo **admin**), then
+      the policy is at
+      `https://uaeuae.github.io/Masar-IBin-Othaimeen/privacy/`
+      (`docs/privacy/index.html`, kept in sync with `docs/privacy-policy.md`)
 
 ## Etiquette / goodwill (recommended before launch)
 The app now streams from **two** foundations' own hosts, so both deserve the
@@ -51,6 +55,31 @@ and on its scholar's page.
       `masar-asc-key` → register bundle id `app.masar.talib` → create the
       App Store Connect app → run the ios-testflight workflow)
 - [ ] Add yourself as internal tester; install via the TestFlight app
+
+## iOS App Store (production release)
+Prereq: TestFlight pipeline already ships every push to main (codemagic.yaml);
+promoting to the store is metadata + review, no new build machinery.
+- [ ] **Send both permission letters first** (docs/outreach/) and wait for a
+      reply — the letters promise to ask before publishing, and App Review
+      (guideline 5.2.1) can demand proof of content rights at any time. Keep
+      any written approval; attach it in App Review notes if asked.
+- [ ] Privacy policy hosted (see Store listing above) and linked in
+      App Store Connect → App Privacy
+- [ ] App Privacy questionnaire: **Data Not Collected** (matches the policy;
+      revisit if Sentry ships later)
+- [ ] Version: bump `app/pubspec.yaml` to `1.0.0+N` (N > last TestFlight
+      build number)
+- [ ] Listing (Arabic primary): name «مسار طالب العلم», subtitle, description,
+      keywords, support URL (the GitHub repo works), copyright line naming the
+      foundations as content owners
+- [ ] Screenshots: 6.7"/6.9" iPhone required; iPad screenshots too unless the
+      target is restricted to iPhone-only in Xcode (Info.plist currently
+      declares iPad orientations)
+- [ ] Age rating questionnaire (education/religion, no UGC → 4+)
+- [ ] App Store Connect → select the TestFlight build → Add for Review →
+      Submit (first review typically 1–3 days)
+- [ ] After approval: release manually or automatically; verify the store
+      listing renders RTL text correctly
 
 ## Later (Phase 2)
 - Sentry crash reporting (then update data-safety form)
