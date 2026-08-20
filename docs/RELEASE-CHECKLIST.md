@@ -24,11 +24,14 @@
 - [ ] **Data safety form**: no data collected; declare only what's true.
       If Sentry is added later, declare crash diagnostics then.
 - [ ] Content rating questionnaire (education/religion, no UGC)
-- [ ] Privacy policy URL — enable GitHub Pages on the repo (Settings → Pages →
-      Deploy from a branch → `main`, folder `/docs`; needs repo **admin**), then
-      the policy is at
+- [x] Privacy policy URL — **live at
+      <https://aalkendi90.github.io/masar-privacy/>** (GitHub Pages on the
+      `aalkendi90/masar-privacy` repo, a copy of `docs/privacy/index.html`;
+      when the policy changes, update `docs/privacy-policy.md`,
+      `docs/privacy/index.html`, and that repo's `index.html` together).
+      Optional later: enable Pages on this repo (Settings → Pages → `main`,
+      folder `/docs`; needs repo **admin**) and switch the stores to
       `https://uaeuae.github.io/Masar-IBin-Othaimeen/privacy/`
-      (`docs/privacy/index.html`, kept in sync with `docs/privacy-policy.md`)
 
 ## Etiquette / goodwill (recommended before launch)
 The app now streams from **two** foundations' own hosts, so both deserve the
