@@ -153,8 +153,17 @@ workflows:
             fi
 
             for attempt in $(seq 1 10); do
-              if app-store-connect beta-groups add-build "$BUILD_ID" --beta-group Masar; then
+              if out=$(app-store-connect beta-groups add-build "$BUILD_ID" --beta-group Masar 2>&1); then
                 echo "Build $PROJECT_BUILD_NUMBER is in the Masar group."
+                exit 0
+              fi
+              echo "$out"
+              # Once a build is attached to an App Store submission, Apple
+              # refuses internal-group changes ("Cannot add internal group to
+              # a build"). The internal testers already received it at the
+              # publishing step, so this is success wearing an error message.
+              if echo "$out" | grep -q "Cannot add internal group to a build"; then
+                echo "Build $PROJECT_BUILD_NUMBER is bound to a store submission; group unchanged, nothing to do."
                 exit 0
               fi
               echo "add-build failed (attempt $attempt/10); retrying"
